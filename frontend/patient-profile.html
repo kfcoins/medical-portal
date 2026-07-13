@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile — PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 24px; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+    /* Cards */
+    .card { background: var(--surface); border-radius: 16px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border); margin-bottom: 24px; }
+    .card-title { font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; color: #4A5568; }
+    .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; background: #F8FAFC; transition: 0.2s; outline: none; }
+    .form-control:focus { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 3px rgba(26, 99, 73, 0.1); }
+    .form-control:disabled { background: #E2E8F0; cursor: not-allowed; color: #64748B; }
+
+    .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Sora', sans-serif; font-size: 0.95rem; }
+    .btn-save:hover { background: var(--primary-light); }
+    .btn-save:disabled { background: #94A3B8; cursor: not-allowed; }
+
+    .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; display: none; }
+    .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="patient-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="patient-prescriptions.html" class="nav-link"><i class="fas fa-file-prescription"></i> My Prescriptions</a>
+      <a href="patient-store.html" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
+      <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
+      <a href="patient-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="patient-profile.html" class="nav-link active"><i class="fas fa-user-circle"></i> Profile</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">My Profile</div>
+      <div class="header-actions">
+        <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Patient Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+
+      <!-- Personal Information -->
+      <div class="card">
+        <h3 class="card-title"><i class="fas fa-user"></i> Personal Information</h3>
+        <form id="profileForm" onsubmit="updateProfile(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" disabled>
+              <small style="color: var(--text-muted); margin-top: 4px; display: block;">Email cannot be changed.</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="phone" required>
+            </div>
+          </div>
+          <div style="text-align: right; margin-top: 16px;">
+            <button type="submit" class="btn-save" id="saveProfileBtn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Security Settings -->
+      <div class="card">
+        <h3 class="card-title"><i class="fas fa-lock"></i> Security Settings</h3>
+        <form id="passwordForm" onsubmit="changePassword(event)">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" required>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPassword" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+            </div>
+          </div>
+          <div style="text-align: right; margin-top: 16px;">
+            <button type="submit" class="btn-save" id="savePasswordBtn">Change Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    let user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'patient') {
+      window.location.href = 'login.html';
+    } else {
+      updateUIWithUser();
+    }
+
+    function updateUIWithUser() {
+      const name = user.first_name + ' ' + user.last_name;
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+
+      document.getElementById('firstName').value = user.first_name || '';
+      document.getElementById('lastName').value = user.last_name || '';
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('phone').value = user.phone || '';
+    }
+
+    function showAlert(message, type = 'success') {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.textContent = message;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.style.display = 'block';
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 5000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function updateProfile(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveProfileBtn');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      const payload = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        phone: document.getElementById('phone').value
+      };
+
+      try {
+        const res = await fetch('../backend/index.php?route=patient/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          user = data.user;
+          localStorage.setItem('user', JSON.stringify(user));
+          updateUIWithUser();
+          showAlert('Profile information updated successfully!', 'success');
+        } else {
+          showAlert(data.message || 'Failed to update profile.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred.', 'error');
+      } finally {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+      }
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('savePasswordBtn');
+      btn.textContent = 'Changing...';
+      btn.disabled = true;
+
+      const payload = {
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      };
+
+      try {
+        const res = await fetch('../backend/index.php?route=patient/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('Password changed successfully!', 'success');
+          document.getElementById('passwordForm').reset();
+        } else {
+          showAlert(data.message || 'Failed to change password.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred.', 'error');
+      } finally {
+        btn.textContent = 'Change Password';
+        btn.disabled = false;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>

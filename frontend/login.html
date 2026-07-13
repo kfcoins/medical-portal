@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login â€” PharmaTrust Ghana</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body { min-height: 100vh; background: #0A2F24; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow-x: hidden; }
+    body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(45,154,106,0.15) 0%, transparent 40%), radial-gradient(circle at bottom left, rgba(45,154,106,0.15) 0%, transparent 40%); pointer-events: none; z-index: 0; }
+    .auth-container { width: 100%; max-width: 440px; position: relative; z-index: 1; }
+    .auth-logo { text-align: center; margin-bottom: 32px; color: white; }
+    .auth-logo .logo-icon { margin: 0 auto 12px; width: 56px; height: 56px; font-size: 1.5rem; border-radius: 14px; background: #2D9A6A; display: flex; align-items: center; justify-content: center; }
+    .auth-logo h2 { font-family: 'Sora', sans-serif; font-size: 1.5rem; color: white; }
+    .auth-logo p { color: rgba(255,255,255,0.6); font-size: 0.88rem; margin-top: 6px; }
+    .auth-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset; }
+    .auth-card h3 { font-family: 'Sora', sans-serif; font-size: 1.4rem; color: #0F1923; margin-bottom: 8px; }
+    .auth-card .subtitle { color: #6B7D8C; font-size: 0.88rem; margin-bottom: 28px; }
+    .role-tabs { display: flex; background: #F4F7FA; border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+    .role-tab { flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #6B7D8C; cursor: pointer; transition: 0.2s; }
+    .role-tab.active { background: white; color: #2D9A6A; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .input-group { position: relative; margin-bottom: 16px; }
+    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6B7D8C; font-size: 0.9rem; }
+    .input-group input { width: 100%; padding: 13px 14px 13px 40px; border: 1.5px solid transparent; background: #F4F7FA; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #0F1923; outline: none; transition: 0.2s; }
+    .input-group input:focus { background: white; border-color: #2D9A6A; box-shadow: 0 0 0 3px rgba(45,154,106,0.1); }
+    .forgot { text-align: right; margin-bottom: 20px; }
+    .forgot a { font-size: 0.82rem; color: #2D9A6A; font-weight: 600; }
+    .auth-footer { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #6B7D8C; }
+    .auth-footer a { color: #2D9A6A; font-weight: 600; }
+    .form-error { display: none; background: #FFF5F5; color: #E53E3E; padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; border: 1px solid #FED7D7; align-items: center; gap: 8px; font-weight: 500; }
+    .form-error.visible { display: flex; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .otp-inputs { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 24px; }
+    .otp-box { width: 45px; height: 50px; border: 1.5px solid #E8EDF2; border-radius: 8px; text-align: center; font-size: 1.4rem; font-weight: 700; color: #0F1923; background: #FAFCFE; font-family: 'Sora', sans-serif; transition: all 0.2s ease; padding: 0; }
+    .otp-box:focus { outline: none; border-color: #2D9A6A; box-shadow: 0 0 0 3px rgba(45, 154, 106, 0.1); background: #FFFFFF; }
+    .otp-subtitle { color: #6B7D8C; font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+    .otp-change-number { font-size: 0.8rem; font-weight: 600; color: #3182CE; text-decoration: none; display: inline-block; margin-bottom: 16px; }
+    .otp-change-number:hover { text-decoration: underline; }
+
+    @media(max-width: 768px) {
+      body { padding: 24px 16px; }
+      .auth-card { padding: 32px 24px; }
+    }
+    @media(max-width: 480px) {
+      .auth-card { padding: 24px 16px; }
+      .auth-logo h2 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-shield-virus"></i></div>
+      <h2>PharmaTrust Ghana</h2>
+      <p>Secure login to your dashboard</p>
+    </div>
+    <div class="auth-card">
+      <h3>Welcome Back</h3>
+      <p class="subtitle">Sign in to continue to your account</p>
+
+      <form id="loginForm">
+        <div id="loginError" class="form-error">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="loginErrorText">Invalid credentials</span>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" name="identifier" placeholder="Agent ID, Email, or Phone" required/>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" placeholder="Password" required/>
+        </div>
+        <div class="forgot"><a href="forgot-password.html">Forgot password?</a></div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <!-- OTP Verification Form (Hidden initially) -->
+      <form id="otpForm" style="display: none;">
+        <div id="otpError" class="form-error">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="otpErrorText">Invalid OTP</span>
+        </div>
+        
+        <div style="text-align: left; margin-bottom: 8px;">
+          <h4 style="font-family: 'Sora', sans-serif; font-size: 1.2rem; color: #0F1923; margin-bottom: 6px;">Enter OTP Code</h4>
+          <p class="otp-subtitle">
+            Please enter the OTP code sent to your registered email address:<br>
+            <strong id="displayEmail" style="color: #0F1923; letter-spacing: 0.5px;"></strong>
+          </p>
+        </div>
+        
+        <div class="otp-inputs" id="otpInputsContainer">
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" required autocomplete="off" />
+        </div>
+        <input type="hidden" id="otpCode" required />
+
+        <button type="submit" class="btn btn-primary btn-full">
+          Verify OTP
+        </button>
+
+        <p class="auth-footer" style="margin-top: 16px;">
+          Didn't receive it? <a href="#" id="resendOtpBtn" onclick="resendOTP(event)">Resend OTP</a>
+        </p>
+      </form>
+
+      <p class="auth-footer" style="margin-top: 24px;">Don't have an account? <a href="register.html">Register</a></p>
+    </div>
+  </div>
+  <script>
+    const API_BASE = '../backend/api';
+
+
+
+    let currentEmail = '';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const verifyEmail = params.get('verify');
+      if (verifyEmail) {
+        currentEmail = verifyEmail;
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('otpForm').style.display = 'block';
+        
+        document.querySelector('.auth-card h3').style.display = 'none';
+        document.querySelector('.auth-card .subtitle').style.display = 'none';
+        document.getElementById('displayEmail').textContent = currentEmail;
+        startResendCountdown();
+      }
+    });
+
+    // Hide error when user starts typing again
+    document.querySelectorAll('#loginForm input').forEach(input => {
+      input.addEventListener('input', () => {
+        document.getElementById('loginError').classList.remove('visible');
+      });
+    });
+
+    // Handle OTP Box Input Logic
+    const otpBoxes = document.querySelectorAll('.otp-box');
+    const hiddenOtpInput = document.getElementById('otpCode');
+
+    otpBoxes.forEach((box, index) => {
+      box.addEventListener('input', (e) => {
+        document.getElementById('otpError').classList.remove('visible');
+        box.value = box.value.replace(/[^0-9]/g, '');
+        if (box.value && index < otpBoxes.length - 1) {
+          otpBoxes[index + 1].focus();
+        }
+        updateHiddenOtp();
+      });
+
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && index > 0) {
+          otpBoxes[index - 1].focus();
+        }
+      });
+
+      box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+        if (pastedData) {
+          for (let i = 0; i < pastedData.length; i++) {
+            if (otpBoxes[i]) otpBoxes[i].value = pastedData[i];
+          }
+          if (pastedData.length < 6) otpBoxes[pastedData.length].focus();
+          else otpBoxes[5].focus();
+          updateHiddenOtp();
+        }
+      });
+    });
+
+    function updateHiddenOtp() {
+      let code = '';
+      otpBoxes.forEach(b => code += b.value);
+      hiddenOtpInput.value = code;
+    }
+
+    let countdownInterval;
+    function startResendCountdown() {
+      const btn = document.getElementById('resendOtpBtn');
+      if (!btn) return;
+      let timeLeft = 60;
+      
+      btn.style.pointerEvents = 'none';
+      btn.style.color = '#A0AEC0';
+      btn.style.textDecoration = 'none';
+      btn.innerText = `Resend OTP (${timeLeft}s)`;
+      
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          btn.style.pointerEvents = 'auto';
+          btn.style.color = '#2D9A6A';
+          btn.style.textDecoration = '';
+          btn.innerText = 'Resend OTP';
+        } else {
+          btn.innerText = `Resend OTP (${timeLeft}s)`;
+        }
+      }, 1000);
+    }
+
+    async function resendOTP(e) {
+      e.preventDefault();
+      if (!currentEmail) return;
+      
+      const link = e.target;
+      if (link.style.pointerEvents === 'none') return;
+      
+      const originalText = link.innerText;
+      link.innerText = 'Sending...';
+      link.style.pointerEvents = 'none';
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/resend-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast(data.message || 'A new OTP has been sent to your email.', 'success');
+          otpBoxes.forEach(b => b.value = '');
+          if (otpBoxes[0]) otpBoxes[0].focus();
+          startResendCountdown();
+        } else {
+          showToast(data.message || 'Failed to resend OTP', 'error');
+          link.innerText = originalText;
+          link.style.pointerEvents = 'auto';
+        }
+      } catch (error) {
+        showToast('Connection error. Please try again.', 'error');
+        link.innerText = originalText;
+        link.style.pointerEvents = 'auto';
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const errDiv = document.getElementById('loginError');
+      errDiv.classList.remove('visible');
+      
+      const formData = new FormData(e.target);
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      try {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+        submitBtn.disabled = true;
+
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.requires_verification) {
+          currentEmail = data.email;
+          document.getElementById('loginForm').style.display = 'none';
+          document.getElementById('otpForm').style.display = 'block';
+          
+          document.querySelector('.auth-card h3').style.display = 'none';
+          document.querySelector('.auth-card .subtitle').style.display = 'none';
+          document.getElementById('displayEmail').textContent = currentEmail;
+
+          showToast('OTP sent to your email. Please verify.', 'info');
+          
+          startResendCountdown();
+          
+          setTimeout(() => {
+            if (otpBoxes[0]) otpBoxes[0].focus();
+          }, 100);
+        } else {
+          showToast(data.message || 'Login failed. Please check your credentials.', 'error');
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('A network error occurred. Please try again later.', 'error');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Handle OTP Submission
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errDiv = document.getElementById('otpError');
+      errDiv.classList.remove('visible');
+
+      const otp = document.getElementById('otpCode').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+
+      try {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        submitBtn.disabled = true;
+
+        const response = await fetch(`${API_BASE}/auth/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail, otp: otp })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          
+          submitBtn.innerHTML = '<i class="fas fa-check"></i> Verified!';
+          submitBtn.style.background = '#2D9A6A';
+          showToast('Login successful! Redirecting...', 'success');
+          
+          setTimeout(() => {
+            const role = data.role;
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            
+            if (redirect === 'checkout' && role === 'patient') {
+              window.location.href = 'index.html?redirect=checkout';
+            } else {
+              if (role === 'admin') window.location.href = 'admin-dashboard.html';
+              else if (role === 'pharmacy') window.location.href = 'pharmacy-dashboard.html';
+              else window.location.href = 'patient-dashboard.html';
+            }
+          }, 1000);
+        } else {
+          showToast(data.message || 'Invalid OTP code.', 'error');
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        showToast('Network error. Try again.', 'error');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>

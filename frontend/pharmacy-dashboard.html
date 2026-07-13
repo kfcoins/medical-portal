@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy Dashboard â€” PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 20px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #4FD1C5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    /* Dashboard Grid */
+    .content-area { padding: 32px; }
+    
+    .welcome-card { background: linear-gradient(135deg, #1B2B48, #2B4C7E); color: white; padding: 32px; border-radius: 16px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(27, 43, 72, 0.15); display: flex; justify-content: space-between; align-items: center; }
+    .welcome-text h2 { font-family: 'Sora', sans-serif; font-size: 1.75rem; margin-bottom: 8px; font-weight: 600; }
+    .welcome-text p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
+    .welcome-icon { font-size: 4rem; opacity: 0.2; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .stat-icon.blue { background: #EBF8FF; color: #3182CE; }
+    .stat-icon.green { background: #F0FFF4; color: #38A169; }
+    .stat-icon.purple { background: #FAF5FF; color: #805AD5; }
+    .stat-info h4 { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+    .stat-info .value { font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
+
+    .section-card { background: var(--surface); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 32px; text-align: center; margin-bottom: 32px; }
+    .section-card h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
+    .section-card p { color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-prescription-bottle-alt"></i> PharmaAgent
+    </div>
+    <div class="nav-links">
+      <a href="pharmacy-dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="pharmacy-inventory.html" class="nav-link"><i class="fas fa-box"></i> Inventory</a>
+      <a href="pharmacy-orders.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="pharmacy-prescriptions.html" class="nav-link"><i class="fas fa-clipboard-list"></i> Prescriptions</a>
+      <a href="pharmacy-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="pharmacy-analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="pharmacy-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Pharmacy Dashboard</div>
+      <div class="header-actions">
+        <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Pharmacy Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="welcome-card">
+        <div class="welcome-text">
+          <h2 id="welcomeTitle">Welcome back!</h2>
+          <p>Here is what's happening at your pharmacy today.</p>
+        </div>
+        <div class="welcome-icon">
+          <i class="fas fa-store-alt"></i>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-pills"></i></div>
+          <div class="stat-info">
+            <h4>Products in Stock</h4>
+            <div class="value" id="productsInStock">-</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-file-prescription"></i></div>
+          <div class="stat-info">
+            <h4>Pending Prescriptions</h4>
+            <div class="value" id="pendingPrescriptions">-</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-history"></i></div>
+          <div class="stat-info">
+            <h4>Recent Orders</h4>
+            <div class="value" id="recentOrders">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>This page is under construction</h3>
+        <p>You have successfully authenticated as a Pharmacy Agent. The full inventory and prescription management features are currently being developed and will be available in the next release.</p>
+        <div style="margin-top: 32px; color: #4FD1C5; font-size: 3rem;">
+          <i class="fas fa-tools"></i>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'pharmacy') {
+      window.location.href = 'login.html';
+    } else {
+      const name = user.pharmacy_name || (user.first_name + ' ' + user.last_name);
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+      document.getElementById('welcomeTitle').textContent = `Welcome back, ${name}!`;
+
+      fetchDashboardStats();
+    }
+
+    async function fetchDashboardStats() {
+      try {
+        const response = await fetch('/Mansro/backend/api/agents/dashboard/stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.stats) {
+          document.getElementById('productsInStock').textContent = data.stats.productsInStock;
+          document.getElementById('pendingPrescriptions').textContent = data.stats.pendingPrescriptions;
+          document.getElementById('recentOrders').textContent = data.stats.totalOrders;
+        }
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>

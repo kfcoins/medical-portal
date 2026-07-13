@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy Orders — PharmaTrust Ghana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+      .modal-overlay.active { display: flex; }
+      .modal { background: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+      .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; }
+      .modal-header h3 { margin: 0; font-size: 1.25rem; color: #1e293b; }
+      .close-modal { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b; }
+      .close-modal:hover { color: #0f172a; }
+      .delivery-content { width: 100%; }
+      .delivery-details-grid { display: flex; flex-direction: column; gap: 12px; }
+      .detail-card { display: flex; align-items: flex-start; gap: 16px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.2s ease; }
+      .detail-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+      .icon-circle { width: 40px; height: 40px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+      .detail-card:nth-child(2) .icon-circle { background: #dcfce7; color: #16a34a; }
+      .detail-card:nth-child(3) .icon-circle { background: #f3e8ff; color: #9333ea; }
+      .detail-info { display: flex; flex-direction: column; gap: 4px; }
+      .detail-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+      .detail-value { font-size: 0.95rem; color: #1e293b; font-weight: 500; line-height: 1.5; }
+    </style>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 20px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #4FD1C5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; }
+
+    .orders-card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    
+    .table-responsive { overflow-x: auto; margin-top: 16px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; background: #FFFFFF; overflow: hidden; border-radius: 8px; }
+    th { padding: 18px 24px; font-weight: 600; color: #1A202C; background: #D8E2ED; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; border: none; }
+    td { padding: 18px 24px; border: none; vertical-align: middle; color: #2D3748; font-weight: 500; font-size: 0.95rem; }
+    tbody tr:nth-child(even) { background: #F4F7F9; }
+    tbody tr { transition: background 0.2s; }
+    tbody tr:hover { background: #E2E8F0; }
+
+    /* Custom Checkbox */
+    input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border: 2px solid #8B9BB4; border-radius: 4px; outline: none; cursor: pointer; position: relative; background: transparent; transition: 0.2s; vertical-align: middle; }
+    input[type="checkbox"]:checked { background-color: #3182CE; border-color: #3182CE; }
+    input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+    #selectAll:checked::after { content: ''; position: absolute; left: 4px; top: 7px; width: 8px; height: 2px; background: white; border: none; transform: none; }
+    
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-paid { background: #D1FAE5; color: #059669; }
+    .badge-unpaid { background: #FEE2E2; color: #DC2626; }
+    
+    .payment-select {
+      appearance: none;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      text-align: center;
+    }
+    .payment-select.paid { background: #D1FAE5; color: #059669; }
+    .payment-select.unpaid { background: #FEE2E2; color: #DC2626; }
+
+    .status-select { padding: 6px 16px; border-radius: 20px; border: none; font-size: 0.75rem; font-weight: 700; cursor: pointer; appearance: none; outline: none; background-color: #f1f1f1; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+    .status-select:focus { box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5); }
+    .status-select.pending { background: #FEF3C7; color: #D97706; }
+    .status-select.confirmed { background: #DBEAFE; color: #2563EB; }
+    .status-select.dispensed { background: #EDE9FE; color: #7C3AED; }
+    .status-select.delivered { background: #D1FAE5; color: #059669; }
+    .status-select.cancelled { background: #FEE2E2; color: #DC2626; }
+
+    .order-items { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+    
+    .no-orders { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-prescription-bottle-alt"></i> PharmaAgent
+    </div>
+    <div class="nav-links">
+      <a href="pharmacy-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="pharmacy-inventory.html" class="nav-link"><i class="fas fa-box"></i> Inventory</a>
+      <a href="pharmacy-orders.html" class="nav-link active"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="pharmacy-prescriptions.html" class="nav-link"><i class="fas fa-clipboard-list"></i> Prescriptions</a>
+      <a href="pharmacy-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="pharmacy-analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="pharmacy-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Orders Management</div>
+      <div class="header-actions">
+        <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Pharmacy Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="orders-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0;">Recent Customer Orders</h3>
+          <div style="display: flex; gap: 15px; align-items: center;">
+            <select id="sortOrders" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #E5E7EB; background: #fff; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;" onchange="handleSortOrders()">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="price_high">Highest Price</option>
+              <option value="price_low">Lowest Price</option>
+              <option value="status_pending">Status (Pending First)</option>
+              <option value="status_delivered">Status (Delivered First)</option>
+            </select>
+            <div id="batchActions" style="display: none; gap: 10px; align-items: center;">
+            <span id="selectedCount" style="font-weight: 600; font-size: 0.9rem; color: var(--text-muted);">0 selected</span>
+            <select id="batchStatus" class="status-select">
+              <option value="">-- Update Status --</option>
+              <option value="pending">PENDING</option>
+              <option value="confirmed">CONFIRMED</option>
+              <option value="dispensed">DISPENSED</option>
+              <option value="delivered">DELIVERED</option>
+              <option value="cancelled">CANCELLED</option>
+            </select>
+            <button onclick="applyBatchUpdate()" style="padding: 6px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Apply</button>
+          </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="ordersTable">
+            <thead>
+              <tr>
+                <th width="40"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                <th>Order ID</th>
+                <th>Patient</th>
+                <th>Items</th>
+                <th>Delivery</th>
+                <th>Total (GHS)</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr>
+                <td colspan="9" class="no-orders"><i class="fas fa-spinner fa-spin"></i> Loading pharmacy orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="deliveryModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> Delivery Details</h3>
+        <button class="close-modal" onclick="closeDeliveryModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="deliveryDetailsContent" class="delivery-content">
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    function viewDeliveryDetails(details) {
+      let phone = "N/A", email = "N/A", address = details;
+
+      if (details.includes(' | Phone: ') || details.includes(' | Email: ')) {
+          const parts = details.split(' | ');
+          address = parts[0] || '';
+          parts.forEach(p => {
+              if (p.startsWith('Phone: ')) phone = p.replace('Phone: ', '').trim();
+              if (p.startsWith('Email: ')) email = p.replace('Email: ', '').trim();
+          });
+      } else if (details.includes('📞 Phone:') || details.includes('📧 Email:')) {
+          const lines = details.split('\n');
+          let inAddress = false;
+          address = '';
+          lines.forEach(line => {
+              if (line.startsWith('📞 Phone:')) phone = line.replace('📞 Phone:', '').trim();
+              else if (line.startsWith('📧 Email:')) email = line.replace('📧 Email:', '').trim();
+              else if (line.startsWith('📍 Delivery Location:')) inAddress = true;
+              else if (inAddress && line.trim()) address += line.trim() + ', ';
+          });
+          address = address.replace(/,\s*$/, '');
+      } else if (details === 'sdvfsefcs' || details.trim() === '') {
+          address = 'No valid address provided.';
+      }
+
+      const html = `
+          <div class="delivery-details-grid">
+              <div class="detail-card">
+                  <div class="icon-circle"><i class="fas fa-map-marked-alt"></i></div>
+                  <div class="detail-info">
+                      <span class="detail-label">Location Address</span>
+                      <span class="detail-value">${address || 'Not Provided'}</span>
+                  </div>
+              </div>
+              <div class="detail-card">
+                  <div class="icon-circle"><i class="fas fa-phone-alt"></i></div>
+                  <div class="detail-info">
+                      <span class="detail-label">Contact Number</span>
+                      <span class="detail-value">${phone}</span>
+                  </div>
+              </div>
+              <div class="detail-card">
+                  <div class="icon-circle"><i class="fas fa-envelope"></i></div>
+                  <div class="detail-info">
+                      <span class="detail-label">Email Address</span>
+                      <span class="detail-value" style="word-break: break-all;">${email}</span>
+                  </div>
+              </div>
+          </div>
+      `;
+
+      document.getElementById('deliveryDetailsContent').innerHTML = html;
+      document.getElementById('deliveryModal').classList.add('active');
+    }
+    
+    function closeDeliveryModal() {
+      document.getElementById('deliveryModal').classList.remove('active');
+    }
+
+    window.allOrders = [];
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      if (!token || !user || user.role !== 'pharmacy') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const name = user.pharmacy_name || (user.first_name + ' ' + user.last_name);
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+
+      try {
+        const res = await fetch('../backend/index.php?route=orders/my', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        const tbody = document.getElementById('ordersBody');
+        
+        if (data.success && data.orders.length > 0) {
+          window.allOrders = data.orders;
+          renderOrders(window.allOrders);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="9" class="no-orders">No orders have been placed for your pharmacy yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8" class="no-orders" style="color:red">Failed to load orders.</td></tr>';
+      }
+    });
+
+    function renderOrders(ordersToRender) {
+      const tbody = document.getElementById('ordersBody');
+      tbody.innerHTML = '';
+      if (ordersToRender.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="no-orders">No orders found.</td></tr>';
+          return;
+      }
+      
+      ordersToRender.forEach(order => {
+        const tr = document.createElement('tr');
+            
+            let itemsHtml = order.items.map(i => `${i.quantity}x ${i.medicine.name}`).join('<br>');
+            
+            let paymentHtml;
+            let methodText = 'Pay on Delivery';
+            if (order.payment_method !== 'cash') {
+                 if (order.payment_method === 'card') methodText = 'Card (Paystack)';
+                 else if (order.payment_method === 'momo' || order.payment_method === 'mobile_money') methodText = 'Momo (Paystack)';
+                 else if (order.payment_method === 'bank') methodText = 'Bank Transfer (Paystack)';
+                 else methodText = order.payment_method.toUpperCase() + ' (Paystack)';
+            }
+                             
+            // Anything other than cash is an online payment handled via Paystack and cannot be changed manually
+            if (order.payment_method !== 'cash') {
+              let staticClass = order.payment_status === 'paid' ? 'badge-paid' : 'badge-unpaid';
+              paymentHtml = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                  <span class="badge ${staticClass}">${order.payment_status.toUpperCase()}</span>
+                  <span style="font-size: 0.65rem; color: #6B7280; font-weight: 600; text-transform: uppercase;">${methodText}</span>
+                </div>
+              `;
+            } else {
+              let paymentClass = order.payment_status === 'paid' ? 'paid' : 'unpaid';
+              paymentHtml = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                  <select class="payment-select ${paymentClass}" data-id="${order.id}" onchange="updatePaymentStatus(this)">
+                    <option value="unpaid" ${order.payment_status === 'unpaid' ? 'selected' : ''}>UNPAID</option>
+                    <option value="paid" ${order.payment_status === 'paid' ? 'selected' : ''}>PAID</option>
+                  </select>
+                  <span style="font-size: 0.65rem; color: #6B7280; font-weight: 600; text-transform: uppercase;">${methodText}</span>
+                </div>
+              `;
+            }
+
+            let actionBtnHtml = `<button onclick='viewDeliveryDetails(${JSON.stringify(order.delivery_address || "No delivery details provided").replace(/'/g, "&#39;")})' style="padding: 6px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px;"><i class="fas fa-truck"></i> View Details</button>`;
+            tr.innerHTML = `
+              <td><input type="checkbox" class="order-checkbox" value="${order.id}" onchange="updateBatchUI()"></td>
+              <td><strong>${order.order_no}</strong></td>
+              <td>${order.patient_name || order.patient_id}</td>
+              <td><div class="order-items">${itemsHtml}</div></td>
+              <td>${actionBtnHtml}</td>
+              <td><strong>₵${parseFloat(order.total_amount).toFixed(2)}</strong></td>
+              <td>
+                <select class="status-select ${order.status}" data-id="${order.id}" onchange="updateOrderStatus(this)">
+                  <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>PENDING</option>
+                  <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>CONFIRMED</option>
+                  <option value="dispensed" ${order.status === 'dispensed' ? 'selected' : ''}>DISPENSED</option>
+                  <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>DELIVERED</option>
+                  <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>CANCELLED</option>
+                </select>
+              </td>
+              <td>${paymentHtml}</td>
+              <td>${new Date(order.created_at).toLocaleDateString()}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+    }
+
+    function handleSortOrders() {
+      const criteria = document.getElementById('sortOrders').value;
+      let sortedOrders = [...window.allOrders];
+      
+      const statusRank = {
+        'pending': 1,
+        'confirmed': 2,
+        'dispensed': 3,
+        'delivered': 4,
+        'cancelled': 5
+      };
+      
+      if (criteria === 'newest') {
+        sortedOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      } else if (criteria === 'oldest') {
+        sortedOrders.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      } else if (criteria === 'price_high') {
+        sortedOrders.sort((a, b) => parseFloat(b.total_amount) - parseFloat(a.total_amount));
+      } else if (criteria === 'price_low') {
+        sortedOrders.sort((a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount));
+      } else if (criteria === 'status_pending') {
+        sortedOrders.sort((a, b) => (statusRank[a.status] || 99) - (statusRank[b.status] || 99));
+      } else if (criteria === 'status_delivered') {
+        sortedOrders.sort((a, b) => (statusRank[b.status] || 99) - (statusRank[a.status] || 99));
+      }
+      
+      renderOrders(sortedOrders);
+    }
+
+    async function updateOrderStatus(selectElem) {
+      const orderId = selectElem.getAttribute('data-id');
+      const newStatus = selectElem.value;
+      const token = localStorage.getItem('token');
+      
+      selectElem.className = 'status-select ' + newStatus;
+      
+      try {
+        const res = await fetch(`../backend/index.php?route=orders/${orderId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if(data.success) {
+          if (window.showToast) window.showToast('Order status updated to ' + newStatus.toUpperCase(), 'success');
+        } else {
+          if (window.showToast) window.showToast('Failed to update status: ' + data.message, 'error');
+          else alert('Failed to update status: ' + data.message);
+        }
+      } catch(e) {
+        console.error(e);
+        if (window.showToast) window.showToast('Error updating status', 'error');
+        else alert('Error updating status');
+      }
+    }
+
+    async function updatePaymentStatus(selectElem) {
+      const orderId = selectElem.getAttribute('data-id');
+      const newStatus = selectElem.value;
+      const token = localStorage.getItem('token');
+      
+      selectElem.className = 'payment-select ' + newStatus;
+      
+      try {
+        const res = await fetch(`../backend/index.php?route=orders/${orderId}/payment_status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if(data.success) {
+          if (window.showToast) window.showToast('Payment status updated to ' + newStatus.toUpperCase(), 'success');
+        } else {
+          if (window.showToast) window.showToast('Failed to update payment status: ' + data.message, 'error');
+          else alert('Failed to update payment status: ' + data.message);
+        }
+      } catch(e) {
+        console.error(e);
+        if (window.showToast) window.showToast('Error updating payment status', 'error');
+        else alert('Error updating payment status');
+      }
+    }
+
+    function toggleAll(selectAllCheckbox) {
+      const checkboxes = document.querySelectorAll('.order-checkbox');
+      checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+      updateBatchUI();
+    }
+
+    function updateBatchUI() {
+      const selected = document.querySelectorAll('.order-checkbox:checked').length;
+      const batchActions = document.getElementById('batchActions');
+      const selectedCount = document.getElementById('selectedCount');
+      
+      if (selected > 0) {
+        batchActions.style.display = 'flex';
+        selectedCount.textContent = selected + ' selected';
+      } else {
+        batchActions.style.display = 'none';
+        document.getElementById('selectAll').checked = false;
+      }
+    }
+
+    async function applyBatchUpdate() {
+      const newStatus = document.getElementById('batchStatus').value;
+      if (!newStatus) return;
+
+      const checkedBoxes = document.querySelectorAll('.order-checkbox:checked');
+      if (checkedBoxes.length === 0) return;
+
+      const orderIds = Array.from(checkedBoxes).map(cb => cb.value);
+      const token = localStorage.getItem('token');
+
+      try {
+        const res = await fetch('../backend/index.php?route=orders/batch-status', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ orderIds, status: newStatus })
+        });
+        
+        const data = await res.json();
+        if(data.success) {
+          if (window.showToast) window.showToast('Orders successfully updated to ' + newStatus.toUpperCase(), 'success');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          if (window.showToast) window.showToast('Failed to batch update: ' + data.message, 'error');
+          else alert('Failed to batch update: ' + data.message);
+        }
+      } catch(e) {
+        console.error(e);
+        if (window.showToast) window.showToast('Error applying batch update', 'error');
+        else alert('Error applying batch update');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient Dashboard â€” PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 20px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    /* Dashboard Grid */
+    .content-area { padding: 32px; }
+    
+    .welcome-card { background: var(--primary); color: white; padding: 32px; border-radius: 16px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(26, 99, 73, 0.15); display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
+    .welcome-text { position: relative; z-index: 2; }
+    .welcome-text h2 { font-family: 'Sora', sans-serif; font-size: 1.75rem; margin-bottom: 8px; font-weight: 600; }
+    .welcome-text p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
+    .welcome-icon { font-size: 8rem; opacity: 0.1; position: absolute; right: 20px; bottom: -20px; z-index: 1; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .stat-icon.blue { background: #EBF8FF; color: #3182CE; }
+    .stat-icon.green { background: #F0FFF4; color: #38A169; }
+    .stat-icon.orange { background: #FFFAF0; color: #DD6B20; }
+    .stat-info h4 { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+    .stat-info .value { font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
+
+    .stat-info .value { font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
+
+    .section-card { background: var(--surface); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 32px; margin-bottom: 32px; }
+    .section-card h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 12px 16px; background: #F8FAFC; color: #475569; font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-transform: capitalize; }
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-confirmed { background: #DBEAFE; color: #2563EB; }
+    .status-dispensed { background: #E0E7FF; color: #4F46E5; }
+    .status-delivered { background: #D1FAE5; color: #059669; }
+    .status-cancelled { background: #FEE2E2; color: #DC2626; }
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="patient-dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+      <a href="patient-prescriptions.html" class="nav-link"><i class="fas fa-file-prescription"></i> My Prescriptions</a>
+      <a href="patient-store.html" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
+      <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
+      <a href="patient-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="patient-profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">My Dashboard</div>
+      <div class="header-actions">
+        <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Patient Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="welcome-card">
+        <div class="welcome-text">
+          <h2 id="welcomeTitle">Hello!</h2>
+          <p>Find genuine medications and verify your prescriptions easily.</p>
+        </div>
+        <div class="welcome-icon">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-file-prescription"></i></div>
+          <div class="stat-info">
+            <h4>Active Prescriptions</h4>
+            <div class="value" id="activePrescriptionsCount">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="fas fa-shopping-bag"></i></div>
+          <div class="stat-info">
+            <h4>Total Orders</h4>
+            <div class="value" id="totalOrdersCount">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-info">
+            <h4>Delivered Orders</h4>
+            <div class="value" id="deliveredOrdersCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>Recent Orders</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Pharmacy</th>
+              <th>Amount (GHS)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersBody">
+            <tr><td colspan="5" style="text-align:center; color:#94A3B8;">Loading orders...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'patient') {
+      window.location.href = 'login.html';
+    } else {
+      const name = user.first_name + ' ' + user.last_name;
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+      document.getElementById('welcomeTitle').textContent = `Hello, ${user.first_name}!`;
+      
+      // Fetch dynamic stats
+      fetchPatientStats();
+    }
+
+    async function fetchPatientStats() {
+      try {
+        const response = await fetch('../backend/index.php?route=patient/dashboard/stats', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('activePrescriptionsCount').textContent = data.stats.activePrescriptions;
+          document.getElementById('totalOrdersCount').textContent = data.stats.totalOrders;
+          document.getElementById('deliveredOrdersCount').textContent = data.stats.deliveredOrders;
+          
+          const tbody = document.getElementById('recentOrdersBody');
+          if(data.recentOrders && data.recentOrders.length > 0) {
+              tbody.innerHTML = data.recentOrders.map(o => `
+                  <tr>
+                      <td>#${o.id.substring(0,8)}</td>
+                      <td>${new Date(o.created_at).toLocaleDateString()}</td>
+                      <td>${o.pharmacy_name || 'System'}</td>
+                      <td>${parseFloat(o.amount_due).toFixed(2)}</td>
+                      <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+                  </tr>
+              `).join('');
+          } else {
+              tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94A3B8;">No recent orders found.</td></tr>';
+          }
+        } else {
+          console.error('Failed to fetch stats:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching patient stats:', error);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>

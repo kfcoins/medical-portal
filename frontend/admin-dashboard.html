@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #4A47A3; /* Deep Purple for Admin */
+      --primary-light: #5B58BD;
+      --primary-hover: #F0EDF7;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar matching the design */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.3rem; background: var(--primary); color: white; letter-spacing: 0.5px; height: 80px; }
+    .sidebar-header i { font-size: 1.5rem; color: white; }
+    
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: var(--primary-hover); color: var(--primary); font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 80px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: flex-start; gap: 20px; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+    .icon-blue { background: #EBF8FF; color: #3182CE; }
+    .icon-green { background: #F0FFF4; color: #38A169; }
+    .icon-yellow { background: #FEFCBF; color: #D69E2E; }
+    .stat-info { flex: 1; }
+    .stat-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; font-family: 'Sora', sans-serif; color: var(--text); line-height: 1; }
+
+    /* Quick Links */
+    .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .action-card { background: var(--surface); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-decoration: none; color: var(--text); }
+    .action-card:hover { border-color: var(--primary); transform: translateY(-4px); }
+    .action-card i { font-size: 2rem; color: var(--primary); margin-bottom: 16px; display: block; }
+    .action-card h3 { font-family: 'Sora', sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
+    .action-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <a href="admin-approvals.html" class="nav-link"><i class="fas fa-file-signature"></i> Approvals</a>
+      <a href="admin-pharmacies.html" class="nav-link"><i class="fas fa-store"></i> Pharmacies</a>
+      <a href="admin-patients.html" class="nav-link"><i class="fas fa-users"></i> Patients</a>
+      <a href="admin-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Administrator Dashboard</div>
+      <div class="user-profile">
+        <div class="user-avatar" id="userInitial">A</div>
+        <span id="userName">Admin</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-yellow">
+            <i class="fas fa-file-signature"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Pending Approvals</div>
+            <div class="stat-value" id="pendingPharmaciesCount">0</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon icon-green">
+            <i class="fas fa-store-alt"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Active Pharmacies</div>
+            <div class="stat-value" id="activePharmaciesCount">0</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon icon-blue">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Total Patients</div>
+            <div class="stat-value" id="totalPatientsCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <h2 style="font-family: 'Sora'; font-size: 1.25rem; margin-bottom: 24px; margin-top: 16px;">Quick Actions</h2>
+      <div class="quick-links">
+        <a href="admin-approvals.html" class="action-card">
+          <i class="fas fa-check-circle"></i>
+          <h3>Review Pending Registrations</h3>
+          <p>Verify and approve new pharmacy applications</p>
+        </a>
+        <a href="admin-pharmacies.html" class="action-card">
+          <i class="fas fa-store"></i>
+          <h3>Manage Pharmacies</h3>
+          <p>View all active pharmacies and their details</p>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'admin') {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('userName').textContent = user.first_name + ' ' + user.last_name;
+      document.getElementById('userInitial').textContent = user.first_name.charAt(0);
+      fetchStats();
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch('../backend/index.php?route=admin/stats', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          document.getElementById('pendingPharmaciesCount').textContent = data.data.pendingPharmacies;
+          document.getElementById('activePharmaciesCount').textContent = data.data.activePharmacies;
+          document.getElementById('totalPatientsCount').textContent = data.data.patients;
+        }
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
