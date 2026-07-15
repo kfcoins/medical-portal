@@ -99,18 +99,20 @@ table {
   /* Chat Layout specific fixes */
   .chat-container {
     flex-direction: column !important;
+    height: calc(100vh - 120px) !important;
   }
   
   .chat-sidebar {
     width: 100% !important;
-    height: 35vh; /* Take top part of screen */
+    flex: 0 0 35% !important; 
+    min-height: 200px;
     border-right: none !important;
     border-bottom: 1px solid var(--border);
   }
   
   .chat-main {
-    flex: none !important;
-    height: 65vh; /* Take bottom part of screen */
+    width: 100% !important;
+    flex: 1 !important;
   }
   
   .chat-messages {

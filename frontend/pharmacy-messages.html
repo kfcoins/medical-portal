@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pharmacy Messages — PharmaTrust Ghana</title>
+  <title>Pharmacy Messages â€” PharmaTrust Ghana</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -85,6 +85,8 @@
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94A3B8; }
     .empty-state i { font-size: 4rem; margin-bottom: 16px; color: #CBD5E1; }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
 </head>
 <body>
 
@@ -474,26 +476,37 @@
       const price = document.getElementById('invoicePrice').value;
       const notes = document.getElementById('invoiceNotes').value;
 
-      const invoiceData = {
-        type: 'invoice',
-        name: name,
-        price: price,
-        prescription: notes
-      };
-
       try {
-        if (!wsConn || wsConn.readyState !== WebSocket.OPEN) {
-            throw new Error("WebSocket not connected");
+        const token = localStorage.getItem('token');
+        const res = await fetch('../backend/index.php?route=prescriptions/custom-invoice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            patient_id: activeContactId,
+            item_name: name,
+            price: price,
+            prescription: notes
+          })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (wsConn && wsConn.readyState === WebSocket.OPEN) {
+            wsConn.send(JSON.stringify({
+              receiver_id: activeContactId,
+              message: JSON.stringify(data.invoice.payload)
+            }));
+          }
+
+          if (window.showToast) window.showToast('Invoice sent successfully to patient!', 'success');
+          else alert('Invoice sent successfully to patient!');
+          closeInvoiceModal();
+        } else {
+          alert('Failed to send invoice: ' + data.message);
         }
-
-        wsConn.send(JSON.stringify({
-            receiver_id: activeContactId,
-            message: JSON.stringify(invoiceData)
-        }));
-
-        if (window.showToast) window.showToast('Invoice sent successfully to patient!', 'success');
-        else alert('Invoice sent successfully to patient!');
-        closeInvoiceModal();
       } catch (err) {
         console.error(err);
         alert('An error occurred. Please try again.');

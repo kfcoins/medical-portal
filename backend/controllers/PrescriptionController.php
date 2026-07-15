@@ -105,9 +105,7 @@ class PrescriptionController {
                 'rx' => 1
             ]);
 
-            // 2. Insert into messages table
-            $message_id = "MSG-" . time() . "-" . bin2hex(random_bytes(4));
-            $payload = json_encode([
+            $payload = [
                 'type' => 'invoice',
                 'medicine_id' => $medicine_id,
                 'name' => $item_name,
@@ -115,23 +113,14 @@ class PrescriptionController {
                 'prescription' => $prescription,
                 'agent_id' => $agent['id'],
                 'agent_name' => $agent['pharmacy_name']
-            ]);
-
-            $stmtMsg = $this->conn->prepare("INSERT INTO messages (id, sender_id, receiver_id, message) VALUES (:id, :sid, :rid, :msg)");
-            $stmtMsg->execute([
-                'id' => $message_id,
-                'sid' => $decoded['id'],
-                'rid' => $patient_id,
-                'msg' => $payload
-            ]);
+            ];
 
             $this->conn->commit();
             
             echo json_encode([
                 "success" => true, 
-                "message" => "Invoice sent to patient successfully",
+                "message" => "Invoice generated successfully",
                 "invoice" => [
-                    "id" => $message_id,
                     "payload" => $payload
                 ]
             ]);
