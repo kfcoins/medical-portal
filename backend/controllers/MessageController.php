@@ -71,6 +71,16 @@ class MessageController {
         $stmt->execute(['uid' => $user_id]);
         $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Deduplicate conversations in PHP (fixes issues where multiple messages have the exact same max created_at)
+        $unique = [];
+        foreach($conversations as $c) {
+            $cid = $c['other_user_id'];
+            if(!isset($unique[$cid])) {
+                $unique[$cid] = $c;
+            }
+        }
+        $conversations = array_values($unique);
+
         // Map data safely
         $formatted = array_map(function($c) use ($user_id) {
             $name = $c['role'] === 'pharmacy' && !empty($c['pharmacy_name']) ? $c['pharmacy_name'] : $c['first_name'] . ' ' . $c['last_name'];
