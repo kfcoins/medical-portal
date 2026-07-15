@@ -481,35 +481,19 @@
         prescription: notes
       };
 
-      const token = localStorage.getItem('token');
       try {
-        const res = await fetch('../backend/index.php?route=messages/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          body: JSON.stringify({
+        if (!wsConn || wsConn.readyState !== WebSocket.OPEN) {
+            throw new Error("WebSocket not connected");
+        }
+
+        wsConn.send(JSON.stringify({
             receiver_id: activeContactId,
             message: JSON.stringify(invoiceData)
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          if (window.showToast) window.showToast('Invoice sent successfully to patient!', 'success');
-          else alert('Invoice sent successfully to patient!');
-          closeInvoiceModal();
-          
-          if (wsConn && wsConn.readyState === WebSocket.OPEN) {
-            wsConn.send(JSON.stringify({
-                type: 'message',
-                data: data.message
-            }));
-          }
-          appendMessage(data.message, JSON.parse(localStorage.getItem('user')).id);
-        } else {
-          alert(data.message || 'Error sending invoice');
-        }
+        }));
+
+        if (window.showToast) window.showToast('Invoice sent successfully to patient!', 'success');
+        else alert('Invoice sent successfully to patient!');
+        closeInvoiceModal();
       } catch (err) {
         console.error(err);
         alert('An error occurred. Please try again.');
