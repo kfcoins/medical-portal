@@ -235,8 +235,10 @@
       if(activeEl) activeEl.classList.add('active');
 
       const chatMain = document.getElementById('chatMain');
+      document.querySelector('.chat-container').classList.add('mobile-chat-active');
       chatMain.innerHTML = `
         <div class="chat-header">
+          <button class="mobile-back-btn" onclick="document.querySelector('.chat-container').classList.remove('mobile-chat-active')" style="display: none; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text); margin-right: 12px;"><i class="fas fa-arrow-left"></i></button>
           <div class="conv-avatar" style="width:40px; height:40px;">${contactName.charAt(0)}</div>
           <div style="font-weight: 600;">${contactName}</div>
         </div>
