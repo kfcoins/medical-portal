@@ -1,0 +1,127 @@
+/* Mobile Menu Toggle Button */
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text, #4A5568);
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 16px;
+  padding: 4px;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 95; /* Just below sidebar which is usually 100 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Base Responsive Fixes */
+html, body {
+  overflow-x: hidden;
+}
+
+.main-content {
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+.sidebar {
+  transition: transform 0.3s ease;
+}
+
+/* Scrollable Tables on Mobile */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+table {
+  min-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px; /* Force consistent width */
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0 !important; /* Override inline or hardcoded margin-left */
+  }
+  
+  .top-header {
+    padding: 0 16px !important;
+  }
+  
+  .content-area {
+    padding: 16px !important;
+  }
+  
+  /* Make grid containers stack on mobile */
+  .stats-grid,
+  .quick-links,
+  .grid-2-col,
+  .dashboard-grid,
+  .order-details-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Flex containers that might need wrapping */
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .user-profile span#userName {
+    display: none; /* Hide name on mobile, keep avatar */
+  }
+  
+  /* Chat Layout specific fixes */
+  .chat-container {
+    flex-direction: column !important;
+  }
+  
+  .chat-sidebar {
+    width: 100% !important;
+    height: 35vh; /* Take top part of screen */
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .chat-main {
+    flex: none !important;
+    height: 65vh; /* Take bottom part of screen */
+  }
+  
+  .chat-messages {
+    padding: 16px !important;
+  }
+  
+  .chat-input-area {
+    padding: 12px !important;
+  }
+  
+  .message-bubble {
+    max-width: 90% !important;
+  }
+}
