@@ -21,6 +21,13 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
     
     /* Sidebar */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; }
+    .modal-header h3 { margin: 0; font-size: 1.25rem; color: #1e293b; }
+    .close-modal { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b; }
+    .close-modal:hover { color: #0f172a; }
     .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
     .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
     .sidebar-header i { font-size: 1.6rem; color: white; }
@@ -228,7 +235,13 @@
               if(showLoader) listElem.innerHTML = '<div style="padding: 20px; text-align: center; color: #94A3B8;">No conversations yet.</div>';
               return;
           }
-          listElem.innerHTML = data.conversations.map(c => `
+          listElem.innerHTML = data.conversations.map(c => {
+            let previewMsg = c.last_message;
+            try {
+              const p = JSON.parse(previewMsg);
+              if (p.type === 'invoice') previewMsg = 'Sent a custom invoice';
+            } catch(e) {}
+            return `
             <div class="conversation-item ${c.contact_id === activeContactId ? 'active' : ''}" onclick="openConversation('${c.contact_id}', '${c.contact_name.replace(/'/g, "\\'")}')">
               <div class="conv-avatar">${c.contact_name.charAt(0)}</div>
               <div class="conv-details">
@@ -236,10 +249,11 @@
                   <span class="conv-name">${c.contact_name}</span>
                   <span class="conv-time">${formatTime(c.created_at)}</span>
                 </div>
-                <div class="conv-message">${c.last_message} ${c.unread_count > 0 ? '<span class="unread-badge">New</span>' : ''}</div>
+                <div class="conv-message">${previewMsg} ${c.unread_count > 0 ? '<span class="unread-badge">New</span>' : ''}</div>
               </div>
             </div>
-          `).join('');
+            `;
+          }).join('');
         }
       } catch (err) {
         console.error(err);
