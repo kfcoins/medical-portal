@@ -112,7 +112,7 @@ class OrderController {
             // Insert items
             foreach ($items as $item) {
                 // Determine medicine_id format. If Mongo, it's string. Since we changed to MySQL, it'll be an int.
-                $med_id = is_array($item['medicine']) ? $item['medicine']['_id'] : (isset($item['medicine_id']) ? $item['medicine_id'] : $item['medicine']);
+                $med_id = is_array($item['medicine']) ? (isset($item['medicine']['id']) ? $item['medicine']['id'] : $item['medicine']['_id']) : (isset($item['medicine_id']) ? $item['medicine_id'] : $item['medicine']);
                 
                 $stmtItem = $this->conn->prepare("INSERT INTO order_items (order_id, medicine_id, quantity, unit_price) VALUES (:oid, :mid, :qty, :up)");
                 $stmtItem->execute([

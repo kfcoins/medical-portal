@@ -60,6 +60,9 @@ class MedicineController {
             $params['agent'] = $agent_id;
         }
 
+        // Hide custom invoices from the public store
+        $where[] = "m.name NOT LIKE '[Custom Invoice]%'";
+
         $whereSql = "";
         if (count($where) > 0) {
             $whereSql = "WHERE " . implode(" AND ", $where);

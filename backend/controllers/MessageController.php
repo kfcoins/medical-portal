@@ -31,6 +31,10 @@ class MessageController {
         $decoded = Jwt::authenticate();
         $user_id = $decoded['id'];
 
+        // Auto-delete messages older than 7 days
+        $cleanupStmt = $this->conn->prepare("DELETE FROM messages WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+        $cleanupStmt->execute();
+
         // Get the latest message for each conversation
         // Group by the other user
         $query = "
@@ -86,6 +90,10 @@ class MessageController {
     private function getMessageHistory($contact_id) {
         $decoded = Jwt::authenticate();
         $user_id = $decoded['id'];
+
+        // Auto-delete messages older than 7 days
+        $cleanupStmt = $this->conn->prepare("DELETE FROM messages WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+        $cleanupStmt->execute();
 
         $query = "
             SELECT m.*, 

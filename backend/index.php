@@ -71,6 +71,11 @@ switch ($controller) {
         $patientController = new PatientController();
         $patientController->handleRequest($action, $id);
         break;
+    case 'prescriptions':
+        require_once 'controllers/PrescriptionController.php';
+        $prescriptionController = new PrescriptionController();
+        $prescriptionController->handleRequest($action, $id);
+        break;
     default:
         http_response_code(404);
         echo json_encode(["success" => false, "message" => "API endpoint not found. route=".$route]);

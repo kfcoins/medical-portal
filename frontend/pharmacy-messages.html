@@ -102,9 +102,16 @@
   <main class="main-content">
     <header class="top-header">
       <div class="header-title">Messages</div>
+      <div class="header-actions" style="display: flex; align-items: center;">
+
+        <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span style="position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; background-color: #E53E3E; border-radius: 50%; border: 2px solid #F4F7FA;"></span>
+        </a>
       <div class="user-profile">
         <div class="user-avatar" id="userInitial">P</div>
         <span id="userName">Pharmacy Name</span>
+      </div>
       </div>
     </header>
 
@@ -121,6 +128,9 @@
 
       <!-- Main Chat Area -->
       <div class="chat-main" id="chatMain">
+        <div style="background: #FFFBEB; color: #B45309; padding: 10px; text-align: center; font-size: 0.85rem; border-bottom: 1px solid #FEF3C7;">
+          <i class="fas fa-info-circle"></i> Note: Messages are automatically deleted after 7 days for privacy.
+        </div>
         <div class="empty-state">
           <i class="far fa-comments"></i>
           <h3>Your Messages</h3>
@@ -133,7 +143,8 @@
   <script src="js/main.js"></script>
   <script>
     let activeContactId = null;
-    let pollInterval = null;
+    let wsConn = null;
+    let typingTimeout = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
       const token = localStorage.getItem('token');
@@ -149,10 +160,26 @@
       document.getElementById('userInitial').textContent = name.charAt(0);
 
       loadConversations();
-      pollInterval = setInterval(() => {
-          loadConversations(false);
-          if (activeContactId) loadMessages(activeContactId, false);
-      }, 5000);
+
+      // Initialize WebSocket
+      wsConn = new WebSocket('ws://localhost:8081?token=' + token);
+      wsConn.onopen = function(e) {
+          console.log("WebSocket connection established");
+      };
+      wsConn.onmessage = function(e) {
+          const payload = JSON.parse(e.data);
+          if (payload.type === 'message') {
+              const msg = payload.data;
+              if (activeContactId === msg.sender_id || activeContactId === msg.receiver_id) {
+                  appendMessage(msg, user.id);
+              }
+              loadConversations(false);
+          } else if (payload.type === 'typing') {
+              if (activeContactId === payload.sender_id) {
+                  showTypingIndicator();
+              }
+          }
+      };
     });
 
     async function loadConversations(showLoader = true) {
@@ -213,6 +240,10 @@
           sendMessage();
       });
 
+      document.getElementById('messageInput').addEventListener('input', () => {
+          sendTypingEvent();
+      });
+
       await loadMessages(contactId, true);
     }
 
@@ -233,9 +264,30 @@
                 const user = JSON.parse(localStorage.getItem('user'));
                 msgContainer.innerHTML = data.messages.map(m => {
                     const isOutgoing = m.sender_id === user.id;
+                    let displayMessage = m.message;
+                    
+                    try {
+                      const payload = JSON.parse(m.message);
+                      if (payload.type === 'invoice') {
+                        displayMessage = `
+                          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-top: 8px; width: 100%; max-width: 300px; color: #1e293b; text-align: left;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 8px;">
+                              <i class="fas fa-file-invoice-dollar"></i> Custom Prescription Invoice
+                            </div>
+                            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 4px;">${payload.name}</div>
+                            <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${payload.prescription || 'No notes provided.'}</div>
+                            <div style="font-weight: 700; color: #1A6349; font-size: 1.1rem; margin-bottom: 16px;">GHS ${parseFloat(payload.price).toFixed(2)}</div>
+                            <div style="font-size: 0.8rem; color: #64748b; font-style: italic;"><i class="fas fa-check-circle" style="color: #10B981;"></i> Sent to patient's chat</div>
+                          </div>
+                        `;
+                      }
+                    } catch (e) {
+                      // Normal text message
+                    }
+
                     return `
                       <div class="message-bubble ${isOutgoing ? 'message-outgoing' : 'message-incoming'}">
-                        ${m.message}
+                        ${displayMessage}
                         <div class="message-time">${formatTime(m.created_at)}</div>
                       </div>
                     `;
@@ -254,39 +306,100 @@
         const input = document.getElementById('messageInput');
         const btn = document.getElementById('sendBtn');
         const msg = input.value.trim();
-        if(!msg || !activeContactId) return;
+        if(!msg || !activeContactId || !wsConn) return;
 
         input.disabled = true;
         btn.disabled = true;
 
-        const token = localStorage.getItem('token');
         try {
-            const res = await fetch('../backend/index.php?route=messages/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({
-                    receiver_id: activeContactId,
-                    message: msg
-                })
-            });
-            const data = await res.json();
-            if(data.success) {
-                input.value = '';
-                await loadMessages(activeContactId, true);
-                loadConversations(false);
-            } else {
-                if (window.showToast) window.showToast(data.message, 'error');
-            }
+            wsConn.send(JSON.stringify({
+                receiver_id: activeContactId,
+                message: msg
+            }));
+            input.value = '';
         } catch(e) {
             console.error(e);
+            if (window.showToast) window.showToast('Connection error', 'error');
         } finally {
             input.disabled = false;
             btn.disabled = false;
             input.focus();
         }
+    }
+
+    function appendMessage(m, currentUserId) {
+        const msgContainer = document.getElementById('chatMessages');
+        if (!msgContainer) return;
+        
+        if (msgContainer.innerHTML.includes('Say hello!')) {
+            msgContainer.innerHTML = '';
+        }
+        
+        const isOutgoing = m.sender_id === currentUserId;
+        
+        let displayMessage = m.message;
+        try {
+          const parsed = JSON.parse(m.message);
+          if (parsed.type === 'invoice') {
+            displayMessage = `
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-top: 8px; width: 100%; max-width: 300px; color: #1e293b; text-align: left;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 8px;">
+                  <i class="fas fa-file-invoice-dollar"></i> Custom Prescription Invoice
+                </div>
+                <div style="font-weight: 600; font-size: 1rem; margin-bottom: 4px;">${parsed.name}</div>
+                <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${parsed.prescription || 'No notes provided.'}</div>
+                <div style="font-weight: 700; color: #1A6349; font-size: 1.1rem; margin-bottom: 16px;">GHS ${parseFloat(parsed.price).toFixed(2)}</div>
+                <div style="font-size: 0.8rem; color: #64748b; font-style: italic;"><i class="fas fa-check-circle" style="color: #10B981;"></i> Sent to patient's chat</div>
+              </div>
+            `;
+          }
+        } catch (e) {}
+
+        const div = document.createElement('div');
+        div.className = `message-bubble ${isOutgoing ? 'message-outgoing' : 'message-incoming'}`;
+        div.innerHTML = `
+            ${displayMessage}
+            <div class="message-time">${formatTime(m.created_at || new Date())}</div>
+        `;
+        
+        const typingInd = document.getElementById('typingIndicator');
+        if (typingInd) {
+            msgContainer.insertBefore(div, typingInd);
+        } else {
+            msgContainer.appendChild(div);
+        }
+        
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        let msgContainer = document.getElementById('chatMessages');
+        if (!msgContainer) return;
+        
+        let typingInd = document.getElementById('typingIndicator');
+        if (!typingInd) {
+            typingInd = document.createElement('div');
+            typingInd.id = 'typingIndicator';
+            typingInd.className = 'message-bubble message-incoming';
+            typingInd.style.fontStyle = 'italic';
+            typingInd.style.opacity = '0.7';
+            typingInd.innerText = 'Typing...';
+            msgContainer.appendChild(typingInd);
+        }
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+        
+        if (typingTimeout) clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            if (typingInd) typingInd.remove();
+        }, 3000);
+    }
+    
+    function sendTypingEvent() {
+        if (!wsConn || !activeContactId) return;
+        wsConn.send(JSON.stringify({
+            type: 'typing',
+            receiver_id: activeContactId
+        }));
     }
 
     function formatTime(dateStr) {

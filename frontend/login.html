@@ -335,10 +335,10 @@
             
             if (redirect === 'checkout' && role === 'patient') {
               window.location.href = 'index.html?redirect=checkout';
+            } else if (redirect === 'chat') {
+              window.location.href = 'index.html?open_chat=true';
             } else {
-              if (role === 'admin') window.location.href = 'admin-dashboard.html';
-              else if (role === 'pharmacy') window.location.href = 'pharmacy-dashboard.html';
-              else window.location.href = 'patient-dashboard.html';
+              window.location.href = 'index.html';
             }
           }, 1000);
         } else {

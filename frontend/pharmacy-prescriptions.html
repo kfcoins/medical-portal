@@ -135,7 +135,12 @@
     <header class="top-header">
       <div class="header-title">Prescriptions Management</div>
       <div class="header-actions">
-        <div class="user-profile">
+
+        <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span style="position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; background-color: #E53E3E; border-radius: 50%; border: 2px solid #F4F7FA;"></span>
+        </a>
+      <div class="user-profile">
           <div class="user-avatar" id="userInitial">P</div>
           <span id="userName">Pharmacy Name</span>
         </div>
@@ -147,6 +152,9 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 style="margin: 0;">Prescription Orders</h3>
           <div style="display: flex; gap: 15px; align-items: center;">
+            <button onclick="openInvoiceModal()" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-plus"></i> Create Invoice
+            </button>
             <select id="sortOrders" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #E5E7EB; background: #fff; font-size: 0.9rem; color: var(--text-dark); cursor: pointer;" onchange="handleSortOrders()">
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -206,6 +214,43 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-invoice-dollar" style="color: var(--primary); margin-right: 8px;"></i> Create Patient Invoice</h3>
+        <button class="close-modal" onclick="closeInvoiceModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="delivery-content">
+        <form id="invoiceForm" onsubmit="submitInvoice(event)">
+          <div style="margin-bottom: 16px; position: relative;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Search Patient (Phone/Email)</label>
+            <input type="text" id="patientSearch" placeholder="Type at least 3 characters..." style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit;" autocomplete="off" oninput="searchPatientDebounce()">
+            <div id="patientDropdown" style="position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; display: none; max-height: 200px; overflow-y: auto;">
+              <!-- Dropdown items will be injected here -->
+            </div>
+            <input type="hidden" id="selectedPatientId" required>
+            <div id="selectedPatientDisplay" style="margin-top: 8px; font-size: 0.85rem; color: #1A6349; font-weight: 600; display: none;"></div>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Item/Medication Name</label>
+            <input type="text" id="invoiceItemName" placeholder="e.g. Amoxicillin 500mg" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Price (GHS)</label>
+            <input type="number" id="invoicePrice" step="0.01" min="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit;">
+          </div>
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Prescription/Notes</label>
+            <textarea id="invoiceNotes" rows="3" placeholder="e.g. Take 1 every 8 hours" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+          <button type="submit" id="submitInvoiceBtn" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">
+            Send to Patient
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
   <script>
     function viewPrescription(imageUrl) {
@@ -223,6 +268,117 @@
     
     function closePrescriptionModal() {
       document.getElementById('prescriptionModal').classList.remove('active');
+    }
+
+    // Invoice Modal Logic
+    function openInvoiceModal() {
+      document.getElementById('invoiceForm').reset();
+      document.getElementById('selectedPatientId').value = '';
+      document.getElementById('selectedPatientDisplay').style.display = 'none';
+      document.getElementById('patientDropdown').style.display = 'none';
+      document.getElementById('invoiceModal').classList.add('active');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.remove('active');
+    }
+
+    let searchTimeout = null;
+    function searchPatientDebounce() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(searchPatient, 400);
+    }
+
+    async function searchPatient() {
+      const q = document.getElementById('patientSearch').value.trim();
+      const dropdown = document.getElementById('patientDropdown');
+      
+      if (q.length < 3) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`../backend/index.php?route=prescriptions/search-patient&q=${encodeURIComponent(q)}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        if (data.success && data.patients.length > 0) {
+          dropdown.innerHTML = data.patients.map(p => `
+            <div style="padding: 10px; border-bottom: 1px solid #e2e8f0; cursor: pointer;" onclick="selectPatient('${p.id}', '${p.first_name} ${p.last_name}', '${p.phone}')" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+              <div style="font-weight: 600; font-size: 0.9rem;">${p.first_name} ${p.last_name}</div>
+              <div style="font-size: 0.8rem; color: #64748b;">${p.phone} | ${p.email}</div>
+            </div>
+          `).join('');
+          dropdown.style.display = 'block';
+        } else {
+          dropdown.innerHTML = '<div style="padding: 10px; font-size: 0.85rem; color: #64748b;">No patients found</div>';
+          dropdown.style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function selectPatient(id, name, phone) {
+      document.getElementById('selectedPatientId').value = id;
+      document.getElementById('patientSearch').value = '';
+      document.getElementById('patientDropdown').style.display = 'none';
+      
+      const display = document.getElementById('selectedPatientDisplay');
+      display.innerHTML = `Selected Patient: ${name} (${phone})`;
+      display.style.display = 'block';
+    }
+
+    async function submitInvoice(e) {
+      e.preventDefault();
+      
+      const patientId = document.getElementById('selectedPatientId').value;
+      if (!patientId) {
+        alert('Please search and select a patient first.');
+        return;
+      }
+      
+      const btn = document.getElementById('submitInvoiceBtn');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      
+      const payload = {
+        patient_id: patientId,
+        item_name: document.getElementById('invoiceItemName').value,
+        price: document.getElementById('invoicePrice').value,
+        prescription: document.getElementById('invoiceNotes').value
+      };
+      
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('../backend/index.php?route=prescriptions/custom-invoice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          if (window.showToast) window.showToast('Invoice sent successfully to patient!', 'success');
+          else alert('Invoice sent successfully to patient!');
+          closeInvoiceModal();
+        } else {
+          if (window.showToast) window.showToast(data.message || 'Error sending invoice', 'error');
+          else alert(data.message || 'Error sending invoice');
+        }
+      } catch (err) {
+        if (window.showToast) window.showToast('A network error occurred.', 'error');
+        else alert('A network error occurred.');
+      } finally {
+        btn.textContent = 'Send to Patient';
+        btn.disabled = false;
+      }
     }
 
     window.allOrders = [];
@@ -249,7 +405,11 @@
         const tbody = document.getElementById('ordersBody');
         
         if (data.success && data.orders.length > 0) {
-          const rxOrders = data.orders.filter(o => o.prescription && o.prescription.trim() !== '');
+          const rxOrders = data.orders.filter(o => {
+            const hasRxImage = o.prescription && o.prescription.trim() !== '';
+            const hasCustomInvoice = o.items && o.items.some(i => i.medicine && i.medicine.name && i.medicine.name.startsWith('[Custom Invoice]'));
+            return hasRxImage || hasCustomInvoice;
+          });
           window.allOrders = rxOrders;
           
           if (rxOrders.length > 0) {
