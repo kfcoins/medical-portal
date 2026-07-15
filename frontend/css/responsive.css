@@ -108,11 +108,13 @@ table {
     min-height: 200px;
     border-right: none !important;
     border-bottom: 1px solid var(--border);
+    overflow-y: auto !important;
   }
   
   .chat-main {
     width: 100% !important;
     flex: 1 !important;
+    overflow-y: auto !important;
   }
   
   .chat-messages {
