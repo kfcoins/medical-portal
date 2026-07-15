@@ -140,6 +140,38 @@
     </div>
   </main>
 
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-invoice-dollar" style="color: var(--primary); margin-right: 8px;"></i> Create Patient Invoice</h3>
+        <button class="close-modal" onclick="closeInvoiceModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="delivery-content">
+        <form id="invoiceForm" onsubmit="submitInvoice(event)">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Patient</label>
+            <div id="invoicePatientDisplay" style="padding: 10px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; font-weight: 500; color: #1E293B;"></div>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Item/Medication Name</label>
+            <input type="text" id="invoiceItemName" placeholder="e.g. Amoxicillin 500mg" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Price (GHS)</label>
+            <input type="number" id="invoicePrice" step="0.01" min="0.01" placeholder="0.00" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit;">
+          </div>
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4A5568; margin-bottom: 6px;">Prescription/Notes</label>
+            <textarea id="invoiceNotes" rows="3" placeholder="e.g. Take 1 every 8 hours" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; outline: none; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+          <button type="submit" id="submitInvoiceBtn" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;">
+            Send to Patient
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
   <script>
     let activeContactId = null;
@@ -225,6 +257,7 @@
         <div class="chat-header">
           <div class="conv-avatar" style="width:40px; height:40px;">${contactName.charAt(0)}</div>
           <div style="font-weight: 600;">${contactName}</div>
+          <button style="margin-left:auto; padding:8px 16px; background:#10B981; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px;" onclick="openInvoiceModal('${contactId}', '${contactName.replace(/'/g, "\\'")}')"><i class="fas fa-file-invoice-dollar"></i> Create Invoice</button>
         </div>
         <div class="chat-messages" id="chatMessages">
           <div style="text-align: center; padding: 20px; color: #94A3B8;">Loading messages...</div>
