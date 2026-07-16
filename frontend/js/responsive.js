@@ -96,7 +96,7 @@ async function updateGlobalBadges() {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const res = await fetch('../backend/index.php?route=messages/conversations', {
+                const res = await fetch(`../backend/index.php?route=messages/conversations&_t=${Date.now()}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await res.json();
