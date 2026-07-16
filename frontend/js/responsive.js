@@ -46,6 +46,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateGlobalBadges();
+
+    // Global Notification WebSocket
+    const globalToken = localStorage.getItem('token');
+    if (globalToken) {
+        // Prevent setting up if we are on the messages page (which has its own wsConn)
+        // Actually, it's safer to just let it run or check window location.
+        if (!window.location.pathname.includes('messages.html')) {
+            const notifWs = new WebSocket('ws://localhost:8081?token=' + globalToken);
+            notifWs.onmessage = function(e) {
+                try {
+                    const payload = JSON.parse(e.data);
+                    if (payload.type === 'message') {
+                        updateGlobalBadges();
+                    }
+                } catch(err) {
+                    console.error('WebSocket payload error:', err);
+                }
+            };
+            notifWs.onerror = function() {
+                // Silently handle errors for background notif socket
+            };
+        }
+    }
 });
 
 async function updateGlobalBadges() {
