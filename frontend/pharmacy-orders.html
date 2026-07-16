@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pharmacy Orders — PharmaTrust Ghana</title>
+  <title>Pharmacy Orders â€” PharmaTrust Ghana</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -110,6 +110,8 @@
     
     .no-orders { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
 </head>
 <body>
 
@@ -223,14 +225,14 @@
               if (p.startsWith('Phone: ')) phone = p.replace('Phone: ', '').trim();
               if (p.startsWith('Email: ')) email = p.replace('Email: ', '').trim();
           });
-      } else if (details.includes('📞 Phone:') || details.includes('📧 Email:')) {
+      } else if (details.includes('ðŸ“ž Phone:') || details.includes('ðŸ“§ Email:')) {
           const lines = details.split('\n');
           let inAddress = false;
           address = '';
           lines.forEach(line => {
-              if (line.startsWith('📞 Phone:')) phone = line.replace('📞 Phone:', '').trim();
-              else if (line.startsWith('📧 Email:')) email = line.replace('📧 Email:', '').trim();
-              else if (line.startsWith('📍 Delivery Location:')) inAddress = true;
+              if (line.startsWith('ðŸ“ž Phone:')) phone = line.replace('ðŸ“ž Phone:', '').trim();
+              else if (line.startsWith('ðŸ“§ Email:')) email = line.replace('ðŸ“§ Email:', '').trim();
+              else if (line.startsWith('ðŸ“ Delivery Location:')) inAddress = true;
               else if (inAddress && line.trim()) address += line.trim() + ', ';
           });
           address = address.replace(/,\s*$/, '');
@@ -358,7 +360,7 @@
               <td>${order.patient_name || order.patient_id}</td>
               <td><div class="order-items">${itemsHtml}</div></td>
               <td>${actionBtnHtml}</td>
-              <td><strong>₵${parseFloat(order.total_amount).toFixed(2)}</strong></td>
+              <td><strong>â‚µ${parseFloat(order.total_amount).toFixed(2)}</strong></td>
               <td>
                 <select class="status-select ${order.status}" data-id="${order.id}" onchange="updateOrderStatus(this)">
                   <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>PENDING</option>
@@ -521,3 +523,4 @@
   </script>
 </body>
 </html>
+

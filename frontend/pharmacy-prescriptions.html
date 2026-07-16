@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pharmacy Prescriptions — PharmaTrust Ghana</title>
+  <title>Pharmacy Prescriptions â€” PharmaTrust Ghana</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -110,6 +110,8 @@
     
     .no-orders { text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem; }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
 </head>
 <body>
 
@@ -477,7 +479,7 @@
               <td>${order.patient_name || order.patient_id}</td>
               <td><div class="order-items">${itemsHtml}</div></td>
               <td>${actionBtnHtml}</td>
-              <td><strong>₵${parseFloat(order.total_amount).toFixed(2)}</strong></td>
+              <td><strong>â‚µ${parseFloat(order.total_amount).toFixed(2)}</strong></td>
               <td>
                 <select class="status-select ${order.status}" data-id="${order.id}" onchange="updateOrderStatus(this)">
                   <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>PENDING</option>
@@ -640,3 +642,4 @@
   </script>
 </body>
 </html>
+
