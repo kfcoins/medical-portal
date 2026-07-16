@@ -110,14 +110,14 @@
       </div>
       <div class="header-actions" style="display: flex; align-items: center;">
 
-        <a href="#" class="notification-icon" title="Cart" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 8px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+        <a href="patient-store.html" class="notification-icon" title="Cart" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 8px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
           <i class="fas fa-shopping-cart"></i>
-          <span style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #10B981; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">2</span>
+          <span id="cartBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #10B981; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
         </a>
 
         <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
           <i class="fas fa-bell"></i>
-          <span style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">3</span>
+          <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
         </a>
       <div class="user-profile">
         <div class="user-avatar" id="userInitial">P</div>
@@ -215,7 +215,9 @@
               if(showLoader) listElem.innerHTML = '<div style="padding: 20px; text-align: center; color: #94A3B8;">No conversations yet.</div>';
               return;
           }
+          let totalUnread = 0;
           listElem.innerHTML = data.conversations.map(c => {
+            totalUnread += parseInt(c.unread_count || 0);
             let previewMsg = c.last_message;
             try {
               const p = JSON.parse(previewMsg);
@@ -234,6 +236,12 @@
             </div>
             `;
           }).join('');
+          
+          const notifBadge = document.getElementById('notifBadge');
+          if (notifBadge) {
+              notifBadge.textContent = totalUnread;
+              notifBadge.style.display = totalUnread > 0 ? 'flex' : 'none';
+          }
         }
       } catch (err) {
         console.error(err);
@@ -487,6 +495,15 @@
             toggleBtn.addEventListener('click', () => {
                 chatSidebar.classList.toggle('collapsed');
             });
+        }
+        
+        // Load cart total
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartBadge = document.getElementById('cartBadge');
+        if (cartBadge) {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = totalItems;
+            cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
         }
     });
 
