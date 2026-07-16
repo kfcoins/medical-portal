@@ -1,6 +1,6 @@
 /* Mobile Menu Toggle Button */
 .mobile-menu-btn {
-  display: none;
+  display: block;
   background: transparent;
   border: none;
   color: var(--text, #4A5568);
@@ -158,5 +158,22 @@ table {
   
   .message-bubble {
     max-width: 90% !important;
+  }
+}
+
+/* Desktop Collapsible Sidebar */
+@media (min-width: 769px) {
+  body.sidebar-collapsed {
+    --sidebar-width: 84px;
+  }
+  .sidebar {
+    width: var(--sidebar-width);
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width 0.3s ease;
+  }
+  body.sidebar-collapsed .sidebar:hover {
+    width: 260px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
   }
 }

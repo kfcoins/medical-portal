@@ -48,6 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function toggleSidebar() {
+    if (window.innerWidth > 768) {
+        document.body.classList.toggle('sidebar-collapsed');
+        return;
+    }
+
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     
