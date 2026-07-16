@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const user = JSON.parse(userStr);
       const name = user.first_name || user.firstName || 'User';
-      let dashboardUrl = 'index.html';
+      let dashboardUrl = 'patient-dashboard.html';
       if (user.role === 'admin') dashboardUrl = 'admin-dashboard.html';
       else if (user.role === 'pharmacy') dashboardUrl = 'pharmacy-dashboard.html';
       else if (user.role === 'patient') dashboardUrl = 'patient-dashboard.html';

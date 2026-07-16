@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
         hamburgerBtn.onclick = toggleSidebar;
         
-        if (titleDiv) {
+        if (titleDiv && titleDiv.parentElement === topHeader) {
             topHeader.insertBefore(hamburgerBtn, titleDiv);
         } else {
             topHeader.prepend(hamburgerBtn);
@@ -113,7 +113,7 @@ async function updateGlobalBadges() {
 }
 
 function toggleSidebar() {
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > 992) {
         document.body.classList.toggle('sidebar-collapsed');
         return;
     }

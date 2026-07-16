@@ -10,6 +10,24 @@
   <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
+  <script>
+    // Smart redirect: if already logged in, go straight to the dashboard
+    (function() {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (token && user && user.role) {
+          const dashboards = {
+            patient: 'patient-dashboard.html',
+            pharmacy: 'pharmacy-dashboard.html',
+            admin: 'admin-dashboard.html'
+          };
+          const dest = dashboards[user.role];
+          if (dest) { window.location.replace(dest); return; }
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- ===== NAVIGATION ===== -->
   <nav class="navbar" id="navbar">
@@ -551,7 +569,7 @@
           const navActions = document.querySelector('.nav-actions');
           const heroCta = document.querySelector('.hero-cta');
           
-          let dashboardUrl = 'index.html';
+          let dashboardUrl = 'patient-dashboard.html';
           if (user.role === 'admin') dashboardUrl = 'admin-dashboard.html';
           else if (user.role === 'pharmacy') dashboardUrl = 'pharmacy-dashboard.html';
           else if (user.role === 'patient') dashboardUrl = 'patient-dashboard.html';
