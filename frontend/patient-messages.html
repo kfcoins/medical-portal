@@ -44,7 +44,8 @@
 
     /* Chat Layout */
     .chat-container { display: flex; flex: 1; overflow: hidden; }
-    .chat-sidebar { width: 320px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .chat-sidebar { width: 320px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.3s ease, min-width 0.3s ease; overflow: hidden; }
+    .chat-sidebar.collapsed { width: 0 !important; min-width: 0 !important; border-right: none; }
     .chat-sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
     .chat-sidebar-header input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #E2E8F0; outline: none; background: #F8FAFC; font-size: 0.9rem; }
     .conversations-list { flex: 1; overflow-y: auto; padding: 12px; }
@@ -101,7 +102,12 @@
 
   <main class="main-content">
     <header class="top-header">
-      <div class="header-title">Messages</div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="toggleChatSidebar" style="background: none; border: none; font-size: 1.25rem; color: #64748B; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='#64748B'">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-title">Messages</div>
+      </div>
       <div class="header-actions" style="display: flex; align-items: center;">
 
         <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
@@ -469,6 +475,15 @@
       const d = new Date(dateStr);
       return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('toggleChatSidebar');
+        const chatSidebar = document.querySelector('.chat-sidebar');
+        if(toggleBtn && chatSidebar) {
+            toggleBtn.addEventListener('click', () => {
+                chatSidebar.classList.toggle('collapsed');
+            });
+        }
+    });
 
     function logout() {
       localStorage.removeItem('token');
