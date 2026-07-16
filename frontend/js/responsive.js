@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebarHeader.appendChild(closeBtn);
     }
     
-    // 3. Ensure Table Containers have overflow-x on mobile
     const tables = document.querySelectorAll('table');
     tables.forEach(table => {
         if (!table.parentElement.classList.contains('table-container') && !table.parentElement.classList.contains('table-responsive')) {
@@ -45,7 +44,50 @@ document.addEventListener('DOMContentLoaded', () => {
             wrapper.appendChild(table);
         }
     });
+
+    updateGlobalBadges();
 });
+
+async function updateGlobalBadges() {
+    // 1. Cart Badge (for patient pages)
+    const cartBadge = document.getElementById('cartBadge');
+    if (cartBadge) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartBadge.textContent = totalItems;
+        cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+    
+    // Also update cartCount if it exists (patient-store uses cartCount)
+    const cartCount = document.getElementById('cartCount');
+    if (cartCount) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        cartCount.style.display = totalItems > 0 ? 'inline-block' : 'none';
+    }
+
+    // 2. Notification Badge (unread messages)
+    const notifBadge = document.getElementById('notifBadge');
+    if (notifBadge) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const res = await fetch('../backend/index.php?route=messages/conversations', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                if (data.success && data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, c) => sum + parseInt(c.unread_count || 0), 0);
+                    notifBadge.textContent = totalUnread;
+                    notifBadge.style.display = totalUnread > 0 ? 'flex' : 'none';
+                }
+            } catch (err) {
+                console.error('Error fetching unread count:', err);
+            }
+        }
+    }
+}
 
 function toggleSidebar() {
     if (window.innerWidth > 768) {
