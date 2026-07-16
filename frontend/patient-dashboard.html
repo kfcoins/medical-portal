@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -89,7 +89,6 @@
     </div>
     <div class="nav-links">
       <a href="patient-dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
-      <a href="patient-prescriptions.html" class="nav-link"><i class="fas fa-file-prescription"></i> My Prescriptions</a>
       <a href="patient-store.html" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
       <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
       <a href="patient-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
@@ -133,13 +132,7 @@
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon blue"><i class="fas fa-file-prescription"></i></div>
-          <div class="stat-info">
-            <h4>Active Prescriptions</h4>
-            <div class="value" id="activePrescriptionsCount">0</div>
-          </div>
-        </div>
+
         <div class="stat-card">
           <div class="stat-icon orange"><i class="fas fa-shopping-bag"></i></div>
           <div class="stat-info">
@@ -202,7 +195,7 @@
         const data = await response.json();
         
         if (data.success) {
-          document.getElementById('activePrescriptionsCount').textContent = data.stats.activePrescriptions;
+
           document.getElementById('totalOrdersCount').textContent = data.stats.totalOrders;
           document.getElementById('deliveredOrdersCount').textContent = data.stats.deliveredOrders;
           

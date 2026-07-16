@@ -426,7 +426,15 @@
         let displayMessage = m.message;
         try {
           const parsed = JSON.parse(m.message);
-          if (parsed.type === 'invoice') {
+          if (parsed.type === 'attachment') {
+            displayMessage = `
+              <div style="margin-bottom: 4px;">
+                ${parsed.fileType === 'image' 
+                  ? `<img src="../backend/${parsed.url}" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0;" onclick="window.open('../backend/${parsed.url}', '_blank')">` 
+                  : `<a href="../backend/${parsed.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #F1F5F9; padding: 12px; border-radius: 8px; text-decoration: none; color: #0F1923; border: 1px solid #E2E8F0;"><i class="fas fa-file-pdf" style="color: #E53E3E; font-size: 1.5rem;"></i> View PDF</a>`}
+              </div>
+            `;
+          } else if (parsed.type === 'invoice') {
             displayMessage = `
               <div style="width: 100%; min-width: 220px; max-width: 260px; color: #1e293b; text-align: left;">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">

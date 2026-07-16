@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -124,13 +124,7 @@
             <div class="value" id="productsInStock">-</div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon green"><i class="fas fa-file-prescription"></i></div>
-          <div class="stat-info">
-            <h4>Pending Prescriptions</h4>
-            <div class="value" id="pendingPrescriptions">-</div>
-          </div>
-        </div>
+
         <div class="stat-card">
           <div class="stat-icon purple"><i class="fas fa-history"></i></div>
           <div class="stat-info">
@@ -176,7 +170,7 @@
         
         if (data.success && data.stats) {
           document.getElementById('productsInStock').textContent = data.stats.productsInStock;
-          document.getElementById('pendingPrescriptions').textContent = data.stats.pendingPrescriptions;
+
           document.getElementById('recentOrders').textContent = data.stats.totalOrders;
         }
       } catch (err) {

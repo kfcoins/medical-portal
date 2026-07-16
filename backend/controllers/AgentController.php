@@ -167,10 +167,7 @@ class AgentController {
         $stmtStock->execute(['aid' => $agent_id]);
         $productsInStock = $stmtStock->fetchColumn();
 
-        // Pending Prescriptions
-        $stmtRx = $this->conn->prepare("SELECT COUNT(*) FROM orders WHERE agent_id = :aid AND prescription IS NOT NULL AND status = 'pending'");
-        $stmtRx->execute(['aid' => $agent_id]);
-        $pendingPrescriptions = $stmtRx->fetchColumn();
+
 
         echo json_encode([
             "success" => true,
@@ -180,8 +177,7 @@ class AgentController {
                 "revenue" => (float)$revenue,
                 "rating" => (float)$agent['rating'],
                 "verificationStatus" => $agent['verification_status'],
-                "productsInStock" => (int)$productsInStock,
-                "pendingPrescriptions" => (int)$pendingPrescriptions
+                "productsInStock" => (int)$productsInStock
             ]
         ]);
     }

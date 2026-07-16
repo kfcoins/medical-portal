@@ -89,7 +89,6 @@
     </div>
     <div class="nav-links">
       <a href="patient-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
-      <a href="patient-prescriptions.html" class="nav-link"><i class="fas fa-file-prescription"></i> My Prescriptions</a>
       <a href="patient-store.html" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
       <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
       <a href="patient-messages.html" class="nav-link active"><i class="fas fa-envelope"></i> Messages</a>
@@ -271,7 +270,11 @@
           <div style="text-align: center; padding: 20px; color: #94A3B8;">Loading messages...</div>
         </div>
         <form class="chat-input-area" id="chatForm">
-          <input type="text" class="chat-input" id="messageInput" placeholder="Type your message here..." autocomplete="off" required>
+          <label for="attachmentInput" style="cursor: pointer; margin-right: 12px; color: #64748b; font-size: 1.2rem; display: flex; align-items: center;" title="Attach Prescription/Image">
+            <i class="fas fa-paperclip"></i>
+          </label>
+          <input type="file" id="attachmentInput" accept=".jpg,.jpeg,.png,.pdf" style="display: none;">
+          <input type="text" class="chat-input" id="messageInput" placeholder="Type your message here..." autocomplete="off">
           <button type="submit" class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
         </form>
       `;
@@ -284,6 +287,16 @@
       document.getElementById('messageInput').addEventListener('input', () => {
           sendTypingEvent();
       });
+
+      const attachmentInput = document.getElementById('attachmentInput');
+      if (attachmentInput) {
+        attachmentInput.addEventListener('change', async (e) => {
+            if(e.target.files.length > 0) {
+                await uploadAttachment(e.target.files[0]);
+                e.target.value = '';
+            }
+        });
+      }
 
       await loadMessages(contactId, true);
       loadConversations(false);
@@ -355,6 +368,42 @@
       }
     }
 
+    
+    async function uploadAttachment(file) {
+        if(!activeContactId || !wsConn) return;
+        
+        const formData = new FormData();
+        formData.append('receiver_id', activeContactId);
+        formData.append('attachment', file);
+        
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('../backend/index.php?route=messages/upload', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+            const data = await res.json();
+            if(data.success) {
+                const payload = {
+                    type: 'attachment',
+                    url: data.url,
+                    fileType: data.fileType,
+                    originalName: data.originalName
+                };
+                wsConn.send(JSON.stringify({
+                    receiver_id: activeContactId,
+                    message: JSON.stringify(payload)
+                }));
+            } else {
+                alert(data.message || 'Upload failed');
+            }
+        } catch(e) {
+            console.error(e);
+            alert('Upload error');
+        }
+    }
+
     async function sendMessage() {
         const input = document.getElementById('messageInput');
         const btn = document.getElementById('sendBtn');
@@ -394,7 +443,15 @@
         let displayMessage = payload.message;
         try {
           const parsed = JSON.parse(payload.message);
-          if (parsed.type === 'invoice') {
+          if (parsed.type === 'attachment') {
+            displayMessage = `
+              <div style="margin-bottom: 4px;">
+                ${parsed.fileType === 'image' 
+                  ? `<img src="../backend/${parsed.url}" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0;" onclick="window.open('../backend/${parsed.url}', '_blank')">` 
+                  : `<a href="../backend/${parsed.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #F1F5F9; padding: 12px; border-radius: 8px; text-decoration: none; color: #0F1923; border: 1px solid #E2E8F0;"><i class="fas fa-file-pdf" style="color: #E53E3E; font-size: 1.5rem;"></i> View PDF</a>`}
+              </div>
+            `;
+          } else if (parsed.type === 'invoice') {
             const medJson = JSON.stringify({
               id: parsed.medicine_id,
               name: parsed.name,

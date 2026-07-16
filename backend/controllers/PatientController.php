@@ -36,10 +36,7 @@ class PatientController {
         $stmtTotal->execute(['uid' => $user_id]);
         $totalOrders = $stmtTotal->fetchColumn();
 
-        // Get pending prescriptions (where prescription image is uploaded and order status is pending)
-        $stmtRx = $this->conn->prepare("SELECT COUNT(*) FROM orders WHERE patient_id = :uid AND prescription IS NOT NULL AND status = 'pending'");
-        $stmtRx->execute(['uid' => $user_id]);
-        $activePrescriptions = $stmtRx->fetchColumn();
+
 
         // Get delivered orders
         $stmtDel = $this->conn->prepare("SELECT COUNT(*) FROM orders WHERE patient_id = :uid AND status = 'delivered'");
@@ -62,7 +59,6 @@ class PatientController {
             "success" => true,
             "stats" => [
                 "totalOrders" => (int)$totalOrders,
-                "activePrescriptions" => (int)$activePrescriptions,
                 "deliveredOrders" => (int)$deliveredOrders
             ],
             "recentOrders" => $recentOrders

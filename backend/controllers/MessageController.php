@@ -19,6 +19,8 @@ class MessageController {
             $this->getMessageHistory($id);
         } elseif ($method === 'POST' && $action === 'send') {
             $this->sendMessage();
+        } elseif ($method === 'POST' && $action === 'upload') {
+            $this->uploadAttachment();
         } elseif ($method === 'PATCH' && $action === 'read' && $id) {
             $this->markAsRead($id);
         } else {
@@ -161,6 +163,71 @@ class MessageController {
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(["success" => false, "message" => "Error sending message: " . $e->getMessage()]);
+        }
+    }
+
+    
+    private function uploadAttachment() {
+        $decoded = Jwt::authenticate();
+        $sender_id = $decoded['id'];
+
+        $receiver_id = isset($_POST['receiver_id']) ? $_POST['receiver_id'] : null;
+
+        if (!$receiver_id) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Receiver ID is required"]);
+            return;
+        }
+
+        if (!isset($_FILES['attachment']) || $_FILES['attachment']['error'] !== UPLOAD_ERR_OK) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Please upload a valid file."]);
+            return;
+        }
+
+        $uploadDir = __DIR__ . '/../../uploads/chat/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileTmpPath = $_FILES['attachment']['tmp_name'];
+        $fileName = $_FILES['attachment']['name'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Only JPG, PNG and PDF files are allowed."]);
+            return;
+        }
+
+        $newFileName = "chat_" . time() . "_" . uniqid() . "." . $fileExtension;
+        $destPath = $uploadDir . $newFileName;
+
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $fileUrl = 'uploads/chat/' . $newFileName;
+            
+            // Generate a JSON payload for the message
+            $payload = [
+                'type' => 'attachment',
+                'url' => $fileUrl,
+                'fileType' => ($fileExtension === 'pdf') ? 'pdf' : 'image',
+                'originalName' => $fileName
+            ];
+            
+            $messageContent = json_encode($payload);
+
+            http_response_code(201);
+            echo json_encode([
+                "success" => true, 
+                "message" => "Attachment uploaded successfully", 
+                "url" => $fileUrl,
+                "fileType" => ($fileExtension === 'pdf') ? 'pdf' : 'image',
+                "originalName" => $fileName
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to move uploaded file."]);
         }
     }
 
