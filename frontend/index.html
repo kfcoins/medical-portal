@@ -838,7 +838,7 @@
             navActions.innerHTML = `
               <a href="${dashboardLink}" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 15px;">
                 <i class="fas fa-bell"></i>
-                <span style="position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; background-color: #E53E3E; border-radius: 50%; border: 2px solid #F4F7FA;"></span>
+                <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
               </a>
               <a href="${dashboardLink}" class="btn btn-outline" style="border: 2px solid #2D9A6A; color: #2D9A6A;">Dashboard</a>
               <a href="#" onclick="logoutUser(event)" class="btn btn-primary" style="background-color: #E53E3E; border-color: #E53E3E;">Sign Out</a>
