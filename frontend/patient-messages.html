@@ -380,14 +380,14 @@
             }).replace(/'/g, "&#39;");
             
             displayMessage = `
-              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-top: 8px; width: 100%; max-width: 300px; color: #1e293b; text-align: left;">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 8px;">
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px; margin-top: 4px; width: 100%; max-width: 250px; color: #1e293b; text-align: left;">
+                <div style="font-size: 0.65rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 4px;">
                   <i class="fas fa-file-invoice-dollar"></i> Custom Prescription Invoice
                 </div>
-                <div style="font-weight: 600; font-size: 1rem; margin-bottom: 4px;">${parsed.name}</div>
-                <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px; line-height: 1.4;">${parsed.prescription || 'No notes provided.'}</div>
-                <div style="font-weight: 700; color: #1A6349; font-size: 1.1rem; margin-bottom: 16px;">GHS ${parseFloat(parsed.price).toFixed(2)}</div>
-                <button onclick='addInvoiceToCart(${medJson})' style="width: 100%; padding: 10px; background: #1A6349; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 2px;">${parsed.name}</div>
+                <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px; line-height: 1.3;">${parsed.prescription || 'No notes provided.'}</div>
+                <div style="font-weight: 700; color: #1A6349; font-size: 1rem; margin-bottom: 10px;">GHS ${parseFloat(parsed.price).toFixed(2)}</div>
+                <button onclick='addInvoiceToCart(${medJson})' style="width: 100%; padding: 6px; background: #1A6349; color: white; border: none; border-radius: 4px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
                   Add to Cart
                 </button>
               </div>
