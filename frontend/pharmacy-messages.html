@@ -247,8 +247,9 @@
     async function loadConversations(showLoader = true) {
       const token = localStorage.getItem('token');
       try {
-        const res = await fetch('../backend/index.php?route=messages/conversations', {
-          headers: { 'Authorization': 'Bearer ' + token }
+        const res = await fetch(`../backend/index.php?route=messages/conversations&_t=${Date.now()}`, {
+          headers: { 'Authorization': 'Bearer ' + token },
+          cache: 'no-store'
         });
         const data = await res.json();
         const listElem = document.getElementById('conversationsList');
@@ -284,6 +285,10 @@
           if (notifBadge) {
               notifBadge.textContent = totalUnread;
               notifBadge.style.display = totalUnread > 0 ? 'flex' : 'none';
+          }
+          
+          if (typeof updateGlobalBadges === 'function') {
+              updateGlobalBadges();
           }
         }
       } catch (err) {
@@ -325,6 +330,7 @@
       });
 
       await loadMessages(contactId, true);
+      loadConversations(false);
     }
 
     async function loadMessages(contactId, scroll = false) {
