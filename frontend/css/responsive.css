@@ -10,6 +10,18 @@
   padding: 4px;
 }
 
+/* Close Sidebar Button */
+.close-sidebar-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 4px;
+}
+
 /* Sidebar Overlay */
 .sidebar-overlay {
   display: none;
@@ -54,6 +66,10 @@ table {
 
 @media (max-width: 768px) {
   .mobile-menu-btn {
+    display: block;
+  }
+  
+  .close-sidebar-btn {
     display: block;
   }
   
