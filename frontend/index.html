@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PharmaTrust Ghanaana â€” Your Trusted Pharmacy Network</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <title>PharmaTrust Ghanaana &mdash; Your Trusted Pharmacy Network</title>
+  <link rel="stylesheet" href="css/style.css?v=1.1"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
@@ -18,7 +19,6 @@
         const user = JSON.parse(localStorage.getItem('user'));
         if (token && user && user.role) {
           const dashboards = {
-            patient: 'patient-dashboard.html',
             pharmacy: 'pharmacy-dashboard.html',
             admin: 'admin-dashboard.html'
           };
@@ -88,19 +88,19 @@
             <i class="fas fa-play-circle"></i> Learn More
           </a>
         </div>
-        <div class="hero-stats">
+        <div class="hero-stats" data-aos="fade-up">
           <div class="stat">
-            <span class="stat-num" data-target="2400">0</span>+
+            <div class="stat-value"><span class="stat-num" data-target="2400">0</span><span class="stat-suffix">+</span></div>
             <span class="stat-label">Verified Agents</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-num" data-target="16">0</span>
+            <div class="stat-value"><span class="stat-num" data-target="16">0</span></div>
             <span class="stat-label">Regions Covered</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-num" data-target="98">0</span>%
+            <div class="stat-value"><span class="stat-num" data-target="98">0</span><span class="stat-suffix">%</span></div>
             <span class="stat-label">Satisfaction Rate</span>
           </div>
         </div>
@@ -119,7 +119,7 @@
             <i class="fas fa-truck"></i>
             <div>
               <strong>Fast Delivery</strong>
-              <span>Accra â€” 2hrs</span>
+              <span>Accra &mdash; 2hrs</span>
             </div>
           </div>
         </div>
@@ -180,94 +180,9 @@
                 <p>Active agents in Accra, Kumasi, Tamale, Cape Coast, and 12 other regions.</p>
               </div>
             </div>
-            <div class="about-feature">
-              <div class="feature-icon teal"><i class="fas fa-mobile-alt"></i></div>
-              <div>
-                <strong>USSD & Mobile Access</strong>
-                <p>Order medicines via *920# USSD â€” no smartphone needed for rural Ghana.</p>
-              </div>
-            </div>
-          </div>
-          <a href="#agents" class="btn btn-primary">Meet Our Agents <i class="fas fa-arrow-right"></i></a>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ===== SERVICES ===== -->
-  <section class="services section" id="services">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-eyebrow">What We Offer</div>
-        <h2 class="section-title">End-to-End Pharmaceutical Services</h2>
-        <p class="section-desc">From prescription verification to doorstep delivery, PharmaTrust Ghana handles every step of the medicine supply chain.</p>
-      </div>
-      <div class="services-grid">
-        <div class="service-card featured">
-          <div class="service-icon"><i class="fas fa-qrcode"></i></div>
-          <h3>Medicine Verification</h3>
-          <p>Scan any medication's QR code to instantly verify its authenticity with FDA Ghana's database.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> Real-time FDA database check</li>
-            <li><i class="fas fa-check"></i> Batch number tracking</li>
-            <li><i class="fas fa-check"></i> Expiry date alerts</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-prescription-bottle-alt"></i></div>
-          <h3>Agent Distribution</h3>
-          <p>Licensed agents distribute genuine medicines to clinics, hospitals, and homes across Ghana.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> 2,400+ active agents</li>
-            <li><i class="fas fa-check"></i> Same-day delivery in cities</li>
-            <li><i class="fas fa-check"></i> Rural outreach programs</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-file-medical"></i></div>
-          <h3>e-Prescription System</h3>
-          <p>Doctors issue digital prescriptions; patients redeem them at any verified agent across Ghana.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> Secure digital prescriptions</li>
-            <li><i class="fas fa-check"></i> Doctor-pharmacist messaging</li>
-            <li><i class="fas fa-check"></i> Prescription history</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-chart-line"></i></div>
-          <h3>Stock Management</h3>
-          <p>Real-time inventory management for pharmacies and agents with automated low-stock alerts.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> Live inventory dashboard</li>
-            <li><i class="fas fa-check"></i> Reorder automation</li>
-            <li><i class="fas fa-check"></i> Expiry tracking</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-hand-holding-heart"></i></div>
-          <h3>NHIS Integration</h3>
-          <p>Seamless National Health Insurance Scheme processing â€” no paperwork, instant claims.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> Instant NHIS verification</li>
-            <li><i class="fas fa-check"></i> Digital claim submission</li>
-            <li><i class="fas fa-check"></i> Covered medicine list</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="service-card">
-          <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
-          <h3>Agent Training</h3>
-          <p>Ongoing certification and training programs for agents to maintain the highest standards.</p>
-          <ul class="service-list">
-            <li><i class="fas fa-check"></i> Online & in-person training</li>
-            <li><i class="fas fa-check"></i> FDA compliance modules</li>
-            <li><i class="fas fa-check"></i> Certification badges</li>
-          </ul>
-          <a href="#" class="service-link">Learn more <i class="fas fa-arrow-right"></i></a>
+          </div>
+
         </div>
       </div>
     </div>
@@ -313,6 +228,79 @@
       <div class="medicines-grid" id="medicinesGrid">
         <!-- Medicines will be dynamically loaded here by main.js -->
         <p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">Loading medicines...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES ===== -->
+  <section class="services section" id="services">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">What We Offer</div>
+        <h2 class="section-title">End-to-End Pharmaceutical Services</h2>
+        <p class="section-desc">From prescription verification to doorstep delivery, PharmaTrust Ghana handles every step of the medicine supply chain.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card featured">
+          <div class="service-icon"><i class="fas fa-shopping-cart"></i></div>
+          <h3>Online Medicine Ordering</h3>
+          <p>Browse our extensive catalogue of genuine medicines and place orders directly from verified pharmacies.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Easy add-to-cart checkout</li>
+            <li><i class="fas fa-check"></i> Genuine medicines guaranteed</li>
+            <li><i class="fas fa-check"></i> Direct pharmacy ordering</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-comments"></i></div>
+          <h3>Real-Time Consultations</h3>
+          <p>Chat directly with licensed pharmacists to ask questions, discuss prescriptions, and get expert medical advice.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Secure instant messaging</li>
+            <li><i class="fas fa-check"></i> Direct pharmacist access</li>
+            <li><i class="fas fa-check"></i> Seamless communication</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h3>Pharmacy Management</h3>
+          <p>Dedicated dashboards for pharmacies to effortlessly manage incoming orders and update their inventory.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Live order processing</li>
+            <li><i class="fas fa-check"></i> Intuitive stock updates</li>
+            <li><i class="fas fa-check"></i> Customer management</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-truck-loading"></i></div>
+          <h3>Order Tracking</h3>
+          <p>Patients can view their complete order history and track the real-time status of their active orders.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Live status updates</li>
+            <li><i class="fas fa-check"></i> Detailed purchase history</li>
+            <li><i class="fas fa-check"></i> Transparent pricing</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-user-shield"></i></div>
+          <h3>Verified Pharmacies Only</h3>
+          <p>Our strict admin approval process ensures that every pharmacy on our platform is fully licensed and vetted.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Admin review dashboard</li>
+            <li><i class="fas fa-check"></i> Platform-wide security</li>
+            <li><i class="fas fa-check"></i> Safe & trusted network</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-chart-pie"></i></div>
+          <h3>Pharmacy Analytics</h3>
+          <p>Powerful analytics tools allow pharmacies to track their sales performance, revenue, and product trends.</p>
+          <ul class="service-list">
+            <li><i class="fas fa-check"></i> Visual sales charts</li>
+            <li><i class="fas fa-check"></i> Revenue tracking</li>
+            <li><i class="fas fa-check"></i> Business insights</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -427,7 +415,7 @@
         <div class="contact-info">
           <div class="section-eyebrow">Get In Touch</div>
           <h2 class="section-title">Connect With Our Team</h2>
-          <p>Our team is available Mondayâ€“Friday 8amâ€“6pm and Saturdays 9amâ€“3pm to answer all your questions.</p>
+          <p>Our team is available Monday&ndash;Friday 8am&ndash;6pm and Saturdays 9am&ndash;3pm to answer all your questions.</p>
           <div class="contact-details">
             <div class="contact-item">
               <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
@@ -450,13 +438,7 @@
                 <span>support@PharmaTrust.com.gh</span>
               </div>
             </div>
-            <div class="contact-item">
-              <div class="contact-icon"><i class="fas fa-comment-dots"></i></div>
-              <div>
-                <strong>USSD</strong>
-                <span>Dial *920# on any network</span>
-              </div>
-            </div>
+
           </div>
         </div>
         <div class="contact-form-wrap">
@@ -507,7 +489,7 @@
             <div class="logo-icon"><i class="fas fa-shield-virus"></i></div>
             <span class="logo-text">PharmaTrust <span class="logo-gh">GH</span></span>
           </div>
-          <p>Ghana's most trusted pharmaceutical agent platform â€” connecting patients to genuine medicines nationwide.</p>
+          <p>Ghana's most trusted pharmaceutical agent platform &mdash; connecting patients to genuine medicines nationwide.</p>
           <div class="footer-social">
             <a href="#"><i class="fab fa-facebook-f"></i></a>
             <a href="#"><i class="fab fa-twitter"></i></a>
@@ -542,15 +524,15 @@
             <li><a href="#">Ashanti</a></li>
             <li><a href="#">Northern</a></li>
             <li><a href="#">Western</a></li>
-            <li><a href="#">All 16 Regions â†’</a></li>
+            <li><a href="#">All 16 Regions &rarr;</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="container">
-        <p>Â© 2024 PharmaTrust Ghanaana. All rights reserved. | Reg. No. GH-FDA-2024-0421 | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-        <p class="footer-note">Final Year Project Presentation â€” University of Ghana, School of Pharmacy</p>
+        <p>&copy; 2024 PharmaTrust Ghanaana. All rights reserved. | Reg. No. GH-FDA-2024-0421 | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        <p class="footer-note">Final Year Project Presentation &mdash; University of Ghana, School of Pharmacy</p>
       </div>
     </div>
   </footer>
@@ -569,12 +551,12 @@
           const navActions = document.querySelector('.nav-actions');
           const heroCta = document.querySelector('.hero-cta');
           
-          let dashboardUrl = 'patient-dashboard.html';
+          let dashboardUrl = 'index.html';
           if (user.role === 'admin') dashboardUrl = 'admin-dashboard.html';
           else if (user.role === 'pharmacy') dashboardUrl = 'pharmacy-dashboard.html';
-          else if (user.role === 'patient') dashboardUrl = 'patient-dashboard.html';
+          else if (user.role === 'patient') dashboardUrl = 'patient-profile.html';
 
-          // navActions is now fully handled dynamically in main.js
+          
 
           // Update Hero CTA
           if (heroCta) {
@@ -589,7 +571,7 @@
               `;
             } else if (user.role === 'patient') {
               heroCta.innerHTML = `
-                <a href="${dashboardUrl}" class="btn btn-primary btn-lg">
+                <a href="#medicines" class="btn btn-primary btn-lg">
                   <i class="fas fa-pills"></i> Order Medicine
                 </a>
                 <a href="#services" class="btn btn-ghost btn-lg">
@@ -847,9 +829,16 @@
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
-          let dashboardLink = 'patient-dashboard.html';
-          if (user.role === 'admin') dashboardLink = 'admin-dashboard.html';
-          if (user.role === 'pharmacy') dashboardLink = 'pharmacy-dashboard.html';
+          let dashboardLink = 'patient-profile.html';
+          let dashboardText = 'Profile';
+          
+          if (user.role === 'admin') {
+            dashboardLink = 'admin-dashboard.html';
+            dashboardText = 'Dashboard';
+          } else if (user.role === 'pharmacy') {
+            dashboardLink = 'pharmacy-dashboard.html';
+            dashboardText = 'Dashboard';
+          }
           
           const navActions = document.querySelector('.nav-actions');
           if (navActions) {
@@ -858,8 +847,8 @@
                 <i class="fas fa-bell"></i>
                 <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
               </a>
-              <a href="${dashboardLink}" class="btn btn-outline" style="border: 2px solid #2D9A6A; color: #2D9A6A;">Dashboard</a>
-              <a href="#" onclick="logoutUser(event)" class="btn btn-primary" style="background-color: #E53E3E; border-color: #E53E3E;">Sign Out</a>
+              <a href="${dashboardLink}" class="btn btn-outline" style="border-color: #2D9A6A; color: #2D9A6A; transition: 0.3s;" onmouseover="this.style.backgroundColor='#2D9A6A'; this.style.color='white';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2D9A6A';">${dashboardText}</a>
+              <a href="#" onclick="logoutUser(event)" class="btn btn-primary" style="background-color: #E53E3E; border-color: #E53E3E; transition: 0.3s;" onmouseover="this.style.backgroundColor='#C53030'; this.style.borderColor='#C53030';" onmouseout="this.style.backgroundColor='#E53E3E'; this.style.borderColor='#E53E3E';">Sign Out</a>
             `;
             navActions.style.display = 'flex';
             navActions.style.alignItems = 'center';
@@ -969,6 +958,63 @@
       if (urlParams.get('open_chat') === 'true') {
         setTimeout(handlePharmacistFabClick, 500);
       }
+    });
+  </script>
+
+  <!-- AOS Animation Library -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Inject AOS attributes into DOM elements cleanly
+      const fadeUpElements = document.querySelectorAll('.section-header, .trust-bar, .hero-stats');
+      const fadeRightElements = document.querySelectorAll('.hero-content, .about-text');
+      const fadeLeftElements = document.querySelectorAll('.hero-visual, .about-visual');
+      const zoomInElements = document.querySelectorAll('.service-card, .process-step');
+
+      fadeUpElements.forEach(el => el.setAttribute('data-aos', 'fade-up'));
+      fadeRightElements.forEach(el => el.setAttribute('data-aos', 'fade-right'));
+      fadeLeftElements.forEach(el => el.setAttribute('data-aos', 'fade-left'));
+      zoomInElements.forEach(el => el.setAttribute('data-aos', 'zoom-in-up'));
+
+      // Stagger child elements
+      const staggerContainers = document.querySelectorAll('.services-grid, .process-track');
+      staggerContainers.forEach(container => {
+        Array.from(container.children).forEach((child, index) => {
+          child.setAttribute('data-aos-delay', (index * 150).toString());
+        });
+      });
+
+      // Initialize AOS engine
+      AOS.init({
+        duration: 900,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 80,
+      });
+
+      // Handle dynamically injected elements (like medicines & agents)
+      const mutationObserver = new MutationObserver((mutations) => {
+        let shouldRefresh = false;
+        mutations.forEach(mutation => {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1) { 
+              if (node.classList.contains('medicine-card') || node.classList.contains('agent-card')) {
+                node.setAttribute('data-aos', 'zoom-in-up');
+                const randDelay = Math.floor(Math.random() * 3) * 150;
+                node.setAttribute('data-aos-delay', randDelay.toString());
+                shouldRefresh = true;
+              }
+            }
+          });
+        });
+        
+        // Let the DOM update then refresh AOS positioning
+        if (shouldRefresh) {
+          setTimeout(() => AOS.refresh(), 100);
+        }
+      });
+
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
     });
   </script>
 </body>

@@ -51,6 +51,11 @@ switch ($controller) {
         $medicineController = new MedicineController();
         $medicineController->handleRequest($action, $id);
         break;
+    case 'prescriptions':
+        require_once 'controllers/PrescriptionController.php';
+        $prescriptionController = new PrescriptionController();
+        $prescriptionController->handleRequest($action, $id);
+        break;
     case 'orders':
         require_once 'controllers/OrderController.php';
         $orderController = new OrderController();

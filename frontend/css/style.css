@@ -152,7 +152,10 @@ p { line-height: 1.7; color: var(--gray-500); }
 .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
 .hero-stats { display: flex; align-items: center; gap: 32px; }
 .stat { display: flex; flex-direction: column; }
-.stat-num { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800; color: var(--green-700); line-height: 1; }
+.stat-value { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+.stat-num, .stat-suffix { font-family: 'Sora', sans-serif; font-weight: 800; color: var(--green-700); line-height: 1; }
+.stat-num { font-size: 2.5rem; }
+.stat-suffix { font-size: 1.6rem; }
 .stat-label { font-size: 0.78rem; color: var(--gray-500); font-weight: 500; margin-top: 4px; }
 .stat-divider { width: 1px; height: 40px; background: var(--gray-200); }
 .hero-visual { position: relative; }

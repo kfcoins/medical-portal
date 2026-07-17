@@ -27,26 +27,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <!-- Checkout Modal -->
             <div class="modal-overlay" id="checkoutModal">
-                <div class="modal">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
-                    <h3 style="font-family: 'Sora'; font-size: 1.25rem;">Checkout</h3>
-                    <button class="close-cart" onclick="closeCheckoutModal()">&times;</button>
-                </div>
-                <form id="checkoutForm" onsubmit="handleCheckout(event)">
-                    <div class="form-group">
-                    <label>Delivery Address</label>
-                    <textarea class="form-control" id="deliveryAddress" rows="3" required placeholder="Enter full delivery address or directions"></textarea>
+                <div class="modal" style="padding: 0; overflow: hidden; border: none; background: white; border-radius: 16px; width: 90%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+                    <div style="padding: 24px 32px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC;">
+                        <h3 style="font-family: 'Sora', sans-serif; font-size: 1.25rem; color: #0F1923; margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #1A6349; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            Checkout
+                        </h3>
+                        <button class="close-cart" onclick="closeCheckoutModal()" style="background: #E2E8F0; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #475569; transition: all 0.2s ease;">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    <div class="form-group">
-                    <label>Payment Method</label>
-                    <select class="form-control" id="paymentMethod" required>
-                        <option value="cash">Pay on Delivery (Cash)</option>
-                        <option value="momo">Mobile Money (Coming Soon)</option>
-                        <option value="card">Card (Coming Soon)</option>
-                    </select>
-                    </div>
-                    <button type="submit" class="btn-checkout" id="confirmCheckoutBtn" style="margin-top: 16px;">Place Order</button>
-                </form>
+                    <form id="checkoutForm" onsubmit="handleCheckout(event)" style="padding: 32px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box; text-align: left;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Delivery Address <span style="color: #E53E3E;">*</span></label>
+                            <textarea id="deliveryAddress" rows="3" required placeholder="Enter full delivery address, landmark or directions..." style="width: 100%; padding: 14px; border: 1.5px solid #E2E8F0; border-radius: 12px; font-family: inherit; font-size: 0.95rem; color: #0F1923; transition: all 0.2s ease; resize: none; background: #F8FAFC; outline: none; box-sizing: border-box;"></textarea>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Payment Method <span style="color: #E53E3E;">*</span></label>
+                            <div style="position: relative;">
+                                <select id="paymentMethod" required style="width: 100%; padding: 14px; border: 1.5px solid #E2E8F0; border-radius: 12px; font-family: inherit; font-size: 0.95rem; color: #0F1923; transition: all 0.2s ease; background: #F8FAFC; appearance: none; outline: none; cursor: pointer; box-sizing: border-box;">
+                                    <option value="cash">Pay on Delivery (Cash)</option>
+                                    <option value="momo">Mobile Money</option>
+                                    <option value="card">Card</option>
+                                </select>
+                                <div style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #64748B; pointer-events: none;">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: #F8FAFC; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #E2E8F0;">
+                            <span style="color: #64748B; font-weight: 600; font-size: 0.95rem;">Total Amount</span>
+                            <span id="checkoutTotalDisplay" style="font-weight: 800; font-size: 1.3rem; color: #1A6349;">GHS 0.00</span>
+                        </div>
+                        <button type="submit" id="confirmCheckoutBtn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #1A6349 0%, #134e3a 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(26, 99, 73, 0.2); display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px;">
+                            <span>Place Order securely</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         `;
@@ -64,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function addToCart(medicine) {
-    const existingItem = cart.find(item => item.medicine.id === medicine.id);
+    const existingItem = cart.find(item => String(item.medicine.id) === String(medicine.id));
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
@@ -87,13 +106,13 @@ function addToCart(medicine) {
 }
 
 function removeFromCart(id) {
-    cart = cart.filter(item => item.medicine.id !== id);
+    cart = cart.filter(item => String(item.medicine.id) !== String(id));
     saveCart();
     updateCartUI();
 }
 
 function changeQuantity(id, delta) {
-    const item = cart.find(item => item.medicine.id === id);
+    const item = cart.find(item => String(item.medicine.id) === String(id));
     if (item) {
         item.quantity += delta;
         if (item.quantity <= 0) {
@@ -135,7 +154,7 @@ function updateCartUI() {
 
     let total = 0;
     container.innerHTML = cart.map(item => {
-        const itemTotal = item.medicine.price * item.quantity;
+        const itemTotal = parseFloat(item.medicine.price) * item.quantity;
         total += itemTotal;
         return `
         <div class="cart-item">
@@ -144,7 +163,7 @@ function updateCartUI() {
             <div class="cart-item-name">${item.medicine.name}</div>
             <div class="cart-item-pharmacy">${item.medicine.pharmacy_name || 'System'}</div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="cart-item-price">GHS ${item.medicine.price.toFixed(2)}</div>
+                <div class="cart-item-price">GHS ${parseFloat(item.medicine.price).toFixed(2)}</div>
                 <div class="cart-item-actions">
                 <button class="qty-btn" onclick="changeQuantity('${item.medicine.id}', -1)">-</button>
                 <span style="font-size: 0.9rem; font-weight: 500; width: 20px; text-align: center;">${item.quantity}</span>
@@ -179,12 +198,53 @@ function toggleCart() {
 
 function openCheckoutModal() {
     if (cart.length === 0) {
-        alert("Your cart is empty!");
+        if (window.showToast) window.showToast("Your cart is empty!", 'error');
         return;
     }
     toggleCart(); // close sidebar
     const checkoutModal = document.getElementById('checkoutModal');
-    if(checkoutModal) checkoutModal.classList.add('active');
+    if(checkoutModal) {
+        checkoutModal.classList.add('active');
+        const checkoutTotalDisplay = document.getElementById('checkoutTotalDisplay');
+        if (checkoutTotalDisplay) {
+            let total = cart.reduce((sum, item) => sum + parseFloat(item.medicine.price) * item.quantity, 0);
+            checkoutTotalDisplay.textContent = `GHS ${total.toFixed(2)}`;
+        }
+
+        // Enforce Pay on Delivery availability
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        if (paymentMethodSelect) {
+            const cashOption = Array.from(paymentMethodSelect.options).find(opt => opt.value === 'cash');
+            const hasDisabledPOD = cart.some(item => item.medicine.allow_pay_on_delivery == 0);
+            
+            let warningMsg = document.getElementById('podWarning');
+            if (!warningMsg) {
+                warningMsg = document.createElement('div');
+                warningMsg.id = 'podWarning';
+                warningMsg.style.color = '#E53E3E';
+                warningMsg.style.fontSize = '0.8rem';
+                warningMsg.style.marginTop = '6px';
+                paymentMethodSelect.parentNode.appendChild(warningMsg);
+            }
+            
+            if (hasDisabledPOD) {
+                if (cashOption) {
+                    cashOption.disabled = true;
+                    cashOption.innerHTML = 'Pay on Delivery (Disabled)';
+                }
+                if (paymentMethodSelect.value === 'cash') {
+                    paymentMethodSelect.value = 'momo';
+                }
+                warningMsg.textContent = '* One or more items in your cart do not support Pay on Delivery.';
+            } else {
+                if (cashOption) {
+                    cashOption.disabled = false;
+                    cashOption.innerHTML = 'Pay on Delivery (Cash)';
+                }
+                warningMsg.textContent = '';
+            }
+        }
+    }
 }
 
 function closeCheckoutModal() {
@@ -196,18 +256,52 @@ async function handleCheckout(e) {
     e.preventDefault();
     
     const paymentMethod = document.getElementById('paymentMethod').value;
-    if (paymentMethod !== 'cash') {
-        alert('Currently, only Pay on Delivery (Cash) is supported for demo purposes.');
-        return;
-    }
+    const deliveryAddress = document.getElementById('deliveryAddress').value;
 
     const btn = document.getElementById('confirmCheckoutBtn');
-    btn.textContent = 'Processing...';
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     btn.disabled = true;
 
+    if (paymentMethod === 'card' || paymentMethod === 'momo') {
+        if (typeof PaystackPop === 'undefined') {
+            if (window.showToast) window.showToast('Paystack could not be loaded. Please check your internet connection.', 'error');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        const user = JSON.parse(localStorage.getItem('user')) || {};
+        const total = cart.reduce((sum, item) => sum + parseFloat(item.medicine.price) * item.quantity, 0);
+
+        const handler = PaystackPop.setup({
+            key: 'pk_test_3f32e461e6ad186156468f2d35079d1775e1949f', // Dummy key for demo
+            email: user.email || 'guest@example.com',
+            amount: total * 100, // Paystack uses pesewas
+            currency: 'GHS',
+            ref: 'ORD_' + Math.floor((Math.random() * 1000000000) + 1),
+            callback: function(response) {
+                // Pass the reference to our backend
+                submitCartOrder(deliveryAddress, paymentMethod, response.reference, originalText);
+            },
+            onClose: function() {
+                if (window.showToast) window.showToast('Payment window closed.', 'info');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+        handler.openIframe();
+    } else {
+        // Cash payment
+        submitCartOrder(deliveryAddress, paymentMethod, null, originalText);
+    }
+}
+
+async function submitCartOrder(deliveryAddress, paymentMethod, reference, originalBtnText) {
     const payload = {
-        deliveryAddress: document.getElementById('deliveryAddress').value,
+        deliveryAddress: deliveryAddress,
         paymentMethod: paymentMethod,
+        paymentReference: reference,
         items: cart.map(i => ({
             medicine_id: i.medicine.id,
             quantity: i.quantity,
@@ -216,6 +310,7 @@ async function handleCheckout(e) {
     };
     
     const token = localStorage.getItem('token');
+    const btn = document.getElementById('confirmCheckoutBtn');
 
     try {
         const response = await fetch('../backend/index.php?route=orders/checkout', {
@@ -233,16 +328,21 @@ async function handleCheckout(e) {
             saveCart();
             updateCartUI();
             closeCheckoutModal();
-            alert('Order placed successfully! Redirecting to orders page...');
-            window.location.href = 'patient-orders.html';
+            if (window.showToast) window.showToast('Order placed successfully! Redirecting to orders page...', 'success');
+            setTimeout(() => {
+                window.location.href = 'patient-orders.html';
+            }, 1500);
         } else {
-            alert('Checkout failed: ' + (data.message || 'Unknown error'));
+            if (window.showToast) window.showToast('Checkout failed: ' + (data.message || 'Unknown error'), 'error');
+            if(btn) {
+                btn.innerHTML = originalBtnText || 'Place Order';
+                btn.disabled = false;
+            }
         }
     } catch (error) {
-        alert('Checkout failed due to network error.');
-    } finally {
+        if (window.showToast) window.showToast('Checkout failed due to network error.', 'error');
         if(btn) {
-            btn.textContent = 'Place Order';
+            btn.innerHTML = originalBtnText || 'Place Order';
             btn.disabled = false;
         }
     }

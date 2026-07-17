@@ -103,7 +103,7 @@ class AgentController {
 
         $updates = [];
         $params = ['uid' => $user_id];
-        $allowedFields = ['pharmacy_name', 'council_reg_no', 'fda_license_no', 'agent_type', 'region', 'address', 'bio', 'nhis_enabled'];
+        $allowedFields = ['pharmacy_name', 'council_reg_no', 'fda_license_no', 'agent_type', 'region', 'address', 'bio', 'nhis_enabled', 'allow_pay_on_delivery'];
 
         foreach ($allowedFields as $field) {
             if (isset($input[$field])) {

@@ -527,7 +527,7 @@ class OrderController {
                 $med_id = $item['medicine_id'] ?? (isset($item['medicine']) && is_array($item['medicine']) ? $item['medicine']['id'] : ($item['medicine'] ?? null));
                 
                 // Fetch medicine details
-                $stmtMed = $this->conn->prepare("SELECT agent_id, price FROM medicines WHERE id = :id");
+                $stmtMed = $this->conn->prepare("SELECT m.agent_id, m.price, a.allow_pay_on_delivery FROM medicines m JOIN agents a ON m.agent_id = a.id WHERE m.id = :id");
                 $stmtMed->execute(['id' => $med_id]);
                 $med = $stmtMed->fetch();
 
@@ -535,6 +535,10 @@ class OrderController {
 
                 $agent_id = $med['agent_id'];
                 if (!$agent_id) throw new Exception("Medicine is not linked to any pharmacy: " . $med_id);
+
+                if ($paymentMethod === 'cash' && $med['allow_pay_on_delivery'] == 0) {
+                    throw new Exception("One or more items in your cart do not support Pay on Delivery.");
+                }
 
                 if (!isset($ordersByAgent[$agent_id])) {
                     $ordersByAgent[$agent_id] = [

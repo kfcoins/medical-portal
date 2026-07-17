@@ -68,7 +68,7 @@ class MedicineController {
             $whereSql = "WHERE " . implode(" AND ", $where);
         }
 
-        $query = "SELECT m.*, a.pharmacy_name FROM medicines m LEFT JOIN agents a ON m.agent_id = a.id $whereSql ORDER BY m.created_at DESC LIMIT $limit OFFSET $offset";
+        $query = "SELECT m.*, a.pharmacy_name, a.allow_pay_on_delivery FROM medicines m LEFT JOIN agents a ON m.agent_id = a.id $whereSql ORDER BY m.created_at DESC LIMIT $limit OFFSET $offset";
         $stmt = $this->conn->prepare($query);
         $stmt->execute($params);
         $medicines = $stmt->fetchAll();
@@ -94,7 +94,7 @@ class MedicineController {
     }
 
     private function getMedicine($id) {
-        $stmt = $this->conn->prepare("SELECT m.*, a.pharmacy_name FROM medicines m LEFT JOIN agents a ON m.agent_id = a.id WHERE m.id = :id");
+        $stmt = $this->conn->prepare("SELECT m.*, a.pharmacy_name, a.allow_pay_on_delivery FROM medicines m LEFT JOIN agents a ON m.agent_id = a.id WHERE m.id = :id");
         $stmt->execute(['id' => $id]);
         $medicine = $stmt->fetch();
 

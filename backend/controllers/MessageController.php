@@ -171,13 +171,7 @@ class MessageController {
         $decoded = Jwt::authenticate();
         $sender_id = $decoded['id'];
 
-        $receiver_id = isset($_POST['receiver_id']) ? $_POST['receiver_id'] : null;
-
-        if (!$receiver_id) {
-            http_response_code(400);
-            echo json_encode(["success" => false, "message" => "Receiver ID is required"]);
-            return;
-        }
+        // No need for receiver_id here, as the frontend sends the message via WebSocket after getting the file URL
 
         if (!isset($_FILES['attachment']) || $_FILES['attachment']['error'] !== UPLOAD_ERR_OK) {
             http_response_code(400);

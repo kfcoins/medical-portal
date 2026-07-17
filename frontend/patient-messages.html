@@ -80,6 +80,7 @@
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94A3B8; }
     .empty-state i { font-size: 4rem; margin-bottom: 16px; color: #CBD5E1; }
   </style>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
 
@@ -88,8 +89,8 @@
       <i class="fas fa-shield-virus"></i> PharmaTrust
     </div>
     <div class="nav-links">
-      <a href="patient-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
-      <a href="patient-store.html" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
+      <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="index.html#medicines" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
       <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
       <a href="patient-messages.html" class="nav-link active"><i class="fas fa-envelope"></i> Messages</a>
       <a href="patient-profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
@@ -105,7 +106,10 @@
         <button id="toggleChatSidebar" style="background: none; border: none; font-size: 1.25rem; color: #64748B; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='#64748B'">
           <i class="fas fa-users"></i>
         </button>
-        <div class="header-title">Messages</div>
+        <div class="header-title" style="display: flex; align-items: center; gap: 8px;">
+          Messages
+          <span id="connIndicator" title="Connecting..." style="width: 10px; height: 10px; border-radius: 50%; background-color: #F59E0B; display: inline-block;"></span>
+        </div>
       </div>
       <div class="header-actions" style="display: flex; align-items: center;">
 
@@ -180,25 +184,53 @@
       }
 
       // Initialize WebSocket
-      wsConn = new WebSocket('ws://localhost:8081?token=' + token);
-      wsConn.onopen = function(e) {
-          console.log("WebSocket connection established");
-      };
-      wsConn.onmessage = function(e) {
-          const payload = JSON.parse(e.data);
-          if (payload.type === 'message') {
-              const msg = payload.data;
-              if (activeContactId === msg.sender_id || activeContactId === msg.receiver_id) {
-                  appendMessage(msg, user.id);
-              }
-              loadConversations(false);
-          } else if (payload.type === 'typing') {
-              if (activeContactId === payload.sender_id) {
-                  showTypingIndicator();
-              }
-          }
-      };
+      connectWebSocket();
     });
+
+    function connectWebSocket() {
+        const token = localStorage.getItem('token');
+        wsConn = new WebSocket('ws://localhost:8081?token=' + token);
+        
+        wsConn.onopen = function(e) {
+            console.log("WebSocket connection established");
+            const indicator = document.getElementById('connIndicator');
+            if(indicator) {
+                indicator.style.backgroundColor = '#10B981';
+                indicator.title = 'Online';
+            }
+        };
+        
+        wsConn.onmessage = function(e) {
+            const payload = JSON.parse(e.data);
+            if (payload.type === 'message') {
+                const msg = payload.data;
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (activeContactId === msg.sender_id || activeContactId === msg.receiver_id) {
+                    appendMessage(msg, user.id);
+                }
+                loadConversations(false);
+            } else if (payload.type === 'typing') {
+                if (activeContactId === payload.sender_id) {
+                    showTypingIndicator();
+                }
+            }
+        };
+        
+        wsConn.onclose = function(e) {
+            console.warn("WebSocket closed. Reconnecting in 3s...");
+            const indicator = document.getElementById('connIndicator');
+            if(indicator) {
+                indicator.style.backgroundColor = '#E53E3E';
+                indicator.title = 'Offline - Reconnecting...';
+            }
+            setTimeout(connectWebSocket, 3000);
+        };
+        
+        wsConn.onerror = function(e) {
+            console.error("WebSocket error observed.");
+        };
+    }
+
 
     async function loadConversations(showLoader = true) {
       const token = localStorage.getItem('token');
@@ -222,6 +254,7 @@
             try {
               const p = JSON.parse(previewMsg);
               if (p.type === 'invoice') previewMsg = 'Received a custom invoice';
+              else if (p.type === 'attachment') previewMsg = p.fileType === 'image' ? '📷 Image' : '📎 Attachment';
             } catch(e) {}
             return `
             <div class="conversation-item ${c.contact_id === activeContactId ? 'active' : ''}" onclick="openConversation('${c.contact_id}', '${c.contact_name.replace(/'/g, "\\'")}')">
@@ -269,7 +302,13 @@
         <div class="chat-messages" id="chatMessages">
           <div style="text-align: center; padding: 20px; color: #94A3B8;">Loading messages...</div>
         </div>
-        <form class="chat-input-area" id="chatForm">
+        <div id="stagedFileContainer" style="display: none; padding: 8px 16px; background: #F8FAFC; border-top: 1px solid #E2E8F0; align-items: center; justify-content: space-between; border-radius: 8px 8px 0 0; margin-bottom: -1px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #475569; font-size: 0.85rem;">
+                <i class="fas fa-file"></i> <span id="stagedFileName"></span>
+            </div>
+            <button type="button" id="removeStagedFile" style="background: none; border: none; color: #E53E3E; cursor: pointer; padding: 4px;"><i class="fas fa-times"></i></button>
+        </div>
+        <form class="chat-input-area" id="chatForm" style="border-radius: 0 0 8px 8px;">
           <label for="attachmentInput" style="cursor: pointer; margin-right: 12px; color: #64748b; font-size: 1.2rem; display: flex; align-items: center;" title="Attach Prescription/Image">
             <i class="fas fa-paperclip"></i>
           </label>
@@ -289,12 +328,25 @@
       });
 
       const attachmentInput = document.getElementById('attachmentInput');
+      const stagedContainer = document.getElementById('stagedFileContainer');
+      const stagedFileName = document.getElementById('stagedFileName');
+      const removeStagedFile = document.getElementById('removeStagedFile');
+
       if (attachmentInput) {
-        attachmentInput.addEventListener('change', async (e) => {
+        attachmentInput.addEventListener('change', (e) => {
             if(e.target.files.length > 0) {
-                await uploadAttachment(e.target.files[0]);
-                e.target.value = '';
+                stagedFileName.textContent = e.target.files[0].name;
+                stagedContainer.style.display = 'flex';
+            } else {
+                stagedContainer.style.display = 'none';
             }
+        });
+      }
+
+      if (removeStagedFile) {
+        removeStagedFile.addEventListener('click', () => {
+            if(attachmentInput) attachmentInput.value = '';
+            stagedContainer.style.display = 'none';
         });
       }
 
@@ -323,7 +375,15 @@
                     
                     try {
                       const payload = JSON.parse(m.message);
-                      if (payload.type === 'invoice') {
+                      if (payload.type === 'attachment') {
+                        displayMessage = `
+                          <div style="margin-bottom: 4px;">
+                            ${payload.fileType === 'image' 
+                              ? `<img src="../${payload.url}" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0;" onclick="window.open('../${payload.url}', '_blank')">` 
+                              : `<a href="../${payload.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #F1F5F9; padding: 12px; border-radius: 8px; text-decoration: none; color: #0F1923; border: 1px solid #E2E8F0;"><i class="fas fa-file-pdf" style="color: #E53E3E; font-size: 1.5rem;"></i> View PDF</a>`}
+                          </div>
+                        `;
+                      } else if (payload.type === 'invoice') {
                         const medJson = JSON.stringify({
                           id: payload.medicine_id,
                           name: payload.name,
@@ -371,7 +431,27 @@
     
     async function uploadAttachment(file) {
         if(!activeContactId || !wsConn) return;
+        if (wsConn.readyState !== WebSocket.OPEN) {
+            if (window.showToast) window.showToast('You are offline. Please wait for the connection to re-establish before sending an attachment.', 'error');
+            return;
+        }
         
+        const msgContainer = document.getElementById('chatMessages');
+        const uploadId = 'upload-' + Date.now();
+        if (msgContainer) {
+            const emptyState = msgContainer.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            msgContainer.insertAdjacentHTML('beforeend', `
+                <div class="message-bubble message-outgoing" id="${uploadId}" style="opacity: 0.7;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-spinner fa-spin"></i> Uploading attachment...
+                    </div>
+                </div>
+            `);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
         const formData = new FormData();
         formData.append('receiver_id', activeContactId);
         formData.append('attachment', file);
@@ -384,6 +464,10 @@
                 body: formData
             });
             const data = await res.json();
+            
+            const uploadIndicator = document.getElementById(uploadId);
+            if (uploadIndicator) uploadIndicator.remove();
+
             if(data.success) {
                 const payload = {
                     type: 'attachment',
@@ -391,41 +475,69 @@
                     fileType: data.fileType,
                     originalName: data.originalName
                 };
-                wsConn.send(JSON.stringify({
-                    receiver_id: activeContactId,
-                    message: JSON.stringify(payload)
-                }));
+                if (wsConn.readyState === WebSocket.OPEN) {
+                    wsConn.send(JSON.stringify({
+                        receiver_id: activeContactId,
+                        message: JSON.stringify(payload)
+                    }));
+                }
             } else {
-                alert(data.message || 'Upload failed');
+                if (window.showToast) window.showToast(data.message || 'Upload failed', 'error');
             }
         } catch(e) {
             console.error(e);
-            alert('Upload error');
+            const uploadIndicator = document.getElementById(uploadId);
+            if (uploadIndicator) uploadIndicator.remove();
+            if (window.showToast) window.showToast('Upload error', 'error');
         }
     }
 
     async function sendMessage() {
         const input = document.getElementById('messageInput');
         const btn = document.getElementById('sendBtn');
+        const attachmentInput = document.getElementById('attachmentInput');
+        
         const msg = input.value.trim();
-        if(!msg || !activeContactId || !wsConn) return;
+        const hasFile = attachmentInput && attachmentInput.files.length > 0;
 
-        input.disabled = true;
-        btn.disabled = true;
+        if(!msg && !hasFile) return;
+        if(!activeContactId || !wsConn) return;
 
-        try {
+        if (wsConn.readyState !== WebSocket.OPEN) {
+            if (window.showToast) window.showToast('You are offline. Please wait for the connection to re-establish before sending messages.', 'error');
+            return;
+        }
+
+        // Instantly send text if available
+        if (msg) {
             wsConn.send(JSON.stringify({
                 receiver_id: activeContactId,
                 message: msg
             }));
             input.value = '';
-        } catch(e) {
-            console.error(e);
-            alert('Connection error');
-        } finally {
-            input.disabled = false;
-            btn.disabled = false;
-            input.focus();
+        }
+
+        // If there's a file, process it
+        if (hasFile) {
+            const file = attachmentInput.files[0];
+            // Clear UI immediately
+            attachmentInput.value = '';
+            const stagedContainer = document.getElementById('stagedFileContainer');
+            if(stagedContainer) stagedContainer.style.display = 'none';
+            
+            input.disabled = true;
+            btn.disabled = true;
+
+            try {
+                await uploadAttachment(file);
+            } catch(e) {
+                console.error("Upload failed in sendMessage:", e);
+                if (window.showToast) window.showToast('Upload error: ' + e.message, 'error');
+            } finally {
+                input.disabled = false;
+                btn.disabled = false;
+                input.focus();
+            }
         }
     }
 
@@ -447,8 +559,8 @@
             displayMessage = `
               <div style="margin-bottom: 4px;">
                 ${parsed.fileType === 'image' 
-                  ? `<img src="../backend/${parsed.url}" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0;" onclick="window.open('../backend/${parsed.url}', '_blank')">` 
-                  : `<a href="../backend/${parsed.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #F1F5F9; padding: 12px; border-radius: 8px; text-decoration: none; color: #0F1923; border: 1px solid #E2E8F0;"><i class="fas fa-file-pdf" style="color: #E53E3E; font-size: 1.5rem;"></i> View PDF</a>`}
+                  ? `<img src="../${parsed.url}" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer; border: 1px solid #E2E8F0;" onclick="window.open('../${parsed.url}', '_blank')">` 
+                  : `<a href="../${parsed.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #F1F5F9; padding: 12px; border-radius: 8px; text-decoration: none; color: #0F1923; border: 1px solid #E2E8F0;"><i class="fas fa-file-pdf" style="color: #E53E3E; font-size: 1.5rem;"></i> View PDF</a>`}
               </div>
             `;
           } else if (parsed.type === 'invoice') {
@@ -499,22 +611,22 @@
     }
 
     function addInvoiceToCart(medicine) {
-      let cart = [];
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        cart = JSON.parse(savedCart);
+      if (typeof cart === 'undefined') {
+        if (window.showToast) window.showToast('Cart system not loaded.', 'error');
+        return;
       }
       
-      const existingItem = cart.find(item => item.medicine.id === medicine.id);
+      const existingItem = cart.find(item => String(item.medicine.id) === String(medicine.id));
       if (existingItem) {
-        alert('This invoice is already in your cart.');
+        if (window.showToast) window.showToast('This invoice is already in your cart.', 'error');
         return;
       }
       
       cart.push({ medicine, quantity: 1 });
-      localStorage.setItem('cart', JSON.stringify(cart));
+      if (typeof saveCart === 'function') saveCart();
+      if (typeof updateCartUI === 'function') updateCartUI();
       
-      alert('Invoice added to your cart! Please proceed to the store to checkout.');
+      if (window.showToast) window.showToast('Invoice added to your cart! Please proceed to the store to checkout.', 'success');
     }
 
     function showTypingIndicator() {
@@ -576,6 +688,7 @@
       window.location.href = 'login.html';
     }
   </script>
+  <script src="js/main.js"></script>
   <script src="js/responsive.js"></script>
   <script src="js/cart.js"></script>
 </body>

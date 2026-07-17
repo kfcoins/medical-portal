@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const user = JSON.parse(userStr);
       const name = user.first_name || user.firstName || 'User';
-      let dashboardUrl = 'patient-dashboard.html';
+      let dashboardUrl = 'index.html';
       if (user.role === 'admin') dashboardUrl = 'admin-dashboard.html';
       else if (user.role === 'pharmacy') dashboardUrl = 'pharmacy-dashboard.html';
-      else if (user.role === 'patient') dashboardUrl = 'patient-dashboard.html';
+      else if (user.role === 'patient') dashboardUrl = 'patient-profile.html';
 
       navActions.innerHTML = `
         <div style="display: flex; align-items: center;">
@@ -44,25 +44,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== NAVBAR SCROLL =====
   const navbar = document.getElementById('navbar');
+  const scrollTop = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+    if (scrollTop) scrollTop.classList.toggle('visible', window.scrollY > 400);
   });
 
   // ===== HAMBURGER MENU =====
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
-  hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('open');
-  });
-  navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => navLinks.classList.remove('open'));
-  });
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+  }
 
   // ===== SCROLL TO TOP =====
-  document.getElementById('scrollTop').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  if (scrollTop) {
+    scrollTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
   // ===== COUNTER ANIMATION =====
   const counters = document.querySelectorAll('.stat-num[data-target]');
@@ -648,4 +653,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 500);
     }
   }
+});
+
+// Update Pharmacy Sidebar Orders Counter globally
+document.addEventListener('DOMContentLoaded', async () => {
+    const userStr = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    
+    if (userStr && token) {
+        try {
+            const user = JSON.parse(userStr);
+            // Only execute for pharmacy role and if the sidebar element exists
+            if (user.role === 'pharmacy') {
+                const counters = document.querySelectorAll('.sidebarOrdersCounter');
+                if (counters.length > 0) {
+                    const response = await fetch('/Mansro/backend/index.php?route=orders/my', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.orders) {
+                            // Count active orders (not completed, not cancelled, not delivered)
+                            const activeOrders = data.orders.filter(o => 
+                                o.status !== 'completed' && 
+                                o.status !== 'cancelled' && 
+                                o.status !== 'delivered'
+                            );
+                            
+                            counters.forEach(counter => {
+                                if (activeOrders.length > 0) {
+                                    counter.textContent = activeOrders.length;
+                                    counter.style.display = 'inline-block';
+                                } else {
+                                    counter.style.display = 'none';
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error fetching pharmacy sidebar counter:', e);
+        }
+    }
 });
