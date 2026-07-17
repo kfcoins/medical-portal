@@ -3,7 +3,7 @@
 // A simple zero-dependency JWT implementation for PHP
 
 class Jwt {
-    private static $secret = "PharmaTrust-gh-secret-2024-php-version-very-secure";
+    private static $secret = "YOUR_JWT_SECRET_KEY";
 
     public static function encode($payload) {
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);

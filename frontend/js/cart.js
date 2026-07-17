@@ -275,7 +275,7 @@ async function handleCheckout(e) {
         const total = cart.reduce((sum, item) => sum + parseFloat(item.medicine.price) * item.quantity, 0);
 
         const handler = PaystackPop.setup({
-            key: 'pk_test_3f32e461e6ad186156468f2d35079d1775e1949f', // Dummy key for demo
+            key: 'YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your actual public key
             email: user.email || 'guest@example.com',
             amount: total * 100, // Paystack uses pesewas
             currency: 'GHS',

@@ -570,7 +570,7 @@ if (checkoutForm) {
       }
       
       const handler = PaystackPop.setup({
-        key: 'pk_test_3f32e461e6ad186156468f2d35079d1775e1949f', // Dummy key
+        key: 'YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your actual public key
         email: user.email || 'guest@example.com',
         amount: totalAmount * 100,
         currency: 'GHS',

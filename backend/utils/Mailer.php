@@ -16,7 +16,7 @@ class Mailer {
 
    
         $this->mail->Username   = 'pangemah@gmail.com'; 
-        $this->mail->Password   = 'wvndtldfnxrnrthu'; 
+        $this->mail->Password   = 'YOUR_GMAIL_APP_PASSWORD'; 
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $this->mail->Port       = 465;
         $this->mail->Timeout    = 15; // 15 seconds timeout to allow secure TLS connection
