@@ -1,5 +1,7 @@
 <?php
 // index.php - Main entry point
+require_once __DIR__ . '/config/Env.php';
+Env::load(__DIR__ . '/../.env');
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
@@ -34,6 +36,16 @@ switch ($controller) {
         require_once 'controllers/AuthController.php';
         $authController = new AuthController();
         $authController->handleRequest($action);
+        break;
+    case 'config':
+        require_once 'controllers/ConfigController.php';
+        $configController = new ConfigController();
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $configController->getConfig();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Method not allowed"]);
+        }
         break;
     case 'admin':
         require_once 'controllers/AdminController.php';

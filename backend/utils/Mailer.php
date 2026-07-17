@@ -15,8 +15,8 @@ class Mailer {
         $this->mail->SMTPAuth   = true;
 
    
-        $this->mail->Username   = 'pangemah@gmail.com'; 
-        $this->mail->Password   = 'YOUR_GMAIL_APP_PASSWORD'; 
+        $this->mail->Username   = Env::get('MAIL_USERNAME', 'pangemah@gmail.com'); 
+        $this->mail->Password   = Env::get('MAIL_PASSWORD', ''); 
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $this->mail->Port       = 465;
         $this->mail->Timeout    = 15; // 15 seconds timeout to allow secure TLS connection

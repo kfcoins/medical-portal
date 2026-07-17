@@ -5,6 +5,8 @@ use Ratchet\WebSocket\WsServer;
 use App\Chat;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
+require dirname(__DIR__) . '/config/Env.php';
+Env::load(dirname(__DIR__) . '/../.env');
 
 $server = IoServer::factory(
     new HttpServer(

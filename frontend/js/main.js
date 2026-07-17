@@ -569,20 +569,32 @@ if (checkoutForm) {
         return;
       }
       
-      const handler = PaystackPop.setup({
-        key: 'YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your actual public key
-        email: user.email || 'guest@example.com',
-        amount: totalAmount * 100,
-        currency: 'GHS',
-        ref: 'ORD_' + Math.floor((Math.random() * 1000000000) + 1),
-        callback: function(response) {
-          submitOrder(address, method, response.reference);
-        },
-        onClose: function(){
-          showToast('Payment window closed.', 'info');
-        }
-      });
-      handler.openIframe();
+      fetch('/Mansro/backend/index.php?route=config')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.config.paystackPublicKey) {
+                const handler = PaystackPop.setup({
+                    key: data.config.paystackPublicKey,
+                    email: user.email || 'guest@example.com',
+                    amount: totalAmount * 100,
+                    currency: 'GHS',
+                    ref: 'ORD_' + Math.floor((Math.random() * 1000000000) + 1),
+                    callback: function(response) {
+                        submitOrder(address, method, response.reference);
+                    },
+                    onClose: function(){
+                        showToast('Payment window closed.', 'info');
+                    }
+                });
+                handler.openIframe();
+            } else {
+                showToast('Could not load payment configuration.', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Error loading payment configuration.', 'error');
+        });
     } else {
       submitOrder(address, method, null);
     }

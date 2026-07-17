@@ -483,7 +483,7 @@ class OrderController {
                 CURLOPT_URL => "https://api.paystack.co/transaction/verify/" . rawurlencode($reference),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer YOUR_PAYSTACK_SECRET_KEY",
+                    "Authorization: Bearer " . Env::get('PAYSTACK_SECRET_KEY', ''),
                     "Cache-Control: no-cache",
                 ),
             ));

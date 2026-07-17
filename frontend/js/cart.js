@@ -274,23 +274,38 @@ async function handleCheckout(e) {
         const user = JSON.parse(localStorage.getItem('user')) || {};
         const total = cart.reduce((sum, item) => sum + parseFloat(item.medicine.price) * item.quantity, 0);
 
-        const handler = PaystackPop.setup({
-            key: 'YOUR_PAYSTACK_PUBLIC_KEY', // Replace with your actual public key
-            email: user.email || 'guest@example.com',
-            amount: total * 100, // Paystack uses pesewas
-            currency: 'GHS',
-            ref: 'ORD_' + Math.floor((Math.random() * 1000000000) + 1),
-            callback: function(response) {
-                // Pass the reference to our backend
-                submitCartOrder(deliveryAddress, paymentMethod, response.reference, originalText);
-            },
-            onClose: function() {
-                if (window.showToast) window.showToast('Payment window closed.', 'info');
+        fetch('/Mansro/backend/index.php?route=config')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.config.paystackPublicKey) {
+                    const handler = PaystackPop.setup({
+                        key: data.config.paystackPublicKey,
+                        email: user.email || 'guest@example.com',
+                        amount: total * 100, // Paystack uses pesewas
+                        currency: 'GHS',
+                        ref: 'ORD_' + Math.floor((Math.random() * 1000000000) + 1),
+                        callback: function(response) {
+                            submitCartOrder(deliveryAddress, paymentMethod, response.reference, originalText);
+                        },
+                        onClose: function() {
+                            if (window.showToast) window.showToast('Payment window closed.', 'info');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    });
+                    handler.openIframe();
+                } else {
+                    if (window.showToast) window.showToast('Could not load payment configuration.', 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (window.showToast) window.showToast('Error loading payment configuration.', 'error');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-            }
-        });
-        handler.openIframe();
+            });
     } else {
         // Cash payment
         submitCartOrder(deliveryAddress, paymentMethod, null, originalText);
