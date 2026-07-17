@@ -47,6 +47,16 @@ switch ($controller) {
             echo json_encode(["message" => "Method not allowed"]);
         }
         break;
+    case 'webhook':
+        require_once 'controllers/WebhookController.php';
+        $webhookController = new WebhookController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $webhookController->handlePaystackWebhook();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Method not allowed"]);
+        }
+        break;
     case 'admin':
         require_once 'controllers/AdminController.php';
         $adminController = new AdminController();

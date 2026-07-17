@@ -87,15 +87,17 @@ class OrderController {
             $orderNo = "ORD-" . time() . "-" . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
 
             $paymentMethod = isset($input['paymentMethod']) ? $input['paymentMethod'] : 'cash';
+            $paymentReference = isset($input['paymentReference']) ? $input['paymentReference'] : null;
             $deliveryAddress = isset($input['deliveryAddress']) ? $input['deliveryAddress'] : null;
             $prescription = isset($input['prescription']) ? $input['prescription'] : null;
             $notes = isset($input['notes']) ? $input['notes'] : null;
             $nhisDeduction = isset($input['nhisDeduction']) ? $input['nhisDeduction'] : 0;
             $amountDue = $totalAmount - $nhisDeduction;
 
-            $stmt = $this->conn->prepare("INSERT INTO orders (order_no, patient_id, agent_id, total_amount, nhis_deduction, amount_due, prescription, payment_method, delivery_address, notes) VALUES (:on, :pid, :aid, :total, :nhis, :due, :presc, :pm, :da, :notes)");
+            $stmt = $this->conn->prepare("INSERT INTO orders (order_no, paystack_reference, patient_id, agent_id, total_amount, nhis_deduction, amount_due, prescription, payment_method, delivery_address, notes) VALUES (:on, :pref, :pid, :aid, :total, :nhis, :due, :presc, :pm, :da, :notes)");
             $stmt->execute([
                 'on' => $orderNo,
+                'pref' => $paymentReference,
                 'pid' => $patient_id,
                 'aid' => $agentId,
                 'total' => $totalAmount,
