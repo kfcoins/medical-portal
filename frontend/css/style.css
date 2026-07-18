@@ -122,6 +122,21 @@ p { line-height: 1.7; color: var(--gray-500); }
 .nav-flat-btn:hover { color: var(--green-500); background: var(--green-100); }
 .nav-flat-btn.danger-text:hover { color: #E53E3E; background: #FFF5F5; }
 .nav-actions { display: flex; gap: 10px; flex-shrink: 0; align-items: center; }
+.nav-icon-btn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%; background: #F8F9FA;
+  transition: var(--transition); cursor: pointer; text-decoration: none;
+}
+.nav-icon-btn:hover { background: #E9ECEF; }
+.nav-icon-btn.cart-icon { color: var(--green-600); font-size: 1.15rem; }
+.nav-icon-btn.notif-icon { color: #6C757D; font-size: 1.25rem; }
+.icon-badge {
+  position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px;
+  padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px;
+  font-size: 0.7rem; font-weight: bold; display: flex; align-items: center;
+  justify-content: center; border: 2px solid #FFFFFF;
+}
+
 .hamburger { display: none; flex-direction: column; gap: 5px; }
 .hamburger span {
   width: 24px; height: 2px; background: var(--gray-900);
