@@ -33,27 +33,31 @@
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <div class="nav-logo">
-        <a href="index.html" class="logo">
-        <i class="fas fa-plus-circle"></i>
-        <span class="logo-text">PharmaTrust</span>
-      </a>
+        <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+          <img src="https://ui-avatars.com/api/?name=PharmaTrust&background=007646&color=fff&rounded=true&size=36" alt="Logo" style="height: 36px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.style.display='none'">
+          <div style="display: flex; align-items: center;">
+            <span class="logo-text" style="color: #0F1923; font-weight: 800; font-size: 1.3rem;">PharmaTrust</span>
+          </div>
+        </a>
       </div>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#medicines">Medicines</a></li>
-        <li><a href="#agents">Agents</a></li>
-        <li><a href="#contact">Contact</a></li>
+      <ul class="nav-links" id="navLinks" style="list-style: none; margin: 0; padding: 0;">
+        <li><a href="#home" style="color: #007646; font-weight: 600; border-bottom: 2px solid #007646; padding-bottom: 4px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">Home</a></li>
+        <li><a href="#about" style="color: #1A202C; font-weight: 600;">About Us</a></li>
+        <li><a href="#services" style="color: #1A202C; font-weight: 600;">Services</a></li>
+        <li><a href="#medicines" style="color: #1A202C; font-weight: 600;">Medicines</a></li>
+        <li><a href="#agents" style="color: #1A202C; font-weight: 600;">Agents</a></li>
+        <li><a href="#resources" style="color: #1A202C; font-weight: 600;">Resources</a></li>
+        <li><a href="#contact" style="color: #1A202C; font-weight: 600;">Contact</a></li>
       </ul>
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <div class="nav-icon-btn cart-icon" onclick="toggleCart()">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="nav-icon-btn cart-icon" onclick="toggleCart()" style="position: relative; cursor: pointer; color: #4A5568; font-size: 1.1rem; background: #F7FAFC; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
           <i class="fas fa-shopping-cart"></i>
-          <span class="icon-badge" id="cartBadge">0</span>
+          <span class="icon-badge" id="cartBadge" style="position: absolute; top: -5px; right: -5px; background: #E53E3E; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">0</span>
         </div>
         <div class="nav-actions">
-          <a href="register.html" class="btn btn-outline">Register</a>
-          <a href="login.html" class="btn btn-primary">Login</a>
+          <a href="patient-store.html" class="btn btn-primary" style="background: #007646; border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-shopping-bag"></i> Order Medicine
+          </a>
         </div>
       </div>
       <button class="hamburger" id="hamburger">
@@ -63,61 +67,46 @@
   </nav>
 
   <!-- ===== HERO ===== -->
+  <!-- ===== HERO SECTION ===== -->
   <section class="hero" id="home">
     <div class="hero-bg-shapes">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
       <div class="shape shape-3"></div>
     </div>
-    <div class="hero-container">
-      <div class="hero-content">
+    
+    <div class="container hero-container">
+      <div class="hero-content" data-aos="fade-up">
         <h1 class="hero-title">
-          Your <span class="accent">Trusted</span><br/>
-          Pharmacy<br/>
-          Agent<br/>
+          Your <span class="highlight-green">Trusted</span><br>
+          Pharmacy Agent<br>
           in Ghana
         </h1>
         <p class="hero-subtitle">
           Connecting patients, pharmacists, and healthcare providers across Ghana's 16 regions. Verified agents. Genuine medicines. Fast delivery.
         </p>
         <div class="hero-cta">
-          <a href="patient-store.html" class="btn btn-primary btn-lg">
-            <i class="fas fa-pills"></i> Order Medicine
+          <a href="patient-store.html" class="btn btn-primary" style="background: #007646; border-radius: 50px; padding: 14px 28px; border: none; font-weight: 600;">
+            <i class="fas fa-shopping-bag"></i> Order Medicine
           </a>
-          <a href="#services" class="btn btn-ghost btn-lg" style="border: none; background: rgba(255,255,255,0.4); backdrop-filter: blur(4px);">
-            <i class="fas fa-play-circle"></i> Learn More
+          <a href="#services" class="btn btn-outline" style="border: 1px solid #007646; color: #007646; background: transparent; border-radius: 50px; padding: 14px 28px; font-weight: 600;">
+            Learn More <i class="fas fa-arrow-right"></i>
           </a>
-        </div>
-        <div class="hero-stats" data-aos="fade-up">
-          <div class="stat">
-            <div class="stat-value"><span class="stat-num" data-target="2400">0</span><span class="stat-suffix">+</span></div>
-            <span class="stat-label">Verified Agents</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat">
-            <div class="stat-value"><span class="stat-num" data-target="16">0</span></div>
-            <span class="stat-label">Regions Covered</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat">
-            <div class="stat-value"><span class="stat-num" data-target="98">0</span><span class="stat-suffix">%</span></div>
-            <span class="stat-label">Satisfaction Rate</span>
-          </div>
         </div>
       </div>
-      <div class="hero-visual">
+      <div class="hero-visual" data-aos="fade-up" data-aos-delay="200">
         <div class="hero-img-wrapper">
-          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80" alt="Pharmacy Agent" class="hero-img"/>
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80" alt="Pharmacy Agent" class="hero-img"/>
           <div class="hero-float-card card-1">
-            <i class="fas fa-pills"></i>
-            <div>
+            <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="card-text">
               <strong>Medicine Verified</strong>
               <span>Amlodipine 5mg</span>
             </div>
           </div>
           <div class="hero-float-card card-2">
-            <i class="fas fa-truck"></i>
-            <div>
+            <div class="card-icon"><i class="fas fa-truck"></i></div>
+            <div class="card-text">
               <strong>Fast Delivery</strong>
               <span>Accra &mdash; 2hrs</span>
             </div>
@@ -125,33 +114,110 @@
         </div>
       </div>
     </div>
-    <div class="hero-scroll">
-      <span>Scroll Down</span>
-      <div class="scroll-line"></div>
+
+    <div class="container">
+      <div class="stats-row" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-item">
+          <div class="stat-icon-circle"><i class="fas fa-users"></i></div>
+          <div class="stat-text">
+            <strong>2,400+</strong>
+            <span>Verified Agents</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-circle"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="stat-text">
+            <strong>16</strong>
+            <span>Regions Covered</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-circle"><i class="far fa-smile"></i></div>
+          <div class="stat-text">
+            <strong>98%</strong>
+            <span>Satisfaction Rate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="feature-col">
+          <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="feature-info">
+            <strong>Genuine Medicines</strong>
+            <p>All medicines are 100% genuine and sourced from licensed pharmacies.</p>
+          </div>
+        </div>
+        <div class="feature-col">
+          <div class="feature-icon"><i class="fas fa-truck"></i></div>
+          <div class="feature-info">
+            <strong>Fast Delivery</strong>
+            <p>Get your medicines delivered safely and quickly to your doorstep.</p>
+          </div>
+        </div>
+        <div class="feature-col">
+          <div class="feature-icon"><i class="fas fa-user-check"></i></div>
+          <div class="feature-info">
+            <strong>Verified Agents</strong>
+            <p>Our agents are verified professionals you can trust.</p>
+          </div>
+        </div>
+        <div class="feature-col">
+          <div class="feature-icon"><i class="fas fa-headset"></i></div>
+          <div class="feature-info">
+            <strong>24/7 Support</strong>
+            <p>We're here to help you anytime, anywhere.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ===== TRUST BADGES ===== -->
-  <section class="trust-bar">
-    <div class="trust-container">
-      <div class="trust-label-container">
-        <span class="trust-label">Trusted & Partnered With:</span>
-      </div>
-      <div class="trust-marquee-wrapper">
-        <div class="trust-marquee">
-          <div class="trust-item"><i class="fas fa-hospital"></i> Ghana Health Service</div>
-          <div class="trust-item"><i class="fas fa-prescription-bottle"></i> FDA Ghana</div>
-          <div class="trust-item"><i class="fas fa-university"></i> KNUST Pharmacy</div>
-          <div class="trust-item"><i class="fas fa-shield-alt"></i> Pharmacy Council GH</div>
-          <div class="trust-item"><i class="fas fa-globe-africa"></i> WHO Africa</div>
+  <section class="trust-bar-static">
+    <div class="container text-center">
+      <p class="trust-title">Trusted by thousands of customers and healthcare professionals across Ghana.</p>
+      
+      <div class="marquee-container">
+        <div class="marquee-content">
+          <!-- First set -->
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Ghana_Health_Service_logo.jpg" alt="Ghana Health Service" class="trust-img"/>
+            <span>GHANA HEALTH SERVICE</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/PSGH_LOGO.png" alt="Pharmaceutical Society of Ghana" class="trust-img"/>
+            <span>PHARMACEUTICAL SOCIETY OF GHANA</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Food_and_Drug_Authority.png" alt="FDA" class="trust-img"/>
+            <span>FDA FOOD AND DRUGS AUTHORITY</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Coat_of_arms_of_Ghana.svg/500px-Coat_of_arms_of_Ghana.svg.png" alt="Ministry of Health" class="trust-img"/>
+            <span>MINISTRY OF HEALTH</span>
+          </div>
           
-          <div class="trust-item" aria-hidden="true"><i class="fas fa-hospital"></i> Ghana Health Service</div>
-          <div class="trust-item" aria-hidden="true"><i class="fas fa-prescription-bottle"></i> FDA Ghana</div>
-          <div class="trust-item" aria-hidden="true"><i class="fas fa-university"></i> KNUST Pharmacy</div>
-          <div class="trust-item" aria-hidden="true"><i class="fas fa-shield-alt"></i> Pharmacy Council GH</div>
-          <div class="trust-item" aria-hidden="true"><i class="fas fa-globe-africa"></i> WHO Africa</div>
+          <!-- Duplicate set for infinite scroll -->
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Ghana_Health_Service_logo.jpg" alt="Ghana Health Service" class="trust-img"/>
+            <span>GHANA HEALTH SERVICE</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/PSGH_LOGO.png" alt="Pharmaceutical Society of Ghana" class="trust-img"/>
+            <span>PHARMACEUTICAL SOCIETY OF GHANA</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Food_and_Drug_Authority.png" alt="FDA" class="trust-img"/>
+            <span>FDA FOOD AND DRUGS AUTHORITY</span>
+          </div>
+          <div class="logo-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Coat_of_arms_of_Ghana.svg/500px-Coat_of_arms_of_Ghana.svg.png" alt="Ministry of Health" class="trust-img"/>
+            <span>MINISTRY OF HEALTH</span>
+          </div>
         </div>
       </div>
+      
     </div>
   </section>
 
@@ -585,8 +651,8 @@
                 <a href="${dashboardUrl}" class="btn btn-primary btn-lg">
                   <i class="fas fa-columns"></i> Go to Dashboard
                 </a>
-                <a href="#services" class="btn btn-ghost btn-lg">
-                  <i class="fas fa-play-circle"></i> Learn More
+                <a href="#services" class="btn btn-outline btn-lg">
+                  Learn More <i class="fas fa-arrow-right"></i>
                 </a>
               `;
             } else if (user.role === 'patient') {
@@ -594,8 +660,8 @@
                 <a href="#medicines" class="btn btn-primary btn-lg">
                   <i class="fas fa-pills"></i> Order Medicine
                 </a>
-                <a href="#services" class="btn btn-ghost btn-lg">
-                  <i class="fas fa-play-circle"></i> Learn More
+                <a href="#services" class="btn btn-outline btn-lg">
+                  Learn More <i class="fas fa-arrow-right"></i>
                 </a>
               `;
             }
@@ -709,7 +775,7 @@
 
   <!-- Talk to Pharmacist FAB -->
   <div id="pharmacistFab" class="pharmacist-fab" onclick="handlePharmacistFabClick()">
-    <i class="fas fa-user-md"></i>
+    <i class="fas fa-comment-dots"></i>
     <span>Talk to a Pharmacist</span>
   </div>
 

@@ -266,43 +266,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== CONTACT FORM =====
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const btn = contactForm.querySelector('button[type="submit"]');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
       btn.disabled = true;
       
-      try {
-        const formData = new FormData(contactForm);
-        const response = await fetch('../backend/api/contact', {
-          method: 'POST',
-          body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          btn.innerHTML = '<i class="fas fa-check-circle"></i> Message Sent!';
-          btn.style.background = '#2D9A6A';
-          showToast('Your message was sent successfully!', 'success');
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            btn.style.background = '';
-            contactForm.reset();
-          }, 3000);
-        } else {
-          showToast(data.message || 'Failed to send message.', 'error');
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showToast('An error occurred. Please try again later.', 'error');
+      const formData = new FormData(contactForm);
+      const name = formData.get('name') || '';
+      const phone = formData.get('phone') || '';
+      const email = formData.get('email') || '';
+      const userType = formData.get('userType') || '';
+      const message = formData.get('message') || '';
+      
+      const adminWhatsApp = '233555555555'; // Admin phone number
+      
+      let waText = `*New Contact Message*\n\n`;
+      waText += `*Name:* ${name}\n`;
+      waText += `*Phone:* ${phone}\n`;
+      if (email) waText += `*Email:* ${email}\n`;
+      waText += `*User Type:* ${userType}\n\n`;
+      waText += `*Message:*\n${message}`;
+      
+      const waUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(waText)}`;
+      
+      // Open WhatsApp in new tab
+      window.open(waUrl, '_blank');
+      
+      btn.innerHTML = '<i class="fas fa-check-circle"></i> Redirected!';
+      btn.style.background = '#2D9A6A';
+      showToast('Opening WhatsApp to send your message directly to the admin.', 'success');
+      
+      setTimeout(() => {
         btn.innerHTML = originalText;
         btn.disabled = false;
-      }
+        btn.style.background = '';
+        contactForm.reset();
+      }, 3000);
     });
   }
 
