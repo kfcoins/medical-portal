@@ -710,3 +710,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
+
+// Services Slider Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const servicesGrid = document.getElementById('servicesGrid');
+    const servicesPrev = document.getElementById('servicesPrev');
+    const servicesNext = document.getElementById('servicesNext');
+
+    if (servicesGrid && servicesPrev && servicesNext) {
+        // Scroll amount should be roughly the width of one card plus gap
+        const scrollAmount = 344; // 320px width + 24px gap
+        
+        servicesNext.addEventListener('click', () => {
+            servicesGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+        
+        servicesPrev.addEventListener('click', () => {
+            servicesGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+    }
+});
