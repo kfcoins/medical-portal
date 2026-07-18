@@ -391,8 +391,24 @@ p { line-height: 1.7; color: var(--gray-500); }
 
 /* ===== AGENTS ===== */
 .agents { background: var(--gray-100); }
-.agents-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+.agents-grid { 
+  display: flex; 
+  overflow-x: auto; 
+  gap: 24px; 
+  margin-bottom: 40px; 
+  padding: 10px 0 24px 0;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.agents-grid::-webkit-scrollbar {
+  display: none;
+}
 .agent-card {
+  flex: 0 0 calc(33.333% - 16px);
+  scroll-snap-align: start;
+  min-width: 300px;
   background: var(--white); border-radius: var(--radius-lg);
   overflow: hidden; transition: var(--transition);
   border: 1px solid var(--gray-200);
@@ -543,7 +559,6 @@ p { line-height: 1.7; color: var(--gray-500); }
     background: white; gap: 12px;
   }
   .medicines-grid { grid-template-columns: repeat(2, 1fr); }
-  .agents-grid { grid-template-columns: 1fr; }
   .testimonials-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; gap: 40px; }
   .form-row { grid-template-columns: 1fr; }

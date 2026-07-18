@@ -314,35 +314,35 @@
     <div class="container">
       <div class="section-header">
         <div class="section-eyebrow">The Process</div>
-        <h2 class="section-title">How PharmaTrust Ghana Works</h2>
+        <h2 class="section-title">How Mansro Works</h2>
       </div>
       <div class="process-track">
         <div class="process-step">
           <div class="step-num">01</div>
-          <div class="step-icon"><i class="fas fa-user-check"></i></div>
-          <h3>Register your Pharmacy</h3>
-          <p>Submit your pharmacy license, NIA card, and location. Our team verifies within 48 hours.</p>
+          <div class="step-icon"><i class="fas fa-search"></i></div>
+          <h3>Find Your Medicine</h3>
+          <p>Search for the medications you need from our verified network of pharmacies across Ghana.</p>
         </div>
         <div class="process-arrow"><i class="fas fa-chevron-right"></i></div>
         <div class="process-step">
           <div class="step-num">02</div>
-          <div class="step-icon"><i class="fas fa-boxes"></i></div>
-          <h3>Stock Up</h3>
-          <p>Order verified medicines from certified wholesalers directly via your agent dashboard.</p>
+          <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
+          <h3>Place Your Order</h3>
+          <p>Add items to your cart, securely checkout, and choose your preferred delivery method.</p>
         </div>
         <div class="process-arrow"><i class="fas fa-chevron-right"></i></div>
         <div class="process-step">
           <div class="step-num">03</div>
-          <div class="step-icon"><i class="fas fa-search"></i></div>
-          <h3>Verify & Dispense</h3>
-          <p>Scan QR codes to authenticate each medicine before dispensing to customers.</p>
+          <div class="step-icon"><i class="fas fa-prescription-bottle-alt"></i></div>
+          <h3>Pharmacy Processing</h3>
+          <p>A registered pharmacy receives your order and prepares your authentic medications.</p>
         </div>
         <div class="process-arrow"><i class="fas fa-chevron-right"></i></div>
         <div class="process-step">
           <div class="step-num">04</div>
-          <div class="step-icon"><i class="fas fa-hand-holding-usd"></i></div>
-          <h3>Earn & Grow</h3>
-          <p>Earn commissions per order, NHIS reimbursements, and qualify for agent bonuses monthly.</p>
+          <div class="step-icon"><i class="fas fa-truck"></i></div>
+          <h3>Fast Delivery</h3>
+          <p>Get your medications delivered directly to your doorstep by our trusted agents.</p>
         </div>
       </div>
     </div>
@@ -355,9 +355,13 @@
         <div class="section-eyebrow">Our Network</div>
         <h2 class="section-title">Meet Our Top Agents Across Ghana</h2>
       </div>
-      <div class="agents-grid" id="agentsGrid">
-        <!-- Agents will be dynamically loaded here by main.js -->
-        <p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">Loading agents...</p>
+      <div class="agents-slider-container" style="position: relative; width: 100%;">
+        <button class="slider-btn prev-btn" id="agentsPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+        <div class="agents-grid" id="agentsGrid">
+          <!-- Agents will be dynamically loaded here by main.js -->
+          <p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">Loading agents...</p>
+        </div>
+        <button class="slider-btn next-btn" id="agentsNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
       </div>
       <div class="agents-cta">
         <a href="register.html" class="btn btn-primary btn-lg">

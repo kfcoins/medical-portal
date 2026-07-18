@@ -730,3 +730,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Agents Slider Logic (Manual + Auto)
+document.addEventListener('DOMContentLoaded', () => {
+    const agentsGrid = document.getElementById('agentsGrid');
+    const agentsPrev = document.getElementById('agentsPrev');
+    const agentsNext = document.getElementById('agentsNext');
+
+    if (agentsGrid && agentsPrev && agentsNext) {
+        const scrollAmount = 324; // 300px width + 24px gap
+        let autoScrollInterval;
+
+        const startAutoScroll = () => {
+            autoScrollInterval = setInterval(() => {
+                if (agentsGrid.scrollLeft + agentsGrid.clientWidth >= agentsGrid.scrollWidth - 10) {
+                    agentsGrid.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    agentsGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+            }, 3000);
+        };
+
+        const stopAutoScroll = () => clearInterval(autoScrollInterval);
+
+        agentsNext.addEventListener('click', () => {
+            agentsGrid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            stopAutoScroll();
+            startAutoScroll();
+        });
+        
+        agentsPrev.addEventListener('click', () => {
+            agentsGrid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            stopAutoScroll();
+            startAutoScroll();
+        });
+
+        agentsGrid.addEventListener('mouseenter', stopAutoScroll);
+        agentsGrid.addEventListener('mouseleave', startAutoScroll);
+        agentsGrid.addEventListener('touchstart', stopAutoScroll);
+        agentsGrid.addEventListener('touchend', startAutoScroll);
+
+        startAutoScroll();
+    }
+});
