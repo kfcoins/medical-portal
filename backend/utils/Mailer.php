@@ -102,9 +102,41 @@ class Mailer {
             return true;
         } catch (Exception $e) {
             error_log("Message could not be sent to admin. Mailer Error: {$this->mail->ErrorInfo}");
-            return true;
+            return true; 
         }
     }
+
+    public function sendContactMessageAlert($adminEmail, $name, $phone, $email, $userType, $messageText) {
+        try {
+            $this->mail->clearAddresses();
+            $this->mail->addAddress($adminEmail);
+            $this->mail->Subject = 'New Contact Message - PharmaTrust Ghana';
+            $this->mail->Body    = "
+                <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                    <h2>New Message Received</h2>
+                    <p>A new message has been submitted via the contact form.</p>
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>
+                        <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>Name:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>$name</td></tr>
+                        <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>Phone:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>$phone</td></tr>
+                        <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>Email:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>$email</td></tr>
+                        <tr><td style='padding: 8px; border-bottom: 1px solid #ddd;'><strong>User Type:</strong></td><td style='padding: 8px; border-bottom: 1px solid #ddd;'>$userType</td></tr>
+                    </table>
+                    <div style='margin-top: 20px; padding: 15px; background: #f9fafb; border-left: 4px solid #2D9A6A;'>
+                        <p style='margin:0;'><strong>Message:</strong></p>
+                        <p style='white-space: pre-wrap; margin-top: 10px;'>$messageText</p>
+                    </div>
+                </div>
+            ";
+            $this->mail->AltBody = "New Message Received\n\nName: $name\nPhone: $phone\nEmail: $email\nUser Type: $userType\n\nMessage:\n$messageText";
+            
+            $this->mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Contact message could not be sent to Admin. Mailer Error: {$this->mail->ErrorInfo}");
+            return true; 
+        }
+    }
+
 
     public function sendPharmacyReceived($toEmail, $pharmacyName) {
         try {

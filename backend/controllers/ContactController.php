@@ -42,10 +42,22 @@ class ContactController {
         ]);
 
         $id = $this->conn->lastInsertId();
-        
         $stmt = $this->conn->prepare("SELECT * FROM contacts WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $contact = $stmt->fetch();
+
+        // Send email to admin
+        require_once 'utils/Mailer.php';
+        $mailer = new Mailer();
+        $adminEmail = Env::get('ADMIN_EMAIL', 'support@mansro.com.gh');
+        $mailer->sendContactMessageAlert(
+            $adminEmail,
+            $input['name'],
+            $input['phone'],
+            isset($input['email']) ? $input['email'] : 'N/A',
+            isset($input['userType']) ? $input['userType'] : 'N/A',
+            $input['message']
+        );
 
         http_response_code(201);
         echo json_encode([
