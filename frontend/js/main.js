@@ -214,13 +214,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      data.agents.slice(0, 3).forEach(agent => {
+      const agentImages = [
+        "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=300&q=80",
+        "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=300&q=80",
+        "https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?w=300&q=80",
+        "https://images.unsplash.com/photo-1572561300743-2dd367ed0c9a?w=300&q=80",
+        "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=300&q=80"
+      ];
+      
+      data.agents.slice(0, 5).forEach((agent, index) => {
         const div = document.createElement('div');
         div.className = 'agent-card';
         
+        const imgSrc = agentImages[index % agentImages.length];
+        
         div.innerHTML = `
           <div class="agent-img-wrap">
-            <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=300&q=80" alt="${agent.pharmacy_name}"/>
+            <img src="${imgSrc}" alt="${agent.pharmacy_name}"/>
             <div class="agent-verified"><i class="fas fa-check-circle"></i></div>
           </div>
           <div class="agent-info">
