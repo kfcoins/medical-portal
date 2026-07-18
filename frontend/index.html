@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PharmaTrust Ghanaana &mdash; Your Trusted Pharmacy Network</title>
+  <title>Mansro &mdash; Your Trusted Pharmacy Network</title>
   <link rel="stylesheet" href="css/style.css?v=1.1"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -33,8 +33,10 @@
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <div class="nav-logo">
-        <div class="logo-icon"><i class="fas fa-shield-virus"></i></div>
-        <span class="logo-text">PharmaTrust <span class="logo-gh">GH</span></span>
+        <a href="index.html" class="logo">
+        <i class="fas fa-plus-circle"></i>
+        <span class="logo-text">Mansro</span>
+      </a>
       </div>
       <ul class="nav-links" id="navLinks">
         <li><a href="#home">Home</a></li>
@@ -71,17 +73,18 @@
       <div class="hero-content">
         <h1 class="hero-title">
           Your <span class="accent">Trusted</span><br/>
-          Pharmacy Agent<br/>
+          Pharmacy<br/>
+          Agent<br/>
           in Ghana
         </h1>
         <p class="hero-subtitle">
           Connecting patients, pharmacists, and healthcare providers across Ghana's 16 regions. Verified agents. Genuine medicines. Fast delivery.
         </p>
         <div class="hero-cta">
-          <a href="register.html" class="btn btn-primary btn-lg">
-            <i class="fas fa-user-plus"></i> Become an Agent
+          <a href="patient-store.html" class="btn btn-primary btn-lg">
+            <i class="fas fa-pills"></i> Order Medicine
           </a>
-          <a href="#services" class="btn btn-ghost btn-lg">
+          <a href="#services" class="btn btn-ghost btn-lg" style="border: none; background: rgba(255,255,255,0.4); backdrop-filter: blur(4px);">
             <i class="fas fa-play-circle"></i> Learn More
           </a>
         </div>
@@ -167,10 +170,10 @@
           </div>
         </div>
         <div class="about-content">
-          <div class="section-eyebrow">About PharmaTrust Ghana</div>
-          <h2 class="section-title">Bridging the Gap in Ghana's Pharmaceutical Ecosystem</h2>
-          <p class="about-text">
-            PharmaTrust Ghanaana is a digital platform connecting licensed pharmacists, verified medicine agents, and patients across all 16 regions of Ghana. We tackle the challenge of counterfeit drugs and medicine accessibility head-on.
+          <div class="section-eyebrow">About Mansro</div>
+          <h2 class="section-title">Bridging the Gap Between Patients and Authentic Medicine</h2>
+          <p class="about-desc">
+            Mansro is a digital platform connecting licensed pharmacists, verified medicine agents, and patients across all 16 regions of Ghana. We tackle the challenge of counterfeit drugs and medicine accessibility head-on.
           </p>
           <div class="about-features">
             <div class="about-feature">
@@ -243,9 +246,9 @@
   <section class="services section" id="services">
     <div class="container">
       <div class="section-header">
-        <div class="section-eyebrow">What We Offer</div>
-        <h2 class="section-title">End-to-End Pharmaceutical Services</h2>
-        <p class="section-desc">From prescription verification to doorstep delivery, PharmaTrust Ghana handles every step of the medicine supply chain.</p>
+        <div class="section-eyebrow">Our Services</div>
+        <h2 class="section-title">Comprehensive Pharmacy Solutions</h2>
+        <p class="section-desc">From prescription verification to doorstep delivery, Mansro handles every step of the medicine supply chain.</p>
       </div>
       <div class="services-slider-container">
         <button class="slider-btn prev-btn" id="servicesPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
@@ -450,7 +453,7 @@
               <div class="contact-icon"><i class="fas fa-envelope"></i></div>
               <div>
                 <strong>Email Us</strong>
-                <span>support@PharmaTrust.com.gh</span>
+                <span>support@mansro.com.gh</span>
               </div>
             </div>
 
@@ -500,11 +503,13 @@
     <div class="footer-top">
       <div class="container footer-grid">
         <div class="footer-brand">
-          <div class="nav-logo">
-            <div class="logo-icon"><i class="fas fa-shield-virus"></i></div>
-            <span class="logo-text">PharmaTrust <span class="logo-gh">GH</span></span>
+          <div class="footer-brand">
+            <a href="#" class="logo">
+              <i class="fas fa-plus-circle"></i>
+              <span class="logo-text">Mansro</span>
+            </a>
+            <p>Your trusted network for verified medicines and reliable pharmacy agents across Ghana.</p>
           </div>
-          <p>Ghana's most trusted pharmaceutical agent platform &mdash; connecting patients to genuine medicines nationwide.</p>
           <div class="footer-social">
             <a href="#"><i class="fab fa-facebook-f"></i></a>
             <a href="#"><i class="fab fa-twitter"></i></a>
@@ -545,8 +550,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="container">
-        <p>&copy; 2024 PharmaTrust Ghanaana. All rights reserved. | Reg. No. GH-FDA-2024-0421 | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Mansro. All rights reserved. | Reg. No. GH-FDA-2024-0421 | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
         <p class="footer-note">Final Year Project Presentation &mdash; University of Ghana, School of Pharmacy</p>
       </div>
     </div>
@@ -1032,5 +1037,9 @@
       mutationObserver.observe(document.body, { childList: true, subtree: true });
     });
   </script>
+  <!-- ===== FLOATING ACTION BUTTON ===== -->
+  <a href="#" class="floating-btn">
+    <i class="fas fa-user-nurse"></i> Talk to a Pharmacist
+  </a>
 </body>
 </html>
