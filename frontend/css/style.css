@@ -374,7 +374,7 @@ p { line-height: 1.7; color: var(--gray-500); }
   border-color: var(--green-500); color: var(--green-500);
   background: var(--green-100);
 }
-.medicines-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.medicines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
 .medicine-card {
   border-radius: var(--radius); overflow: hidden;
   border: 1px solid var(--gray-200); transition: var(--transition);
@@ -701,14 +701,18 @@ p { line-height: 1.7; color: var(--gray-500); }
 }
 
 /* ===== STORE & CART STYLES ===== */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, 240px); gap: 24px; justify-content: flex-start; }
-.product-card { background: var(--surface, #FFFFFF); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; transition: transform 0.2s; position: relative; border: 1px solid var(--gray-200); }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; justify-content: flex-start; }
+.product-card { background: var(--surface, #FFFFFF); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; transition: transform 0.2s; position: relative; border: 1px solid var(--gray-200); overflow: hidden; }
 .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
-.pharmacy-tag { position: absolute; top: 24px; right: 24px; background: #EBF8FF; color: #3182CE; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; z-index: 2; }
+.product-img-wrapper { width: 100%; height: 180px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; }
+.product-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.product-img-wrapper.no-img { font-size: 2.5rem; color: #A0AEC0; }
+.pharmacy-tag { position: absolute; top: 12px; right: 12px; background: #EBF8FF; color: #3182CE; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.product-info { padding: 16px; display: flex; flex-direction: column; flex: 1; }
 .product-icon { width: 64px; height: 64px; background: #F0FFF4; color: #38A169; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin-bottom: 16px; }
 .product-title { font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; color: #0F1923; }
 .product-cat { color: var(--text-muted, #6B7D8C); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-weight: 500; }
-.product-price { font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--green-700); margin-bottom: 20px; }
+.product-price { font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--green-700); margin-bottom: 20px; margin-top: auto; }
 .add-to-cart { background: var(--green-700); color: white; border: none; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-family: inherit; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, transform 0.1s; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .add-to-cart:active { transform: scale(0.98); }
 .out-of-stock-btn { background: #E2E8F0; color: #A0AEC0; cursor: not-allowed; }

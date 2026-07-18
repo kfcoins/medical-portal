@@ -158,22 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const pharmacyTag = med.pharmacy_name ? `<div class="pharmacy-tag">${med.pharmacy_name}</div>` : '';
         
         const imageHtml = med.image_url 
-          ? `<div style="width:100%; height:160px; border-radius:8px; overflow:hidden; margin-bottom:12px;">
-               <img src="${med.image_url}" style="width:100%; height:100%; object-fit:cover;" alt="${med.name}" />
+          ? `<div class="product-img-wrapper">
+               <img src="${med.image_url}" alt="${med.name}" />
              </div>`
-          : `<div class="product-icon"><i class="fas fa-pills"></i></div>`;
+          : `<div class="product-img-wrapper no-img"><i class="fas fa-pills"></i></div>`;
         
         div.innerHTML = `
           ${pharmacyTag}
           ${imageHtml}
-          <div class="product-title">${med.name}</div>
-          <div class="product-cat">${med.category || 'Medicine'}</div>
-          <div class="product-price">GHS ${parseFloat(med.price).toFixed(2)}</div>
-          <button class="add-to-cart ${outOfStock ? 'out-of-stock-btn' : ''}" 
-                  ${outOfStock ? 'disabled' : `onclick="addToCart('${med.id}')"`}>
-            <i class="fas ${outOfStock ? 'fa-ban' : 'fa-cart-plus'}"></i> 
-            ${outOfStock ? 'Out of Stock' : 'Add to Cart'}
-          </button>
+          <div class="product-info">
+            <div class="product-title">${med.name}</div>
+            <div class="product-cat">${med.category || 'Medicine'}</div>
+            <div class="product-price">GHS ${parseFloat(med.price).toFixed(2)}</div>
+            <button class="add-to-cart ${outOfStock ? 'out-of-stock-btn' : ''}" 
+                    ${outOfStock ? 'disabled' : `onclick="addToCart('${med.id}')"`}>
+              <i class="fas ${outOfStock ? 'fa-ban' : 'fa-cart-plus'}"></i> 
+              ${outOfStock ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          </div>
         `;
         
         div.style.opacity = '0';
