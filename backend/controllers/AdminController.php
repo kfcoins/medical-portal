@@ -35,9 +35,8 @@ class AdminController {
             $this->getAllPatients();
         } elseif ($method === 'PUT' && $action === 'profile' && !$id) {
             $this->updateProfile();
-        } elseif ($method === 'POST' && $action === 'pharmacies' && strpos($id, '/toggle') !== false) {
-            $agentId = explode('/', $id)[0];
-            $this->togglePharmacyStatus($agentId);
+        } elseif ($method === 'POST' && $action === 'pharmacies' && $id && isset($_GET['route']) && strpos($_GET['route'], '/toggle') !== false) {
+            $this->togglePharmacyStatus($id);
         } elseif ($method === 'GET' && $action === 'stats') {
             $this->getStats();
         } else {
