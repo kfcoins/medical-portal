@@ -66,6 +66,26 @@
     .section-card h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
     .section-card p { color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
+    .dashboard-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+    @media (max-width: 992px) { .dashboard-tables { grid-template-columns: 1fr; } }
+    .table-container { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow: hidden; }
+    .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .table-header h3 { font-family: 'Sora', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text); }
+    .table-header a { font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; }
+    .table-header a:hover { text-decoration: underline; }
+    .dashboard-table { width: 100%; border-collapse: collapse; }
+    .dashboard-table th { text-align: left; padding: 12px 24px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: #F8FAFC; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .dashboard-table td { padding: 16px 24px; font-size: 0.9rem; border-bottom: 1px solid var(--border); color: #4A5568; }
+    .dashboard-table tbody tr:last-child td { border-bottom: none; }
+    .dashboard-table tbody tr:hover { background: #F8FAFC; }
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; text-transform: capitalize; }
+    .status-pending { background: #FEFCBF; color: #975A16; }
+    .status-confirmed { background: #EBF8FF; color: #2B6CB0; }
+    .status-dispensed { background: #FAF5FF; color: #6B46C1; }
+    .status-delivered { background: #F0FFF4; color: #276749; }
+    .status-cancelled { background: #FFF5F5; color: #C53030; }
+    .empty-state { padding: 40px; text-align: center; color: var(--text-muted); }
+    .empty-state i { font-size: 2.5rem; color: #CBD5E0; margin-bottom: 16px; }
   </style>
   <link rel="stylesheet" href="css/responsive.css">
   <script src="js/responsive.js"></script>
@@ -135,11 +155,56 @@
         </div>
       </div>
 
-      <div class="section-card">
-        <h3>This page is under construction</h3>
-        <p>You have successfully authenticated as a Pharmacy Agent. The full inventory and prescription management features are currently being developed and will be available in the next release.</p>
-        <div style="margin-top: 32px; color: var(--primary); font-size: 3rem;">
-          <i class="fas fa-tools"></i>
+      <div class="dashboard-tables">
+        <!-- Recent Orders -->
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Recent Orders</h3>
+            <a href="pharmacy-orders.html">View All</a>
+          </div>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Patient</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersTableBody">
+              <tr>
+                <td colspan="4" class="empty-state">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                  <p>Loading orders...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Low Stock Alerts / Items -->
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Recent Inventory Items</h3>
+            <a href="pharmacy-inventory.html">Manage Inventory</a>
+          </div>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="recentItemsTableBody">
+              <tr>
+                <td colspan="3" class="empty-state">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                  <p>Loading inventory...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -158,6 +223,7 @@
       document.getElementById('welcomeTitle').textContent = `Welcome back, ${name}!`;
 
       fetchDashboardStats();
+      fetchDashboardTables();
     }
 
     async function fetchDashboardStats() {
@@ -176,6 +242,66 @@
         }
       } catch (err) {
         console.error('Error fetching stats:', err);
+      }
+    }
+
+    async function fetchDashboardTables() {
+      try {
+        // Fetch Recent Orders
+        const ordersRes = await fetch('/Mansro/backend/api/orders/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const ordersData = await ordersRes.json();
+        
+        const ordersBody = document.getElementById('recentOrdersTableBody');
+        if (ordersData.success && ordersData.orders && ordersData.orders.length > 0) {
+          // Get top 5
+          const topOrders = ordersData.orders.slice(0, 5);
+          ordersBody.innerHTML = topOrders.map(o => {
+             const badgeClass = o.status ? `status-${o.status.toLowerCase()}` : 'status-pending';
+             return `<tr>
+               <td style="font-weight: 500;">${o.order_no}</td>
+               <td>${o.patient_name || 'N/A'}</td>
+               <td><span class="status-badge ${badgeClass}">${o.status || 'Pending'}</span></td>
+               <td>₵${parseFloat(o.total_amount).toFixed(2)}</td>
+             </tr>`;
+          }).join('');
+        } else {
+          ordersBody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-box-open"></i><p>No recent orders found.</p></td></tr>`;
+        }
+
+        // Fetch Recent Inventory
+        const invRes = await fetch('/Mansro/backend/api/medicines/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        let inventoryData = await invRes.json();
+        
+        // If /my endpoint doesn't exist or isn't populated properly, fallback to general medicines query
+        if (!inventoryData.success && user.id) {
+            // fallback
+           const fallbackRes = await fetch(`/Mansro/backend/api/medicines?agent_id=${user.agent_id || ''}`);
+           inventoryData = await fallbackRes.json();
+        }
+
+        const invBody = document.getElementById('recentItemsTableBody');
+        if (inventoryData.success && inventoryData.medicines && inventoryData.medicines.length > 0) {
+          const topItems = inventoryData.medicines.slice(0, 5);
+          invBody.innerHTML = topItems.map(m => {
+             return `<tr>
+               <td style="font-weight: 500;">${m.name}</td>
+               <td style="text-transform: capitalize;">${m.category || 'Other'}</td>
+               <td>₵${parseFloat(m.price).toFixed(2)}</td>
+             </tr>`;
+          }).join('');
+        } else {
+          invBody.innerHTML = `<tr><td colspan="3" class="empty-state"><i class="fas fa-pills"></i><p>No inventory items found.</p></td></tr>`;
+        }
+
+      } catch (err) {
+        console.error('Error fetching dashboard tables:', err);
+        document.getElementById('recentOrdersTableBody').innerHTML = `<tr><td colspan="4" class="empty-state">Error loading orders.</td></tr>`;
+        document.getElementById('recentItemsTableBody').innerHTML = `<tr><td colspan="3" class="empty-state">Error loading inventory.</td></tr>`;
       }
     }
 
