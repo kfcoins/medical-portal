@@ -202,7 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== DYNAMIC FETCHING: AGENTS =====
   async function fetchAgents() {
     const grid = document.getElementById('agentsGrid');
+    const prevBtn = document.getElementById('agentsPrev');
+    const nextBtn = document.getElementById('agentsNext');
     if (!grid) return;
+    
+    // Hide buttons initially during loading/empty state
+    if (prevBtn) prevBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
     
     grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;"><i class="fas fa-spinner fa-spin"></i> Loading agents...</p>';
     
@@ -215,6 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">No verified agents available yet. <a href="register.html" style="color:var(--green-600);font-weight:600;">Register to become the first!</a></p>';
         return;
       }
+      
+      // Show buttons since there are agents
+      if (prevBtn) prevBtn.style.display = '';
+      if (nextBtn) nextBtn.style.display = '';
       
       const agentImages = [
         "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=300&q=80",

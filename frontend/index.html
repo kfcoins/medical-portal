@@ -34,7 +34,7 @@
     <div class="nav-container">
       <div class="nav-logo">
         <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-          <img src="https://ui-avatars.com/api/?name=PharmaTrust&background=007646&color=fff&rounded=true&size=36" alt="Logo" style="height: 36px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.style.display='none'">
+
           <div style="display: flex; align-items: center;">
             <span class="logo-text" style="color: #0F1923; font-weight: 800; font-size: 1.3rem;">PharmaTrust</span>
           </div>
@@ -55,8 +55,8 @@
           <span class="icon-badge" id="cartBadge" style="position: absolute; top: -5px; right: -5px; background: #E53E3E; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">0</span>
         </div>
         <div class="nav-actions">
-          <a href="patient-store.html" class="btn btn-primary" style="background: #007646; border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-shopping-bag"></i> Order Medicine
+          <a href="login.html" style="color: #0F1923; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px;">
+            Login
           </a>
         </div>
       </div>
@@ -236,8 +236,8 @@
           </div>
         </div>
         <div class="about-content">
-          <div class="section-eyebrow">About PharmaTrust</div>
-          <h2 class="section-title">Bridging the Gap Between Patients and Authentic Medicine</h2>
+          <div class="section-eyebrow" style="background: #Edf7f2; color: #1e8755; display: inline-block; padding: 6px 14px; border-radius: 50px; margin-bottom: 16px;">About PharmaTrust</div>
+          <h2 class="section-title" style="font-size: clamp(2rem, 4vw, 2.8rem); color: #0F1923; margin-bottom: 24px; line-height: 1.2;">Bridging the Gap Between Patients and Authentic Medicine</h2>
           <p class="about-desc">
             PharmaTrust is a digital platform connecting licensed pharmacists, verified medicine agents, and patients across all 16 regions of Ghana. We tackle the challenge of counterfeit drugs and medicine accessibility head-on.
           </p>
@@ -618,13 +618,18 @@
     <div class="footer-bottom">
       <div class="footer-bottom">
         <p>&copy; 2024 PharmaTrust. All rights reserved. | Reg. No. GH-FDA-2024-0421 | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-        <p class="footer-note">Final Year Project Presentation &mdash; University of Ghana, School of Pharmacy</p>
       </div>
     </div>
   </footer>
 
   <!-- Scroll to top -->
   <button class="scroll-top" id="scrollTop"><i class="fas fa-chevron-up"></i></button>
+
+  <!-- Talk to Pharmacist FAB -->
+  <div id="pharmacistFab" class="pharmacist-fab" onclick="handlePharmacistFabClick()">
+    <i class="fas fa-comment-dots"></i>
+    <span>Talk to a Pharmacist</span>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -773,11 +778,6 @@
     </div>
   </div>
 
-  <!-- Talk to Pharmacist FAB -->
-  <div id="pharmacistFab" class="pharmacist-fab" onclick="handlePharmacistFabClick()">
-    <i class="fas fa-comment-dots"></i>
-    <span>Talk to a Pharmacist</span>
-  </div>
 
   <!-- Pharmacist Directory Modal -->
   <div id="pharmacistModal" class="modal">
@@ -1103,9 +1103,5 @@
       mutationObserver.observe(document.body, { childList: true, subtree: true });
     });
   </script>
-  <!-- ===== FLOATING ACTION BUTTON ===== -->
-  <a href="#" class="floating-btn">
-    <i class="fas fa-user-nurse"></i> Talk to a Pharmacist
-  </a>
 </body>
 </html>
