@@ -5,6 +5,7 @@ require_once 'utils/Mailer.php';
 
 class AdminController {
     private $conn;
+    public $user;
 
     public function __construct() {
         $db = new Database();
