@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -116,7 +116,7 @@
     </div>
     <div class="nav-links">
       <a href="admin-dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
-      <a href="admin-approvals.html" class="nav-link active"><i class="fas fa-file-signature"></i> Approvals</a>
+      <a href="admin-approvals.html" class="nav-link active"><i class="fas fa-file-signature"></i> Approvals <span class="badge" id="sidebarPendingBadge" style="display: none; background: #E53E3E; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: auto; font-weight: bold;">0</span></a>
       <a href="admin-pharmacies.html" class="nav-link"><i class="fas fa-store"></i> Pharmacies</a>
       <a href="admin-patients.html" class="nav-link"><i class="fas fa-users"></i> Patients</a>
       <a href="admin-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
@@ -407,6 +407,19 @@
       if (e.target === lightbox) {
         closeLightbox();
       }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const t = localStorage.getItem('token');
+      if (!t) return;
+      try {
+        const res = await fetch('../backend/index.php?route=admin/stats', { headers: { 'Authorization': 'Bearer ' + t }});
+        const data = await res.json();
+        if (data.success && data.data.pendingPharmacies > 0) {
+          const b = document.getElementById('sidebarPendingBadge');
+          if (b) { b.textContent = data.data.pendingPharmacies; b.style.display = 'inline-block'; }
+        }
+      } catch (e) {}
     });
 
     function logout() {
