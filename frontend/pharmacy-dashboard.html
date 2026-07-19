@@ -48,10 +48,7 @@
 
     .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-    .welcome-card { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 32px; border-radius: 16px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(74, 71, 163, 0.15); display: flex; justify-content: space-between; align-items: center; }
-    .welcome-text h2 { font-family: 'Sora', sans-serif; font-size: 1.75rem; margin-bottom: 8px; font-weight: 600; }
-    .welcome-text p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
-    .welcome-icon { font-size: 4rem; opacity: 0.2; }
+
 
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
     .stat-card { background: var(--surface); padding: 28px 32px; border-radius: 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; }
@@ -128,15 +125,7 @@
     </header>
 
     <div class="content-area">
-      <div class="welcome-card">
-        <div class="welcome-text">
-          <h2 id="welcomeTitle">Welcome back!</h2>
-          <p>Here is what's happening at your pharmacy today.</p>
-        </div>
-        <div class="welcome-icon">
-          <i class="fas fa-store-alt"></i>
-        </div>
-      </div>
+
 
       <div class="stats-grid">
         <div class="stat-card">
@@ -193,7 +182,6 @@
       const name = user.pharmacy_name || (user.first_name + ' ' + user.last_name);
       document.getElementById('userName').textContent = name;
       document.getElementById('userInitial').textContent = name.charAt(0);
-      document.getElementById('welcomeTitle').textContent = `Welcome back, ${name}!`;
 
       fetchDashboardStats();
       fetchDashboardAnalytics();
