@@ -38,6 +38,8 @@ class AdminController {
             $this->updateProfile();
         } elseif ($method === 'POST' && $action === 'pharmacies' && $id && isset($_GET['route']) && strpos($_GET['route'], '/toggle') !== false) {
             $this->togglePharmacyStatus($id);
+        } elseif ($method === 'POST' && $action === 'patients' && $id && isset($_GET['route']) && strpos($_GET['route'], '/toggle') !== false) {
+            $this->togglePatientStatus($id);
         } elseif ($method === 'GET' && $action === 'stats') {
             $this->getStats();
         } else {
@@ -197,9 +199,29 @@ class AdminController {
         echo json_encode(["success" => true, "message" => "Pharmacy status updated to " . $newStatus, "newStatus" => $newStatus]);
     }
 
+    private function togglePatientStatus($id) {
+        $stmt = $this->conn->prepare("SELECT is_active FROM users WHERE id = :id AND role = 'patient'");
+        $stmt->execute(['id' => $id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            http_response_code(404);
+            echo json_encode(["success" => false, "message" => "Patient not found"]);
+            return;
+        }
+
+        $newStatus = $user['is_active'] ? 0 : 1;
+        $statusStr = $newStatus ? 'active' : 'suspended';
+
+        $stmtUpdate = $this->conn->prepare("UPDATE users SET is_active = :status WHERE id = :id");
+        $stmtUpdate->execute(['status' => $newStatus, 'id' => $id]);
+
+        echo json_encode(["success" => true, "message" => "Patient status updated to " . $statusStr, "newStatus" => $newStatus]);
+    }
+
     private function getAllPatients() {
         $stmt = $this->conn->prepare("
-            SELECT id, first_name, last_name, email, phone, created_at
+            SELECT id, first_name, last_name, email, phone, is_active, created_at
             FROM users
             WHERE role = 'patient'
             ORDER BY created_at DESC

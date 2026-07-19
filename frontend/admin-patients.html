@@ -65,7 +65,33 @@
     .table tbody tr:hover { background: #F8FAFC; }
     
     .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
-    .status-active { background: #EBF8FF; color: #2B6CB0; }
+    .status-active { background: #D1FAE5; color: #065F46; }
+    .status-suspended { background: #FEE2E2; color: #991B1B; }
+
+    .user-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: #EDF2F7; color: #4A5568; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; }
+    .name-cell { display: flex; align-items: center; gap: 12px; }
+
+    /* Modal Styles */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.2s ease; }
+    .modal { background: var(--surface); width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-overlay.active .modal { transform: scale(1); }
+    .modal-header { padding: 24px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--text); }
+    .modal-close { background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .modal-close:hover { color: var(--danger); }
+    .modal-body { padding: 24px; font-size: 0.95rem; color: #4A5568; line-height: 1.5; }
+    .modal-footer { padding: 16px 24px 24px; display: flex; justify-content: flex-end; gap: 12px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: 0.2s; }
+    .btn-cancel { background: #F3F4F6; color: #4B5563; }
+    .btn-cancel:hover { background: #E5E7EB; }
+    .btn-confirm { background: var(--primary); color: white; }
+    .btn-confirm:hover { filter: brightness(1.1); }
+
+    /* Alert Styles */
+    .alert { padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; display: none; font-size: 0.95rem; }
+    .alert-success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+    .alert-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
 
     .user-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: #EDF2F7; color: #4A5568; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; }
     .name-cell { display: flex; align-items: center; gap: 12px; }
@@ -108,6 +134,8 @@
     </header>
 
     <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+
       <div class="card">
         <div class="controls">
           <div class="search-box">
@@ -124,6 +152,7 @@
                 <th>Contact Details</th>
                 <th>Registered Date</th>
                 <th>Account Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="patientsList">
@@ -135,6 +164,23 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title" id="confirmModalTitle">Confirm Action</div>
+          <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="confirmModalBody">
+          Are you sure you want to proceed?
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-confirm" id="confirmModalBtn" onclick="confirmAction()">Yes, Proceed</button>
         </div>
       </div>
     </div>
@@ -151,6 +197,14 @@
       document.getElementById('userName').textContent = user.first_name + ' ' + user.last_name;
       document.getElementById('userInitial').textContent = user.first_name.charAt(0);
       loadPatients();
+    }
+
+    function showAlert(message, type = 'success') {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.textContent = message;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.style.display = 'block';
+      setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
     }
 
     async function loadPatients() {
@@ -182,6 +236,13 @@
         const date = new Date(p.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         const name = p.first_name + ' ' + p.last_name;
         
+        const isActive = p.is_active == 1;
+        const statusClass = isActive ? 'status-active' : 'status-suspended';
+        const statusIcon = isActive ? 'fa-user-check' : 'fa-user-slash';
+        const statusText = isActive ? 'Active' : 'Suspended';
+        const toggleAction = isActive ? 'Suspend' : 'Reactivate';
+        const toggleColor = isActive ? '#E53E3E' : '#38A169';
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
@@ -195,7 +256,12 @@
             <div style="font-size: 0.85rem; color: var(--text-muted);">${p.phone}</div>
           </td>
           <td>${date}</td>
-          <td><span class="status-badge status-active"><i class="fas fa-user-check"></i> Active</span></td>
+          <td><span class="status-badge ${statusClass}"><i class="fas ${statusIcon}"></i> ${statusText}</span></td>
+          <td>
+            <button style="color: ${toggleColor}; background: transparent; border: none; font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.9rem; cursor: pointer; padding: 4px 8px;" onclick="openConfirmModal('${p.id}', '${toggleAction}')" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+              ${toggleAction}
+            </button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -210,6 +276,62 @@
         return name.includes(query) || email.includes(query) || phone.includes(query);
       });
       renderTable(filtered);
+    }
+
+    let currentPatientId = null;
+
+    function openConfirmModal(patientId, action) {
+      currentPatientId = patientId;
+      document.getElementById('confirmModalTitle').textContent = `${action} Patient`;
+      document.getElementById('confirmModalBody').textContent = `Are you sure you want to ${action.toLowerCase()} this patient's account?`;
+      
+      const confirmBtn = document.getElementById('confirmModalBtn');
+      confirmBtn.textContent = `Yes, ${action}`;
+      if(action === 'Suspend') {
+        confirmBtn.style.background = '#E53E3E'; // red
+      } else {
+        confirmBtn.style.background = '#38A169'; // green
+      }
+
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      currentPatientId = null;
+    }
+
+    async function confirmAction() {
+      if (!currentPatientId) return;
+      
+      const btn = document.getElementById('confirmModalBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Processing...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`../backend/index.php?route=admin/patients/${currentPatientId}/toggle`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          showAlert(data.message, 'success');
+          loadPatients();
+        } else {
+          showAlert(data.message || 'Failed to update patient status', 'error');
+        }
+      } catch (err) {
+        console.error('Toggle error:', err);
+        showAlert('An error occurred. Please try again.', 'error');
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        closeModal();
+      }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
