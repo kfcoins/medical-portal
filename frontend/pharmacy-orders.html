@@ -22,7 +22,7 @@
       .detail-card:nth-child(2) .icon-circle { background: #dcfce7; color: #16a34a; }
       .detail-card:nth-child(3) .icon-circle { background: #f3e8ff; color: #9333ea; }
       .detail-info { display: flex; flex-direction: column; gap: 4px; }
-      .detail-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+      .detail-label { font-size: 0.85rem; font-weight: 500; color: #64748b; }
       .detail-value { font-size: 0.95rem; color: #1e293b; font-weight: 500; line-height: 1.5; }
     </style>
   <style>
@@ -205,8 +205,8 @@
   <div class="modal-overlay" id="deliveryModal">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i> Delivery Details</h3>
-        <button class="close-modal" onclick="closeDeliveryModal()"><i class="fas fa-times"></i></button>
+        <h3>Delivery Details</h3>
+        <button class="close-modal" onclick="closeDeliveryModal()">&times;</button>
       </div>
       <div id="deliveryDetailsContent" class="delivery-content">
       </div>
@@ -218,46 +218,44 @@
     function viewDeliveryDetails(details) {
       let phone = "N/A", email = "N/A", address = details;
 
-      if (details.includes(' | Phone: ') || details.includes(' | Email: ')) {
-          const parts = details.split(' | ');
-          address = parts[0] || '';
-          parts.forEach(p => {
-              if (p.startsWith('Phone: ')) phone = p.replace('Phone: ', '').trim();
-              if (p.startsWith('Email: ')) email = p.replace('Email: ', '').trim();
-          });
-      } else if (details.includes('ðŸ“ž Phone:') || details.includes('ðŸ“§ Email:')) {
-          const lines = details.split('\n');
-          let inAddress = false;
-          address = '';
-          lines.forEach(line => {
-              if (line.startsWith('ðŸ“ž Phone:')) phone = line.replace('ðŸ“ž Phone:', '').trim();
-              else if (line.startsWith('ðŸ“§ Email:')) email = line.replace('ðŸ“§ Email:', '').trim();
-              else if (line.startsWith('ðŸ“ Delivery Location:')) inAddress = true;
-              else if (inAddress && line.trim()) address += line.trim() + ', ';
-          });
-          address = address.replace(/,\s*$/, '');
-      } else if (details === 'sdvfsefcs' || details.trim() === '') {
+      if (details === 'sdvfsefcs' || details.trim() === '') {
           address = 'No valid address provided.';
+      } else {
+          const phoneMatch = details.match(/(?:📞 Phone:|ðŸ“ž Phone:|Phone:)\s*([^\n|]+)/);
+          if (phoneMatch) phone = phoneMatch[1].trim();
+          
+          const emailMatch = details.match(/(?:📧 Email:|ðŸ“§ Email:|Email:)\s*([^\n|]+)/);
+          if (emailMatch) email = emailMatch[1].trim();
+          
+          const locMatch = details.match(/(?:📍 Delivery Location:|ðŸ“  Delivery Location:|Delivery Location:)\n*([\s\S]+)/);
+          if (locMatch) {
+              address = locMatch[1].trim().replace(/\n/g, '<br>');
+          } else {
+              // Fallback
+              address = details
+                  .replace(/(?:📞 Phone:|ðŸ“ž Phone:|Phone:)[^\n|]+[|\n]?/g, '')
+                  .replace(/(?:📧 Email:|ðŸ“§ Email:|Email:)[^\n|]+[|\n]?/g, '')
+                  .replace(/(?:📍 Delivery Location:|ðŸ“  Delivery Location:|Delivery Location:)\n?/g, '')
+                  .trim()
+                  .replace(/\n/g, '<br>');
+          }
       }
 
       const html = `
           <div class="delivery-details-grid">
               <div class="detail-card">
-                  <div class="icon-circle"><i class="fas fa-map-marked-alt"></i></div>
                   <div class="detail-info">
                       <span class="detail-label">Location Address</span>
                       <span class="detail-value">${address || 'Not Provided'}</span>
                   </div>
               </div>
               <div class="detail-card">
-                  <div class="icon-circle"><i class="fas fa-phone-alt"></i></div>
                   <div class="detail-info">
                       <span class="detail-label">Contact Number</span>
                       <span class="detail-value">${phone}</span>
                   </div>
               </div>
               <div class="detail-card">
-                  <div class="icon-circle"><i class="fas fa-envelope"></i></div>
                   <div class="detail-info">
                       <span class="detail-label">Email Address</span>
                       <span class="detail-value" style="word-break: break-all;">${email}</span>
