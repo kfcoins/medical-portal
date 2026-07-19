@@ -6,6 +6,7 @@
   <title>Pharmacy Dashboard &mdash; PharmaTrust Ghana</title>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary: #4A47A3; /* Deep Purple for Admin/Agent */
@@ -155,56 +156,28 @@
         </div>
       </div>
 
+      <!-- Charts -->
       <div class="dashboard-tables">
-        <!-- Recent Orders -->
+        <!-- Revenue Chart -->
         <div class="table-container">
           <div class="table-header">
-            <h3>Recent Orders</h3>
-            <a href="pharmacy-orders.html">View All</a>
+            <h3>Monthly Revenue (GHS)</h3>
+            <a href="pharmacy-analytics.html">Full Analytics</a>
           </div>
-          <table class="dashboard-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Patient</th>
-                <th>Status</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody id="recentOrdersTableBody">
-              <tr>
-                <td colspan="4" class="empty-state">
-                  <i class="fas fa-circle-notch fa-spin"></i>
-                  <p>Loading orders...</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="chart-container" style="position: relative; height: 300px; padding: 16px;">
+            <canvas id="revenueChart"></canvas>
+          </div>
         </div>
 
-        <!-- Low Stock Alerts / Items -->
+        <!-- Orders by Status Chart -->
         <div class="table-container">
           <div class="table-header">
-            <h3>Recent Inventory Items</h3>
-            <a href="pharmacy-inventory.html">Manage Inventory</a>
+            <h3>Orders by Status</h3>
+            <a href="pharmacy-orders.html">View Orders</a>
           </div>
-          <table class="dashboard-table">
-            <thead>
-              <tr>
-                <th>Item Name</th>
-                <th>Category</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody id="recentItemsTableBody">
-              <tr>
-                <td colspan="3" class="empty-state">
-                  <i class="fas fa-circle-notch fa-spin"></i>
-                  <p>Loading inventory...</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="chart-container" style="position: relative; height: 300px; padding: 16px;">
+            <canvas id="statusChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -223,7 +196,7 @@
       document.getElementById('welcomeTitle').textContent = `Welcome back, ${name}!`;
 
       fetchDashboardStats();
-      fetchDashboardTables();
+      fetchDashboardAnalytics();
     }
 
     async function fetchDashboardStats() {
@@ -245,64 +218,97 @@
       }
     }
 
-    async function fetchDashboardTables() {
+    async function fetchDashboardAnalytics() {
       try {
-        // Fetch Recent Orders
-        const ordersRes = await fetch('/Mansro/backend/api/orders/my', {
+        const res = await fetch('/Mansro/backend/api/agents/analytics', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        const ordersData = await ordersRes.json();
+        const data = await res.json();
         
-        const ordersBody = document.getElementById('recentOrdersTableBody');
-        if (ordersData.success && ordersData.orders && ordersData.orders.length > 0) {
-          // Get top 5
-          const topOrders = ordersData.orders.slice(0, 5);
-          ordersBody.innerHTML = topOrders.map(o => {
-             const badgeClass = o.status ? `status-${o.status.toLowerCase()}` : 'status-pending';
-             return `<tr>
-               <td style="font-weight: 500;">${o.order_no}</td>
-               <td>${o.patient_name || 'N/A'}</td>
-               <td><span class="status-badge ${badgeClass}">${o.status || 'Pending'}</span></td>
-               <td>₵${parseFloat(o.total_amount).toFixed(2)}</td>
-             </tr>`;
-          }).join('');
+        if (data.success) {
+            renderRevenueChart(data.analytics.revenueByMonth);
+            renderStatusChart(data.analytics.ordersByStatus);
         } else {
-          ordersBody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-box-open"></i><p>No recent orders found.</p></td></tr>`;
+            console.error("Failed to load analytics");
         }
-
-        // Fetch Recent Inventory
-        const invRes = await fetch('/Mansro/backend/api/medicines/my', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        let inventoryData = await invRes.json();
-        
-        // If /my endpoint doesn't exist or isn't populated properly, fallback to general medicines query
-        if (!inventoryData.success && user.id) {
-            // fallback
-           const fallbackRes = await fetch(`/Mansro/backend/api/medicines?agent_id=${user.agent_id || ''}`);
-           inventoryData = await fallbackRes.json();
-        }
-
-        const invBody = document.getElementById('recentItemsTableBody');
-        if (inventoryData.success && inventoryData.medicines && inventoryData.medicines.length > 0) {
-          const topItems = inventoryData.medicines.slice(0, 5);
-          invBody.innerHTML = topItems.map(m => {
-             return `<tr>
-               <td style="font-weight: 500;">${m.name}</td>
-               <td style="text-transform: capitalize;">${m.category || 'Other'}</td>
-               <td>₵${parseFloat(m.price).toFixed(2)}</td>
-             </tr>`;
-          }).join('');
-        } else {
-          invBody.innerHTML = `<tr><td colspan="3" class="empty-state"><i class="fas fa-pills"></i><p>No inventory items found.</p></td></tr>`;
-        }
-
       } catch (err) {
-        console.error('Error fetching dashboard tables:', err);
-        document.getElementById('recentOrdersTableBody').innerHTML = `<tr><td colspan="4" class="empty-state">Error loading orders.</td></tr>`;
-        document.getElementById('recentItemsTableBody').innerHTML = `<tr><td colspan="3" class="empty-state">Error loading inventory.</td></tr>`;
+        console.error('Error fetching analytics:', err);
       }
+    }
+
+    function renderRevenueChart(revenueData) {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        if(revenueData.length === 0) {
+            document.getElementById('revenueChart').parentElement.innerHTML = '<div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center;"><i class="fas fa-chart-line"></i><p>No revenue data yet.</p></div>';
+            return;
+        }
+
+        const labels = revenueData.map(r => r.month);
+        const data = revenueData.map(r => parseFloat(r.total_revenue));
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (GHS)',
+                    data: data,
+                    borderColor: '#4A47A3',
+                    backgroundColor: 'rgba(74, 71, 163, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    function renderStatusChart(statusData) {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        if(statusData.length === 0) {
+            document.getElementById('statusChart').parentElement.innerHTML = '<div class="empty-state" style="height:100%; display:flex; flex-direction:column; justify-content:center;"><i class="fas fa-chart-pie"></i><p>No order data yet.</p></div>';
+            return;
+        }
+
+        const labels = statusData.map(s => s.status.toUpperCase());
+        const data = statusData.map(s => parseInt(s.count));
+        
+        const bgColors = labels.map(l => {
+            if(l === 'DELIVERED') return '#10B981';
+            if(l === 'PENDING') return '#F59E0B';
+            if(l === 'CANCELLED') return '#EF4444';
+            if(l === 'CONFIRMED') return '#3B82F6';
+            if(l === 'DISPENSED') return '#8B5CF6';
+            return '#94A3B8';
+        });
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: bgColors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
     }
 
     function logout() {
