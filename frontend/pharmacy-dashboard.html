@@ -8,8 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
-      --primary: #1A6349;
-      --primary-light: #2D9A6A;
+      --primary: #4A47A3; /* Deep Purple for Admin/Agent */
+      --primary-light: #5B58BD;
+      --primary-hover: #F0EDF7;
       --bg: #F4F7FA;
       --surface: #FFFFFF;
       --text: #0F1923;
@@ -22,37 +23,37 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
     
     /* Sidebar */
-    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
-    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
-    .sidebar-header i { font-size: 1.6rem; color: white; }
-    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
-    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.3rem; background: var(--primary); color: white; letter-spacing: 0.5px; height: 80px; }
+    .sidebar-header i { font-size: 1.5rem; color: white; }
+    
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; }
     .nav-link:hover { background: #F7FAFC; color: #1A202C; }
-    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link.active { background: var(--primary-hover); color: var(--primary); font-weight: 600; }
     .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    
     .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
-    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; }
     .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
     .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
 
     /* Main Content */
-    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
-    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+    .top-header { background: var(--surface); height: 80px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
     .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
-    .header-actions { display: flex; align-items: center; gap: 20px; }
     .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
-    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #4FD1C5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
 
-    /* Dashboard Grid */
-    .content-area { padding: 32px; }
-    
-    .welcome-card { background: linear-gradient(135deg, #1B2B48, #2B4C7E); color: white; padding: 32px; border-radius: 16px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(27, 43, 72, 0.15); display: flex; justify-content: space-between; align-items: center; }
+    .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    .welcome-card { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 32px; border-radius: 16px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(74, 71, 163, 0.15); display: flex; justify-content: space-between; align-items: center; }
     .welcome-text h2 { font-family: 'Sora', sans-serif; font-size: 1.75rem; margin-bottom: 8px; font-weight: 600; }
     .welcome-text p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
     .welcome-icon { font-size: 4rem; opacity: 0.2; }
 
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
-    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; }
+    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; border: 1px solid var(--border); }
     .stat-card:hover { transform: translateY(-4px); }
     .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
     .stat-icon.blue { background: #EBF8FF; color: #3182CE; }
@@ -61,7 +62,7 @@
     .stat-info h4 { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
     .stat-info .value { font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
 
-    .section-card { background: var(--surface); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 32px; text-align: center; margin-bottom: 32px; }
+    .section-card { background: var(--surface); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 32px; text-align: center; margin-bottom: 32px; border: 1px solid var(--border); }
     .section-card h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
     .section-card p { color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
@@ -92,7 +93,7 @@
   <main class="main-content">
     <header class="top-header">
       <div class="header-title">Pharmacy Dashboard</div>
-      <div class="header-actions">
+      <div class="header-actions" style="display: flex; align-items: center;">
 
         <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
           <i class="fas fa-bell"></i>
@@ -137,7 +138,7 @@
       <div class="section-card">
         <h3>This page is under construction</h3>
         <p>You have successfully authenticated as a Pharmacy Agent. The full inventory and prescription management features are currently being developed and will be available in the next release.</p>
-        <div style="margin-top: 32px; color: #4FD1C5; font-size: 3rem;">
+        <div style="margin-top: 32px; color: var(--primary); font-size: 3rem;">
           <i class="fas fa-tools"></i>
         </div>
       </div>
