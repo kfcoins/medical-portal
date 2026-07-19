@@ -53,15 +53,15 @@
     .welcome-text p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
     .welcome-icon { font-size: 4rem; opacity: 0.2; }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
-    .stat-card { background: var(--surface); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 20px; transition: transform 0.2s; border: 1px solid var(--border); }
-    .stat-card:hover { transform: translateY(-4px); }
-    .stat-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .stat-icon.blue { background: #EBF8FF; color: #3182CE; }
-    .stat-icon.green { background: #F0FFF4; color: #38A169; }
-    .stat-icon.purple { background: #FAF5FF; color: #805AD5; }
-    .stat-info h4 { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
-    .stat-info .value { font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--text); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: var(--surface); padding: 28px 32px; border-radius: 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.05); }
+    .stat-top-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .stat-top-accent.blue { background: #3182CE; }
+    .stat-top-accent.purple { background: #805AD5; }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .stat-value-container { display: flex; align-items: baseline; gap: 16px; }
+    .stat-value { font-size: 2.8rem; font-weight: 800; font-family: 'Sora', sans-serif; color: var(--text); line-height: 1; letter-spacing: -1px; }
 
     .section-card { background: var(--surface); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 32px; text-align: center; margin-bottom: 32px; border: 1px solid var(--border); }
     .section-card h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
@@ -140,18 +140,18 @@
 
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon blue"><i class="fas fa-pills"></i></div>
-          <div class="stat-info">
-            <h4>Products in Stock</h4>
-            <div class="value" id="productsInStock">-</div>
+          <div class="stat-top-accent blue"></div>
+          <div class="stat-label">Products in Stock</div>
+          <div class="stat-value-container">
+            <div class="stat-value" id="productsInStock">0</div>
           </div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon purple"><i class="fas fa-history"></i></div>
-          <div class="stat-info">
-            <h4>Recent Orders</h4>
-            <div class="value" id="recentOrders">-</div>
+          <div class="stat-top-accent purple"></div>
+          <div class="stat-label">Recent Orders</div>
+          <div class="stat-value-container">
+            <div class="stat-value" id="recentOrders">0</div>
           </div>
         </div>
       </div>
