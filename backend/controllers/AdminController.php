@@ -73,9 +73,21 @@ class AdminController {
         $stmt = $this->conn->query("SELECT COUNT(*) FROM users WHERE role = 'patient'");
         $totalPatients = $stmt->fetchColumn();
 
+        // Patients last month (Trend)
+        $stmt = $this->conn->query("SELECT COUNT(*) FROM users WHERE role = 'patient' AND created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)");
+        $patientsLastMonth = $stmt->fetchColumn();
+        $patientsBeforeLastMonth = $totalPatients - $patientsLastMonth;
+        $patientsTrend = $patientsBeforeLastMonth > 0 ? round(($patientsLastMonth / $patientsBeforeLastMonth) * 100) : ($patientsLastMonth > 0 ? 100 : 0);
+
         // Active Pharmacies
         $stmt = $this->conn->query("SELECT COUNT(*) FROM agents WHERE verification_status = 'approved'");
         $activePharmacies = $stmt->fetchColumn();
+
+        // Active Pharmacies last month (Trend)
+        $stmt = $this->conn->query("SELECT COUNT(*) FROM agents WHERE verification_status = 'approved' AND created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)");
+        $activePharmaciesLastMonth = $stmt->fetchColumn();
+        $activePharmaciesBeforeLastMonth = $activePharmacies - $activePharmaciesLastMonth;
+        $pharmaciesTrend = $activePharmaciesBeforeLastMonth > 0 ? round(($activePharmaciesLastMonth / $activePharmaciesBeforeLastMonth) * 100) : ($activePharmaciesLastMonth > 0 ? 100 : 0);
 
         // Pending Pharmacies
         $stmt = $this->conn->query("SELECT COUNT(*) FROM agents WHERE verification_status = 'pending'");
@@ -85,7 +97,9 @@ class AdminController {
             "success" => true, 
             "data" => [
                 "patients" => $totalPatients,
+                "patientsTrend" => $patientsTrend,
                 "activePharmacies" => $activePharmacies,
+                "pharmaciesTrend" => $pharmaciesTrend,
                 "pendingPharmacies" => $pendingPharmacies
             ]
         ]);
