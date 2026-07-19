@@ -81,7 +81,7 @@
 
     /* Modal */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-    .modal { background: var(--surface); border-radius: 16px; width: 100%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .modal { background: var(--surface); border-radius: 16px; width: 100%; max-width: 750px !important; padding: 0 !important; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .modal-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
     .modal-close { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
@@ -302,7 +302,7 @@
           <td>${date}</td>
           <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span></td>
           <td>
-            <button class="btn btn-outline" onclick="openModal(${app.agent_table_id})">Review</button>
+            <button class="btn btn-outline" onclick="openModal('${app.agent_table_id}')">Review</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -310,30 +310,38 @@
     }
 
     function openModal(agentTableId) {
-      const app = currentApplications.find(a => a.agent_table_id == agentTableId);
-      if (!app) return;
-      activeAgentId = agentTableId;
+      try {
+        const app = currentApplications.find(a => a.agent_table_id == agentTableId);
+        if (!app) {
+          alert('Application not found for ID: ' + agentTableId);
+          return;
+        }
+        activeAgentId = agentTableId;
 
-      document.getElementById('mdlPharmacyName').textContent = app.pharmacy_name || 'N/A';
-      document.getElementById('mdlOwnerName').textContent = app.first_name + ' ' + app.last_name;
-      document.getElementById('mdlCouncilNo').textContent = app.council_reg_no || 'N/A';
-      document.getElementById('mdlFdaNo').textContent = app.fda_license_no || 'N/A';
-      document.getElementById('mdlRegion').textContent = app.region || 'N/A';
-      document.getElementById('mdlContact').textContent = `${app.email} | ${app.phone}`;
+        document.getElementById('mdlPharmacyName').textContent = app.pharmacy_name || 'N/A';
+        document.getElementById('mdlOwnerName').textContent = app.first_name + ' ' + app.last_name;
+        document.getElementById('mdlCouncilNo').textContent = app.council_reg_no || 'N/A';
+        document.getElementById('mdlFdaNo').textContent = app.fda_license_no || 'N/A';
+        document.getElementById('mdlRegion').textContent = app.region || 'N/A';
+        document.getElementById('mdlContact').textContent = `${app.email} | ${app.phone}`;
 
-      // Handle Documents
-      setupDocPreview('docLicense', 'docLicensePlaceholder', app.pharm_license_url);
-      setupDocPreview('docIdFront', 'docIdFrontPlaceholder', app.id_front_url);
-      setupDocPreview('docIdBack', 'docIdBackPlaceholder', app.id_back_url);
+        // Handle Documents
+        setupDocPreview('docLicense', 'docLicensePlaceholder', app.pharm_license_url);
+        setupDocPreview('docIdFront', 'docIdFrontPlaceholder', app.id_front_url);
+        setupDocPreview('docIdBack', 'docIdBackPlaceholder', app.id_back_url);
 
-      document.getElementById('reviewModal').style.display = 'flex';
+        document.getElementById('reviewModal').classList.add('active');
+      } catch (err) {
+        console.error('Error in openModal: ', err);
+      }
     }
 
     function setupDocPreview(imgId, placeholderId, url) {
       const img = document.getElementById(imgId);
       const placeholder = document.getElementById(placeholderId);
       if (url) {
-        img.src = '../' + url;
+        // If url starts with /mansro/ or /, it's an absolute path from web root
+        img.src = url.startsWith('/') ? url : '../' + url;
         img.style.display = 'block';
         placeholder.style.display = 'none';
       } else {
@@ -344,7 +352,7 @@
     }
 
     function closeModal() {
-      document.getElementById('reviewModal').style.display = 'none';
+      document.getElementById('reviewModal').classList.remove('active');
       activeAgentId = null;
     }
 
