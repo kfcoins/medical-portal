@@ -63,12 +63,62 @@
     .trend-warning { color: #D69E2E; background: rgba(214, 158, 46, 0.1); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
 
     /* Quick Links */
-    .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-    .action-card { background: var(--surface); padding: 24px; border-radius: 16px; border: 1px solid var(--border); text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-decoration: none; color: var(--text); }
-    .action-card:hover { border-color: var(--primary); transform: translateY(-4px); }
-    .action-card i { font-size: 2rem; color: var(--primary); margin-bottom: 16px; display: block; }
-    .action-card h3 { font-family: 'Sora', sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
-    .action-card p { font-size: 0.9rem; color: var(--text-muted); }
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; padding-bottom: 32px; }
+    .action-card { 
+      background: var(--surface); 
+      padding: 32px; 
+      border-radius: 20px; 
+      border: 1px solid var(--border); 
+      display: flex; 
+      align-items: center; 
+      gap: 24px;
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      box-shadow: 0 4px 24px rgba(0,0,0,0.02); 
+      text-decoration: none; 
+      position: relative;
+      overflow: hidden;
+    }
+    .action-card:hover { 
+      border-color: var(--primary); 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 32px rgba(88, 101, 242, 0.08);
+    }
+    .action-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      background: rgba(229, 62, 62, 0.1);
+      color: #E53E3E;
+    }
+    .action-card:nth-child(2) .action-icon-box {
+      background: rgba(49, 130, 206, 0.1);
+      color: #3182CE;
+    }
+    .action-card:hover .action-icon-box {
+      transform: scale(1.08);
+    }
+    .action-content { flex: 1; }
+    .action-card h3 { font-family: 'Sora', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; color: var(--text); transition: color 0.3s; }
+    .action-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+    .action-arrow {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    .action-card:hover .action-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--primary);
+    }
 
   </style>
   <link rel="stylesheet" href="css/responsive.css">
@@ -194,17 +244,27 @@
       </div>
 
       <!-- Quick Actions -->
-      <h2 style="font-family: 'Sora'; font-size: 1.25rem; margin-bottom: 24px; margin-top: 16px;">Quick Actions</h2>
+      <h2 style="font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 24px; margin-top: 32px; color: var(--text);">Quick Actions</h2>
       <div class="quick-links">
         <a href="admin-approvals.html" class="action-card">
-          <i class="fas fa-check-circle"></i>
-          <h3>Review Pending Registrations</h3>
-          <p>Verify and approve new pharmacy applications</p>
+          <div class="action-icon-box">
+            <i class="fas fa-file-signature"></i>
+          </div>
+          <div class="action-content">
+            <h3>Review Pending Registrations</h3>
+            <p>Verify and approve new pharmacy applications securely.</p>
+          </div>
+          <i class="fas fa-chevron-right action-arrow"></i>
         </a>
         <a href="admin-pharmacies.html" class="action-card">
-          <i class="fas fa-store"></i>
-          <h3>Manage Pharmacies</h3>
-          <p>View all active pharmacies and their details</p>
+          <div class="action-icon-box">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="action-content">
+            <h3>Manage Pharmacies</h3>
+            <p>View, search, and manage all active partner pharmacies.</p>
+          </div>
+          <i class="fas fa-chevron-right action-arrow"></i>
         </a>
       </div>
     </div>

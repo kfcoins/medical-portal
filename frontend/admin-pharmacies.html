@@ -222,8 +222,8 @@
           </td>
           <td><span class="status-badge ${statusClass}"><i class="fas ${statusIcon}"></i> ${statusText}</span></td>
           <td>
-            <button class="btn btn-outline" style="color: ${toggleColor}; border-color: ${toggleColor};" onclick="toggleStatus(${app.agent_table_id})">
-              <i class="fas ${toggleIcon}"></i> ${toggleAction}
+            <button style="color: ${toggleColor}; background: transparent; border: none; font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.9rem; cursor: pointer; padding: 4px 8px;" onclick="toggleStatus(${app.agent_table_id})" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+              ${toggleAction}
             </button>
           </td>
         `;
