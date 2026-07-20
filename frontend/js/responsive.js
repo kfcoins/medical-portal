@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wrapper.appendChild(table);
         }
     });
-
+});
 
 function toggleSidebar() {
     if (window.innerWidth > 992) {
