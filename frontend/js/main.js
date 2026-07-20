@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         div.className = 'product-card';
         
         const pharmacyTag = med.pharmacy_name ? `<div class="pharmacy-tag">${med.pharmacy_name}</div>` : '';
-        const nhisTag = (med.nhis_listed && med.nhis_listed == 1) ? `<div style="margin-bottom: 6px;"><span style="display:inline-block; background:#d1fae5; color:#065f46; font-size:0.65rem; padding:3px 8px; border-radius:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;"><i class="fas fa-shield-alt"></i> NHIS Covered</span></div>` : '';
+        const nhisTag = (med.nhis_listed && med.nhis_listed == 1) ? `<div style="margin-bottom: 6px;"><span style="display:inline-block; background:#d1fae5; color:#065f46; font-size:0.65rem; padding:3px 8px; border-radius:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;"><i class="fas fa-shield-alt"></i> NHIS Covered</span></div>` : '';
         
         const imageHtml = med.image_url 
           ? `<div class="product-img-wrapper">
