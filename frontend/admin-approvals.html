@@ -569,9 +569,25 @@
       try {
         const res = await fetch('../backend/index.php?route=admin/stats', { headers: { 'Authorization': 'Bearer ' + t }});
         const data = await res.json();
-        if (data.success && data.data.pendingPharmacies > 0) {
-          const b = document.getElementById('sidebarPendingBadge');
-          if (b) { b.textContent = data.data.pendingPharmacies; b.style.display = 'inline-block'; }
+        if (data.success) {
+          const pendingPharm = data.data.pendingPharmacies || 0;
+          const pendingNhis = data.data.pendingNhis || 0;
+          const totalPending = pendingPharm + pendingNhis;
+          
+          if (totalPending > 0) {
+            const b = document.getElementById('sidebarPendingBadge');
+            if (b) { b.textContent = totalPending; b.style.display = 'inline-block'; }
+          }
+          
+          if (pendingPharm > 0) {
+            const tp = document.getElementById('tabPharmacies');
+            if(tp && !tp.innerHTML.includes('badge')) tp.innerHTML += ` <span class="badge" style="background:#E53E3E;color:white;padding:2px 6px;border-radius:10px;font-size:0.75rem;margin-left:8px;">${pendingPharm}</span>`;
+          }
+          
+          if (pendingNhis > 0) {
+            const tn = document.getElementById('tabNhis');
+            if(tn && !tn.innerHTML.includes('badge')) tn.innerHTML += ` <span class="badge" style="background:#E53E3E;color:white;padding:2px 6px;border-radius:10px;font-size:0.75rem;margin-left:8px;">${pendingNhis}</span>`;
+          }
         }
       } catch (e) {}
     });

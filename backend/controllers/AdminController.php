@@ -101,6 +101,10 @@ class AdminController {
         $stmt = $this->conn->query("SELECT COUNT(*) FROM agents WHERE verification_status = 'pending'");
         $pendingPharmacies = $stmt->fetchColumn();
 
+        // Pending NHIS
+        $stmt = $this->conn->query("SELECT COUNT(*) FROM users WHERE nhis_status = 'pending' AND role = 'patient'");
+        $pendingNhis = $stmt->fetchColumn();
+
         echo json_encode([
             "success" => true, 
             "data" => [
@@ -108,7 +112,8 @@ class AdminController {
                 "patientsTrend" => $patientsTrend,
                 "activePharmacies" => $activePharmacies,
                 "pharmaciesTrend" => $pharmaciesTrend,
-                "pendingPharmacies" => $pendingPharmacies
+                "pendingPharmacies" => $pendingPharmacies,
+                "pendingNhis" => $pendingNhis
             ]
         ]);
     }

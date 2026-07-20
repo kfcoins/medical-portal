@@ -206,7 +206,7 @@ class PatientController {
                 }
                 
                 if (isset($_FILES['nhis_card_image']) && $_FILES['nhis_card_image']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../uploads/nhis/';
+                    $uploadDir = __DIR__ . '/../../uploads/nhis/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0777, true);
                     }
@@ -215,7 +215,7 @@ class PatientController {
                     if (move_uploaded_file($_FILES['nhis_card_image']['tmp_name'], $targetPath)) {
                         $updates[] = "nhis_card_url = :nhis_img";
                         $updates[] = "nhis_status = 'pending'";
-                        $params['nhis_img'] = 'uploads/nhis/' . $fileName;
+                        $params['nhis_img'] = '/mansro/uploads/nhis/' . $fileName;
                     }
                 }
 
