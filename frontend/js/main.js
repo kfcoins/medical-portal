@@ -658,9 +658,14 @@ window.openCheckout = async function() {
     const payCashBtn = document.getElementById('pay-cash');
     if (payCashBtn) {
         if (hasDisabledPOD) {
+            const blockingItems = cart.filter(item => {
+                const pod = item.medicine.allow_pay_on_delivery;
+                return pod == 0 || pod === "0" || pod === false || pod === null || pod === undefined;
+            }).map(item => item.medicine.name);
+            
             payCashBtn.style.opacity = '0.5';
             payCashBtn.style.pointerEvents = 'none';
-            payCashBtn.innerHTML = '<i class="fas fa-money-bill-wave"></i> Cash on Delivery <div style="font-size:0.75rem; color:#E53E3E; margin-top:4px; font-weight:normal;">Not available for some items</div>';
+            payCashBtn.innerHTML = `<i class="fas fa-money-bill-wave"></i> Cash on Delivery <div style="font-size:0.75rem; color:#E53E3E; margin-top:4px; font-weight:normal;">Not available (blocked by: ${blockingItems.join(', ')})</div>`;
             if (document.getElementById('paymentMethod').value === 'cash') {
                 window.selectPayment('card');
             }

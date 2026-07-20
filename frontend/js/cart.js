@@ -233,6 +233,11 @@ function openCheckoutModal() {
             }
             
             if (hasDisabledPOD) {
+                const blockingItems = cart.filter(item => {
+                    const pod = item.medicine.allow_pay_on_delivery;
+                    return pod == 0 || pod === "0" || pod === false || pod === null || pod === undefined;
+                }).map(item => item.medicine.name);
+
                 if (cashOption) {
                     cashOption.disabled = true;
                     cashOption.innerHTML = 'Pay on Delivery (Disabled)';
@@ -240,7 +245,7 @@ function openCheckoutModal() {
                 if (paymentMethodSelect.value === 'cash') {
                     paymentMethodSelect.value = 'momo';
                 }
-                warningMsg.textContent = '* One or more items in your cart do not support Pay on Delivery.';
+                warningMsg.textContent = `* Pay on Delivery is disabled by: ${blockingItems.join(', ')}`;
             } else {
                 if (cashOption) {
                     cashOption.disabled = false;
