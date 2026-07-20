@@ -319,18 +319,18 @@ class AdminController {
                     return;
                 }
 
-                $stmt = $this->conn->prepare("SELECT password FROM users WHERE id = ?");
+                $stmt = $this->conn->prepare("SELECT password_hash FROM users WHERE id = ?");
                 $stmt->execute([$userId]);
                 $userDb = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if (!password_verify($currentPassword, $userDb['password'])) {
+                if (!password_verify($currentPassword, $userDb['password_hash'])) {
                     http_response_code(401);
                     echo json_encode(["success" => false, "message" => "Incorrect current password."]);
                     return;
                 }
 
                 $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-                $stmt = $this->conn->prepare("UPDATE users SET first_name = ?, last_name = ?, phone = ?, email = ?, password = ? WHERE id = ?");
+                $stmt = $this->conn->prepare("UPDATE users SET first_name = ?, last_name = ?, phone = ?, email = ?, password_hash = ? WHERE id = ?");
                 $stmt->execute([$firstName, $lastName, $phone, $email, $hashedPassword]);
             } else {
                 $stmt = $this->conn->prepare("UPDATE users SET first_name = ?, last_name = ?, phone = ?, email = ? WHERE id = ?");

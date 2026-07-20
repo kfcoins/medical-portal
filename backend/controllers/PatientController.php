@@ -239,16 +239,16 @@ class PatientController {
 
             // Update password if provided
             if (!empty($input['currentPassword']) && !empty($input['newPassword'])) {
-                $stmt = $this->conn->prepare("SELECT password FROM users WHERE id = :id");
+                $stmt = $this->conn->prepare("SELECT password_hash FROM users WHERE id = :id");
                 $stmt->execute(['id' => $user_id]);
                 $user = $stmt->fetch();
 
-                if (!$user || !password_verify($input['currentPassword'], $user['password'])) {
+                if (!$user || !password_verify($input['currentPassword'], $user['password_hash'])) {
                     throw new Exception("Incorrect current password.");
                 }
 
                 $newHash = password_hash($input['newPassword'], PASSWORD_DEFAULT);
-                $stmtPass = $this->conn->prepare("UPDATE users SET password = :pass WHERE id = :id");
+                $stmtPass = $this->conn->prepare("UPDATE users SET password_hash = :pass WHERE id = :id");
                 $stmtPass->execute(['pass' => $newHash, 'id' => $user_id]);
             }
 
