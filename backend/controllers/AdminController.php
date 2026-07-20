@@ -120,7 +120,7 @@ class AdminController {
 
     private function getPendingNhis() {
         $stmt = $this->conn->prepare("
-            SELECT id, first_name, last_name, email, phone, ghana_card, nhis_number, nhis_card_front_url, nhis_card_back_url, nhis_card_url, nhis_status, created_at
+            SELECT id, first_name, last_name, email, phone, ghana_card, nhis_number, nhis_card_front_url, nhis_card_back_url, nhis_status, created_at
             FROM users 
             WHERE nhis_status = 'pending' AND role = 'patient'
             ORDER BY created_at DESC

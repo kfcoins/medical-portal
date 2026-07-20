@@ -224,13 +224,24 @@
           <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>NHIS Number:</strong></p>
           <p id="nhisNumberDisplay" style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-weight: 600;"></p>
         </div>
-        <div>
-          <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>NHIS Card:</strong></p>
-          <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; display: flex; justify-content: center;">
-            <a id="nhisCardLink" href="#" target="_blank" style="display: inline-block; max-width: 100%;">
-                <img id="nhisCardImg" src="" alt="NHIS Card" style="max-width: 100%; max-height: 300px; border-radius: 4px; display: none; object-fit: contain;">
-                <span id="nhisCardText" style="display: none; color: #0284c7; text-decoration: underline;"><i class="fas fa-external-link-alt"></i> View Document</span>
-            </a>
+        <div style="display: flex; gap: 10px;">
+          <div style="flex: 1;">
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>Card Front:</strong></p>
+            <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; display: flex; justify-content: center; align-items: center; min-height: 150px;">
+              <a id="nhisCardFrontLink" href="#" target="_blank" style="display: inline-block; max-width: 100%;">
+                  <img id="nhisCardFrontImg" src="" alt="NHIS Card Front" style="max-width: 100%; max-height: 150px; border-radius: 4px; display: none; object-fit: contain;">
+                  <span id="nhisCardFrontText" style="display: none; color: #0284c7; text-decoration: underline;"><i class="fas fa-external-link-alt"></i> View Document</span>
+              </a>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>Card Back:</strong></p>
+            <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; display: flex; justify-content: center; align-items: center; min-height: 150px;">
+              <a id="nhisCardBackLink" href="#" target="_blank" style="display: inline-block; max-width: 100%;">
+                  <img id="nhisCardBackImg" src="" alt="NHIS Card Back" style="max-width: 100%; max-height: 150px; border-radius: 4px; display: none; object-fit: contain;">
+                  <span id="nhisCardBackText" style="display: none; color: #0284c7; text-decoration: underline;"><i class="fas fa-external-link-alt"></i> View Document</span>
+              </a>
+            </div>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -307,26 +318,31 @@
     function viewNhisDetails(patientId, nhisData) {
       document.getElementById('nhisNumberDisplay').textContent = nhisData.number || 'N/A';
       
-      const cardLink = document.getElementById('nhisCardLink');
-      const cardImg = document.getElementById('nhisCardImg');
-      const cardText = document.getElementById('nhisCardText');
-      
-      if (nhisData.url) {
-          const fileUrl = '../backend/' + nhisData.url;
-          cardLink.href = fileUrl;
-          if (fileUrl.match(/\.(jpeg|jpg|gif|png)$/i)) {
-              cardImg.src = fileUrl;
-              cardImg.style.display = 'block';
-              cardText.style.display = 'none';
+      function setupCard(url, linkId, imgId, textId) {
+          const cardLink = document.getElementById(linkId);
+          const cardImg = document.getElementById(imgId);
+          const cardText = document.getElementById(textId);
+          
+          if (url) {
+              const fileUrl = '../backend/' + url;
+              cardLink.href = fileUrl;
+              if (fileUrl.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                  cardImg.src = fileUrl;
+                  cardImg.style.display = 'block';
+                  cardText.style.display = 'none';
+              } else {
+                  cardImg.style.display = 'none';
+                  cardText.style.display = 'inline-block';
+              }
           } else {
+              cardLink.removeAttribute('href');
               cardImg.style.display = 'none';
-              cardText.style.display = 'inline-block';
+              cardText.style.display = 'none';
           }
-      } else {
-          cardLink.removeAttribute('href');
-          cardImg.style.display = 'none';
-          cardText.style.display = 'none';
       }
+
+      setupCard(nhisData.front_url, 'nhisCardFrontLink', 'nhisCardFrontImg', 'nhisCardFrontText');
+      setupCard(nhisData.back_url, 'nhisCardBackLink', 'nhisCardBackImg', 'nhisCardBackText');
 
       document.getElementById('nhisAcceptBtn').onclick = () => updateNhisStatus(patientId, 'approved');
       document.getElementById('nhisDeclineBtn').onclick = () => updateNhisStatus(patientId, 'declined');

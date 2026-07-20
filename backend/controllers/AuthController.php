@@ -391,7 +391,7 @@ class AuthController {
         $decoded = Jwt::authenticate();
         $user_id = $decoded['id'];
 
-        $stmt = $this->conn->prepare("SELECT id, first_name, last_name, email, phone, role, ghana_card, region, is_verified, is_active, nhis_number, nhis_card_url, nhis_status FROM users WHERE id = :id");
+        $stmt = $this->conn->prepare("SELECT id, first_name, last_name, email, phone, role, ghana_card, region, is_verified, is_active, nhis_number, nhis_card_front_url, nhis_card_back_url, nhis_status FROM users WHERE id = :id");
         $stmt->execute(['id' => $user_id]);
         $user = $stmt->fetch();
 

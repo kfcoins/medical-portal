@@ -255,7 +255,7 @@ class PatientController {
             $this->conn->commit();
 
             // Fetch updated user to return (without password)
-            $stmtGet = $this->conn->prepare("SELECT id, email, first_name, last_name, phone, role, nhis_number, nhis_card_url, nhis_status FROM users WHERE id = :id");
+            $stmtGet = $this->conn->prepare("SELECT id, email, first_name, last_name, phone, role, nhis_number, nhis_card_front_url, nhis_card_back_url, nhis_status FROM users WHERE id = :id");
             $stmtGet->execute(['id' => $user_id]);
             $updatedUser = $stmtGet->fetch(PDO::FETCH_ASSOC);
 

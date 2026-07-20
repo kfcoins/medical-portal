@@ -186,7 +186,7 @@ class OrderController {
             $params['pid'] = $user_id;
         }
 
-        $query = "SELECT o.*, a.pharmacy_name, a.region as agent_region, CONCAT(u.first_name, ' ', u.last_name) as patient_name, u.nhis_number as patient_nhis_number, u.nhis_card_url as patient_nhis_url, u.nhis_status as patient_nhis_status
+        $query = "SELECT o.*, a.pharmacy_name, a.region as agent_region, CONCAT(u.first_name, ' ', u.last_name) as patient_name, u.nhis_number as patient_nhis_number, u.nhis_card_front_url as patient_nhis_front_url, u.nhis_card_back_url as patient_nhis_back_url, u.nhis_status as patient_nhis_status
                   FROM orders o 
                   LEFT JOIN agents a ON o.agent_id = a.id 
                   LEFT JOIN users u ON o.patient_id = u.id
@@ -227,7 +227,8 @@ class OrderController {
             if ($role === 'pharmacy' && $order['payment_method'] === 'nhis') {
                 $order['patient_nhis'] = [
                     'number' => $order['patient_nhis_number'],
-                    'url' => $order['patient_nhis_url'],
+                    'front_url' => $order['patient_nhis_front_url'],
+                    'back_url' => $order['patient_nhis_back_url'],
                     'status' => $order['patient_nhis_status']
                 ];
             }
