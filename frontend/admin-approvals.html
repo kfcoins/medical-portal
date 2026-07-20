@@ -254,11 +254,17 @@
           </div>
         </div>
         
-        <h4 style="margin: 16px 0; font-family: 'Sora';">NHIS Card Image</h4>
-        <div class="docs-grid" style="grid-template-columns: 1fr;">
+        <h4 style="margin: 16px 0; font-family: 'Sora';">NHIS Card Images</h4>
+        <div class="docs-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="doc-item">
-            <img id="docNhisCard" class="doc-image" src="" alt="NHIS Card" style="display: none; height: auto;" onclick="openLightbox(this.src)">
-            <div id="docNhisCardPlaceholder" class="doc-placeholder"><i class="fas fa-id-card"></i></div>
+            <div class="doc-item-title">Front</div>
+            <img id="docNhisCardFront" class="doc-image" src="" alt="NHIS Card Front" style="display: none; height: auto;" onclick="openLightbox(this.src)">
+            <div id="docNhisCardFrontPlaceholder" class="doc-placeholder"><i class="fas fa-id-card"></i></div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-item-title">Back</div>
+            <img id="docNhisCardBack" class="doc-image" src="" alt="NHIS Card Back" style="display: none; height: auto;" onclick="openLightbox(this.src)">
+            <div id="docNhisCardBackPlaceholder" class="doc-placeholder"><i class="fas fa-id-card"></i></div>
           </div>
         </div>
       </div>
@@ -502,7 +508,8 @@
         document.getElementById('nhisMdlNumber').textContent = app.nhis_number || 'N/A';
         document.getElementById('nhisMdlContact').textContent = `${app.email} | ${app.phone}`;
 
-        setupDocPreview('docNhisCard', 'docNhisCardPlaceholder', app.nhis_card_url);
+        setupDocPreview('docNhisCardFront', 'docNhisCardFrontPlaceholder', app.nhis_card_front_url);
+        setupDocPreview('docNhisCardBack', 'docNhisCardBackPlaceholder', app.nhis_card_back_url);
 
         document.getElementById('nhisModal').classList.add('active');
       } catch (err) {

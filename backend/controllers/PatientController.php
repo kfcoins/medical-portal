@@ -183,7 +183,7 @@ class PatientController {
             $this->conn->beginTransaction();
 
             // Update basic info and NHIS if provided
-            if (isset($input['firstName']) || isset($input['lastName']) || isset($input['phone']) || isset($input['nhis_number']) || isset($_FILES['nhis_card_image'])) {
+            if (isset($input['firstName']) || isset($input['lastName']) || isset($input['phone']) || isset($input['nhis_number']) || isset($_FILES['nhis_card_front_image']) || isset($_FILES['nhis_card_back_image'])) {
                 $updates = [];
                 $params = ['id' => $user_id];
                 
@@ -205,17 +205,28 @@ class PatientController {
                     $params['nhis_num'] = $input['nhis_number'];
                 }
                 
-                if (isset($_FILES['nhis_card_image']) && $_FILES['nhis_card_image']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../../uploads/nhis/';
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0777, true);
-                    }
-                    $fileName = "nhis_" . $user_id . "_" . time() . "_" . basename($_FILES['nhis_card_image']['name']);
+                $uploadDir = __DIR__ . '/../../uploads/nhis/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                if (isset($_FILES['nhis_card_front_image']) && $_FILES['nhis_card_front_image']['error'] === UPLOAD_ERR_OK) {
+                    $fileName = "nhis_f_" . $user_id . "_" . time() . "_" . basename($_FILES['nhis_card_front_image']['name']);
                     $targetPath = $uploadDir . $fileName;
-                    if (move_uploaded_file($_FILES['nhis_card_image']['tmp_name'], $targetPath)) {
-                        $updates[] = "nhis_card_url = :nhis_img";
+                    if (move_uploaded_file($_FILES['nhis_card_front_image']['tmp_name'], $targetPath)) {
+                        $updates[] = "nhis_card_front_url = :nhis_front_img";
                         $updates[] = "nhis_status = 'pending'";
-                        $params['nhis_img'] = '/mansro/uploads/nhis/' . $fileName;
+                        $params['nhis_front_img'] = '/mansro/uploads/nhis/' . $fileName;
+                    }
+                }
+                
+                if (isset($_FILES['nhis_card_back_image']) && $_FILES['nhis_card_back_image']['error'] === UPLOAD_ERR_OK) {
+                    $fileName = "nhis_b_" . $user_id . "_" . time() . "_" . basename($_FILES['nhis_card_back_image']['name']);
+                    $targetPath = $uploadDir . $fileName;
+                    if (move_uploaded_file($_FILES['nhis_card_back_image']['tmp_name'], $targetPath)) {
+                        $updates[] = "nhis_card_back_url = :nhis_back_img";
+                        $updates[] = "nhis_status = 'pending'";
+                        $params['nhis_back_img'] = '/mansro/uploads/nhis/' . $fileName;
                     }
                 }
 

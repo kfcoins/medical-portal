@@ -154,14 +154,22 @@
               <input type="text" class="form-control" id="nhisNumber" placeholder="e.g. 12345678">
             </div>
             <div class="form-group">
-              <label class="form-label">Upload NHIS Card (Image)</label>
-              <input type="file" class="form-control" id="nhisCardImage" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
-              <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of your card.</small>
+              <label class="form-label">Upload NHIS Card (Front)</label>
+              <input type="file" class="form-control" id="nhisCardFront" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
+              <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of the front of your card.</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload NHIS Card (Back)</label>
+              <input type="file" class="form-control" id="nhisCardBack" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
+              <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of the back of your card.</small>
             </div>
           </div>
           <div id="nhisCardPreview" style="margin-top: 12px; display: none;">
             <p style="font-size: 0.85rem; font-weight: 500; margin-bottom: 8px;">Current Card Uploaded:</p>
-            <img id="nhisCardImg" src="" alt="NHIS Card" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="display: flex; gap: 16px;">
+              <img id="nhisCardFrontImg" src="" alt="NHIS Card Front" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border); display: none;">
+              <img id="nhisCardBackImg" src="" alt="NHIS Card Back" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border); display: none;">
+            </div>
           </div>
           <div style="text-align: right; margin-top: 16px;">
             <button type="submit" class="btn-save" id="saveNhisBtn">Submit Details</button>
@@ -239,9 +247,16 @@
         nhisBadge.style.color = '#4A5568';
       }
 
-      if (user.nhis_card_url) {
+      if (user.nhis_card_front_url || user.nhis_card_back_url) {
         document.getElementById('nhisCardPreview').style.display = 'block';
-        document.getElementById('nhisCardImg').src = `../backend/${user.nhis_card_url}`;
+        if (user.nhis_card_front_url) {
+          document.getElementById('nhisCardFrontImg').src = user.nhis_card_front_url.startsWith('/') ? user.nhis_card_front_url : `../${user.nhis_card_front_url}`;
+          document.getElementById('nhisCardFrontImg').style.display = 'block';
+        }
+        if (user.nhis_card_back_url) {
+          document.getElementById('nhisCardBackImg').src = user.nhis_card_back_url.startsWith('/') ? user.nhis_card_back_url : `../${user.nhis_card_back_url}`;
+          document.getElementById('nhisCardBackImg').style.display = 'block';
+        }
       }
     }
 
@@ -305,9 +320,14 @@
       const formData = new FormData();
       formData.append('nhis_number', document.getElementById('nhisNumber').value);
       
-      const fileInput = document.getElementById('nhisCardImage');
-      if (fileInput.files.length > 0) {
-        formData.append('nhis_card_image', fileInput.files[0]);
+      const frontFile = document.getElementById('nhisCardFront');
+      if (frontFile.files.length > 0) {
+        formData.append('nhis_card_front_image', frontFile.files[0]);
+      }
+      
+      const backFile = document.getElementById('nhisCardBack');
+      if (backFile.files.length > 0) {
+        formData.append('nhis_card_back_image', backFile.files[0]);
       }
 
       try {
@@ -334,7 +354,8 @@
             updateUIWithUser();
           }
           
-          fileInput.value = ''; // clear file input
+          document.getElementById('nhisCardFront').value = ''; 
+          document.getElementById('nhisCardBack').value = ''; 
         } else {
           showAlert(data.message || 'Update failed', 'error');
         }

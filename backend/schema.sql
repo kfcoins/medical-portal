@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS `users` (
     `role` ENUM('patient', 'pharmacy', 'admin') DEFAULT 'patient',
     `ghana_card` VARCHAR(50),
     `nhis_number` VARCHAR(100),
+    `nhis_card_front_url` VARCHAR(255),
+    `nhis_card_back_url` VARCHAR(255),
     `nhis_card_url` VARCHAR(255),
     `nhis_status` ENUM('pending', 'approved', 'declined') NULL,
     `region` VARCHAR(100),
