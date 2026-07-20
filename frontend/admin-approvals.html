@@ -145,17 +145,16 @@
     <div class="content-area">
       <div id="alertBox" class="alert"></div>
 
+      <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+        <button id="tabPharmacies" class="btn btn-primary" onclick="switchTab('pharmacies')">Pharmacy Applications</button>
+        <button id="tabNhis" class="btn btn-outline" onclick="switchTab('nhis')">NHIS Approvals</button>
+      </div>
+
       <div class="card">
         <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Pharmacy/Agent Name</th>
-                <th>Contact</th>
-                <th>Submitted On</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
+          <table class="table" id="approvalsTable">
+            <thead id="approvalsHead">
+              <!-- Dynamically rendered -->
             </thead>
             <tbody id="approvalsList">
               <tr>
@@ -176,7 +175,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3 class="modal-title">Review Application</h3>
-        <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        <button class="modal-close" onclick="closeModal('reviewModal')"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="detail-grid">
@@ -232,6 +231,44 @@
     </div>
   </div>
 
+  <!-- NHIS Modal -->
+  <div class="modal-overlay" id="nhisModal">
+    <div class="modal" style="max-width: 500px !important;">
+      <div class="modal-header">
+        <h3 class="modal-title">Review NHIS Card</h3>
+        <button class="modal-close" onclick="closeModal('nhisModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid" style="grid-template-columns: 1fr;">
+          <div class="detail-item">
+            <span class="detail-label">Patient Name</span>
+            <span class="detail-value" id="nhisMdlName"></span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">NHIS Number</span>
+            <span class="detail-value" id="nhisMdlNumber"></span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Contact Details</span>
+            <span class="detail-value" id="nhisMdlContact"></span>
+          </div>
+        </div>
+        
+        <h4 style="margin: 16px 0; font-family: 'Sora';">NHIS Card Image</h4>
+        <div class="docs-grid" style="grid-template-columns: 1fr;">
+          <div class="doc-item">
+            <img id="docNhisCard" class="doc-image" src="" alt="NHIS Card" style="display: none; height: auto;" onclick="openLightbox(this.src)">
+            <div id="docNhisCardPlaceholder" class="doc-placeholder"><i class="fas fa-id-card"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="btnRejectNhis" onclick="handleNhisAction('reject')"><i class="fas fa-times"></i> Reject</button>
+        <button class="btn btn-success" id="btnApproveNhis" onclick="handleNhisAction('approve')"><i class="fas fa-check"></i> Approve</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
@@ -242,7 +279,10 @@
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
     let currentApplications = [];
+    let currentNhis = [];
     let activeAgentId = null;
+    let activePatientId = null;
+    let currentTab = 'pharmacies';
 
     if (!token || !user || user.role !== 'admin') {
       window.location.href = 'login.html';
@@ -250,6 +290,13 @@
       document.getElementById('userName').textContent = user.first_name + ' ' + user.last_name;
       document.getElementById('userInitial').textContent = user.first_name.charAt(0);
       loadApprovals();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabPharmacies').className = tab === 'pharmacies' ? 'btn btn-primary' : 'btn btn-outline';
+      document.getElementById('tabNhis').className = tab === 'nhis' ? 'btn btn-primary' : 'btn btn-outline';
+      renderTable();
     }
 
     function showAlert(message, type = 'success') {
@@ -266,47 +313,101 @@
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
-        
         if (data.success) {
-          // Filter out only pending applications for this view
           currentApplications = data.data.filter(app => app.verification_status === 'pending');
-          renderTable();
         }
+        
+        const nhisRes = await fetch('../backend/index.php?route=admin/pending-nhis', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const nhisData = await nhisRes.json();
+        if (nhisData.success) {
+          currentNhis = nhisData.data;
+        }
+
+        renderTable();
       } catch (err) {
         console.error('Failed to load applications:', err);
       }
     }
 
     function renderTable() {
+      const thead = document.getElementById('approvalsHead');
       const tbody = document.getElementById('approvalsList');
       tbody.innerHTML = '';
       
-      if (currentApplications.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No pending applications found.</td></tr>`;
-        return;
-      }
-
-      currentApplications.forEach(app => {
-        const date = new Date(app.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>
-            <div style="font-weight: 600;">${app.pharmacy_name || app.first_name + ' ' + app.last_name}</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">${app.agent_type.toUpperCase()} - ${app.region || 'N/A'}</div>
-          </td>
-          <td>
-            <div>${app.email}</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">${app.phone}</div>
-          </td>
-          <td>${date}</td>
-          <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span></td>
-          <td>
-            <button class="btn btn-outline" onclick="openModal('${app.agent_table_id}')">Review</button>
-          </td>
+      if (currentTab === 'pharmacies') {
+        thead.innerHTML = `
+          <tr>
+            <th>Pharmacy/Agent Name</th>
+            <th>Contact</th>
+            <th>Submitted On</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         `;
-        tbody.appendChild(tr);
-      });
+        
+        if (currentApplications.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No pending pharmacy applications.</td></tr>`;
+          return;
+        }
+
+        currentApplications.forEach(app => {
+          const date = new Date(app.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div style="font-weight: 600;">${app.pharmacy_name || app.first_name + ' ' + app.last_name}</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">${app.agent_type.toUpperCase()} - ${app.region || 'N/A'}</div>
+            </td>
+            <td>
+              <div>${app.email}</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">${app.phone}</div>
+            </td>
+            <td>${date}</td>
+            <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span></td>
+            <td>
+              <button class="btn btn-outline" onclick="openModal('${app.agent_table_id}')">Review</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        thead.innerHTML = `
+          <tr>
+            <th>Patient Name</th>
+            <th>NHIS Number</th>
+            <th>Submitted On</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        `;
+        
+        if (currentNhis.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No pending NHIS approvals.</td></tr>`;
+          return;
+        }
+
+        currentNhis.forEach(app => {
+          const date = new Date(app.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div style="font-weight: 600;">${app.first_name} ${app.last_name}</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">${app.email} | ${app.phone}</div>
+            </td>
+            <td>
+              <div style="font-weight: 500;">${app.nhis_number}</div>
+            </td>
+            <td>${date}</td>
+            <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span></td>
+            <td>
+              <button class="btn btn-outline" onclick="openNhisModal('${app.id}')">Review</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
     function openModal(agentTableId) {
@@ -358,41 +459,86 @@
 
     async function handleAction(action) {
       if (!activeAgentId) return;
+      if (!confirm(`Are you sure you want to ${action} this pharmacy application?`)) return;
 
-      const endpoint = action === 'approve' 
-        ? `../backend/index.php?route=admin/approve-pharmacy/${activeAgentId}`
-        : `../backend/index.php?route=admin/reject-pharmacy/${activeAgentId}`;
-
-      const payload = action === 'reject' ? { reason: "Application did not meet our verification requirements." } : {};
-
-      const btnApprove = document.getElementById('btnApprove');
-      const btnReject = document.getElementById('btnReject');
-      btnApprove.disabled = true;
-      btnReject.disabled = true;
+      const btn = action === 'approve' ? document.getElementById('btnApprove') : document.getElementById('btnReject');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+      btn.disabled = true;
 
       try {
-        const res = await fetch(endpoint, {
+        const res = await fetch(`../backend/index.php?route=admin/${action}-pharmacy&id=${activeAgentId}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          body: Object.keys(payload).length > 0 ? JSON.stringify(payload) : null
+          headers: { 'Authorization': 'Bearer ' + token }
         });
         const data = await res.json();
         
         if (data.success) {
-          showAlert(`Application successfully ${action}d!`);
-          closeModal();
-          loadApprovals(); // Refresh table
+          showAlert(`Pharmacy ${action}d successfully.`, 'success');
+          closeModal('reviewModal');
+          loadApprovals();
         } else {
-          showAlert(data.message || `Failed to ${action} application.`, 'error');
+          showAlert(data.message || `Failed to ${action} pharmacy.`, 'error');
         }
       } catch (err) {
-        showAlert('Network error occurred.', 'error');
+        console.error(err);
+        showAlert(`An error occurred.`, 'error');
       } finally {
-        btnApprove.disabled = false;
-        btnReject.disabled = false;
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    function openNhisModal(patientId) {
+      try {
+        const app = currentNhis.find(a => a.id == patientId);
+        if (!app) {
+          alert('Patient not found');
+          return;
+        }
+        activePatientId = patientId;
+
+        document.getElementById('nhisMdlName').textContent = app.first_name + ' ' + app.last_name;
+        document.getElementById('nhisMdlNumber').textContent = app.nhis_number || 'N/A';
+        document.getElementById('nhisMdlContact').textContent = `${app.email} | ${app.phone}`;
+
+        setupDocPreview('docNhisCard', 'docNhisCardPlaceholder', app.nhis_card_url);
+
+        document.getElementById('nhisModal').classList.add('active');
+      } catch (err) {
+        console.error('Error in openNhisModal: ', err);
+      }
+    }
+
+    async function handleNhisAction(action) {
+      if (!activePatientId) return;
+      if (!confirm(`Are you sure you want to ${action} this NHIS card?`)) return;
+
+      const btn = action === 'approve' ? document.getElementById('btnApproveNhis') : document.getElementById('btnRejectNhis');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`../backend/index.php?route=admin/${action}-nhis&id=${activePatientId}`, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert(`NHIS Card ${action}d successfully.`, 'success');
+          closeModal('nhisModal');
+          loadApprovals();
+        } else {
+          showAlert(data.message || `Failed to ${action} NHIS card.`, 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert(`An error occurred.`, 'error');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
       }
     }
 

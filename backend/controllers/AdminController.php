@@ -26,6 +26,12 @@ class AdminController {
 
         if ($method === 'GET' && $action === 'pending-pharmacies') {
             $this->getPendingPharmacies();
+        } elseif ($method === 'GET' && $action === 'pending-nhis') {
+            $this->getPendingNhis();
+        } elseif ($method === 'POST' && $action === 'approve-nhis' && $id) {
+            $this->approveNhis($id);
+        } elseif ($method === 'POST' && $action === 'reject-nhis' && $id) {
+            $this->rejectNhis($id);
         } elseif ($method === 'POST' && $action === 'approve-pharmacy' && $id) {
             $this->approvePharmacy($id);
         } elseif ($method === 'POST' && $action === 'reject-pharmacy' && $id) {
@@ -105,6 +111,38 @@ class AdminController {
                 "pendingPharmacies" => $pendingPharmacies
             ]
         ]);
+    }
+
+    private function getPendingNhis() {
+        $stmt = $this->conn->prepare("
+            SELECT id, first_name, last_name, email, phone, ghana_card, nhis_number, nhis_card_url, nhis_status, created_at
+            FROM users 
+            WHERE nhis_status = 'pending' AND role = 'patient'
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute();
+        $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["success" => true, "data" => $patients]);
+    }
+
+    private function approveNhis($id) {
+        $stmt = $this->conn->prepare("UPDATE users SET nhis_status = 'approved' WHERE id = :id");
+        if ($stmt->execute(['id' => $id])) {
+            echo json_encode(["success" => true, "message" => "NHIS card approved successfully."]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to approve NHIS card."]);
+        }
+    }
+
+    private function rejectNhis($id) {
+        $stmt = $this->conn->prepare("UPDATE users SET nhis_status = 'declined' WHERE id = :id");
+        if ($stmt->execute(['id' => $id])) {
+            echo json_encode(["success" => true, "message" => "NHIS card rejected."]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to reject NHIS card."]);
+        }
     }
 
     private function approvePharmacy($id) {

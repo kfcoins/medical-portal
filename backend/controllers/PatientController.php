@@ -19,7 +19,7 @@ class PatientController {
             $this->myPrescriptions();
         } elseif ($method === 'POST' && $action === 'prescriptions' && $id === 'upload') { // api/patient/prescriptions/upload
             $this->uploadPrescription();
-        } elseif ($method === 'PUT' && $action === 'profile') { // api/patient/profile
+        } elseif (($method === 'PUT' || $method === 'POST') && $action === 'profile') { // api/patient/profile
             $this->updateProfile();
         } else {
             http_response_code(404);

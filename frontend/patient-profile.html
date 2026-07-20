@@ -42,23 +42,23 @@
     .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 24px; }
     .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
 
-    .content-area { padding: 32px; max-width: 900px; margin: 0 auto; width: 100%; }
+    .content-area { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
 
     /* Cards */
-    .card { background: var(--surface); border-radius: 16px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border); margin-bottom: 24px; }
-    .card-title { font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    .card { background: var(--surface); border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 32px; }
+    .card-title { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; color: #1e293b; }
     
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .form-group { margin-bottom: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .form-group { margin-bottom: 24px; }
     .form-group.full { grid-column: 1 / -1; }
-    .form-label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; color: #4A5568; }
-    .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; background: #F8FAFC; transition: 0.2s; outline: none; }
-    .form-control:focus { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 3px rgba(26, 99, 73, 0.1); }
-    .form-control:disabled { background: #E2E8F0; cursor: not-allowed; color: #64748B; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; color: #475569; }
+    .form-control { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.95rem; background: #fff; transition: 0.2s; outline: none; }
+    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 99, 73, 0.1); }
+    .form-control:disabled { background: #f8fafc; cursor: not-allowed; color: #64748b; }
 
-    .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Sora', sans-serif; font-size: 0.95rem; }
+    .btn-save { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
     .btn-save:hover { background: var(--primary-light); }
-    .btn-save:disabled { background: #94A3B8; cursor: not-allowed; }
+    .btn-save:disabled { background: #94a3b8; cursor: not-allowed; }
 
     .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; display: none; }
     .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
@@ -111,7 +111,7 @@
 
       <!-- Personal Information -->
       <div class="card">
-        <h3 class="card-title"><i class="fas fa-user"></i> Personal Information</h3>
+        <h3 class="card-title">Personal Information</h3>
         <form id="profileForm" onsubmit="updateProfile(event)">
           <div class="form-grid">
             <div class="form-group">
@@ -141,10 +141,10 @@
       <!-- NHIS Card Information -->
       <div class="card">
         <h3 class="card-title">
-          <i class="fas fa-id-card"></i> NHIS Card Details
-          <span id="nhisStatusBadge" class="badge" style="margin-left: 12px; font-size: 0.75rem;">None</span>
+          NHIS Card Details
+          <span id="nhisStatusBadge" class="badge" style="margin-left: 12px; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">None</span>
         </h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 24px;">
           Provide your National Health Insurance Scheme card details to enjoy coverage across pharmacies. Once approved, it can be applied to orders.
         </p>
         <form id="nhisForm" onsubmit="updateNhisCard(event)">
@@ -171,7 +171,7 @@
 
       <!-- Security Settings -->
       <div class="card">
-        <h3 class="card-title"><i class="fas fa-lock"></i> Security Settings</h3>
+        <h3 class="card-title">Security Settings</h3>
         <form id="passwordForm" onsubmit="changePassword(event)">
           <div class="form-group">
             <label class="form-label">Current Password</label>
@@ -311,7 +311,7 @@
       }
 
       try {
-        const response = await fetch('../backend/api.php?action=patient_update_profile', {
+        const response = await fetch('../backend/index.php?route=patient/profile', {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + token
@@ -324,7 +324,7 @@
           showAlert('NHIS details submitted successfully. Awaiting verification.');
           
           // Refresh user data
-          const userResponse = await fetch('../backend/api.php?action=auth_me', {
+          const userResponse = await fetch('../backend/index.php?route=auth/me', {
             headers: { 'Authorization': 'Bearer ' + token }
           });
           const userData = await userResponse.json();
