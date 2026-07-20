@@ -619,6 +619,24 @@ window.openCheckout = function() {
         if (phoneEl) phoneEl.value = user.phone || '';
         if (regionEl && user.region) regionEl.value = user.region;
     }
+    // Check for Pay on Delivery restrictions
+    const hasDisabledPOD = cart.some(item => item.medicine.allow_pay_on_delivery == 0 || item.medicine.allow_pay_on_delivery == "0" || item.medicine.allow_pay_on_delivery === false);
+    const payCashBtn = document.getElementById('pay-cash');
+    if (payCashBtn) {
+        if (hasDisabledPOD) {
+            payCashBtn.style.opacity = '0.5';
+            payCashBtn.style.pointerEvents = 'none';
+            payCashBtn.innerHTML = '<i class="fas fa-money-bill-wave"></i> Cash on Delivery <div style="font-size:0.75rem; color:#E53E3E; margin-top:4px; font-weight:normal;">Not available for some items</div>';
+            if (document.getElementById('paymentMethod').value === 'cash') {
+                window.selectPayment('card');
+            }
+        } else {
+            payCashBtn.style.opacity = '1';
+            payCashBtn.style.pointerEvents = 'auto';
+            payCashBtn.innerHTML = '<i class="fas fa-money-bill-wave"></i> Cash on Delivery';
+        }
+    }
+
     checkoutModal.classList.add('active');
     document.getElementById('cartWidget').classList.remove('active');
   }
@@ -630,6 +648,13 @@ window.closeCheckout = function() {
 };
 
 window.selectPayment = function(method) {
+  if (method === 'cash') {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const hasDisabledPOD = cart.some(item => item.medicine.allow_pay_on_delivery == 0 || item.medicine.allow_pay_on_delivery == "0" || item.medicine.allow_pay_on_delivery === false);
+    if (hasDisabledPOD) {
+      return; // Do not allow selection if disabled
+    }
+  }
   document.getElementById('paymentMethod').value = method;
   document.getElementById('pay-card').classList.remove('selected');
   document.getElementById('pay-cash').classList.remove('selected');
