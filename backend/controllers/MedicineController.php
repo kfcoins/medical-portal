@@ -227,6 +227,7 @@ class MedicineController {
         $description = isset($input['description']) ? $input['description'] : '';
         $stock_qty = isset($input['stock_qty']) ? (int)$input['stock_qty'] : 0;
         $expiry_date = isset($input['expiry_date']) && !empty($input['expiry_date']) ? $input['expiry_date'] : null;
+        $nhis_listed = isset($input['nhis_listed']) ? (int)$input['nhis_listed'] : 0;
 
         if (empty($name) || $price <= 0) {
             http_response_code(400);
@@ -247,8 +248,8 @@ class MedicineController {
             }
         }
 
-        $query = "INSERT INTO medicines (id, agent_id, name, category, price, description, stock_qty, expiry_date, image_url) 
-                  VALUES (:id, :agent_id, :name, :cat, :price, :desc, :stock, :exp, :image_url)";
+        $query = "INSERT INTO medicines (id, agent_id, name, category, price, description, stock_qty, expiry_date, image_url, nhis_listed) 
+                  VALUES (:id, :agent_id, :name, :cat, :price, :desc, :stock, :exp, :image_url, :nhis)";
         $stmt = $this->conn->prepare($query);
         try {
             $stmt->execute([
@@ -260,7 +261,8 @@ class MedicineController {
                 'desc' => $description,
                 'stock' => $stock_qty,
                 'exp' => $expiry_date,
-                'image_url' => $image_url
+                'image_url' => $image_url,
+                'nhis' => $nhis_listed
             ]);
             echo json_encode(["success" => true, "message" => "Medicine added successfully", "id" => $id]);
         } catch (Exception $e) {
@@ -309,6 +311,7 @@ class MedicineController {
         $description = isset($input['description']) ? $input['description'] : '';
         $stock_qty = isset($input['stock_qty']) ? (int)$input['stock_qty'] : 0;
         $expiry_date = isset($input['expiry_date']) && !empty($input['expiry_date']) ? $input['expiry_date'] : null;
+        $nhis_listed = isset($input['nhis_listed']) ? (int)$input['nhis_listed'] : 0;
 
         if (empty($name) || $price <= 0) {
             http_response_code(400);
@@ -316,7 +319,7 @@ class MedicineController {
             return;
         }
 
-        $query = "UPDATE medicines SET name = :name, category = :cat, price = :price, description = :desc, stock_qty = :stock, expiry_date = :exp";
+        $query = "UPDATE medicines SET name = :name, category = :cat, price = :price, description = :desc, stock_qty = :stock, expiry_date = :exp, nhis_listed = :nhis";
         $params = [
             'id' => $id,
             'name' => $name,
@@ -324,7 +327,8 @@ class MedicineController {
             'price' => $price,
             'desc' => $description,
             'stock' => $stock_qty,
-            'exp' => $expiry_date
+            'exp' => $expiry_date,
+            'nhis' => $nhis_listed
         ];
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {

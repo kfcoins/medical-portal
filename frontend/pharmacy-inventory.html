@@ -70,9 +70,18 @@
     .modal-overlay.active .modal { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .modal-header h3 { font-family: 'Sora', sans-serif; font-size: 1.25rem; }
-    .close-modal { background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; }
+    .close-modal { background: transparent; border: none; font-size: 1.25rem; color: #64748B; cursor: pointer; transition: 0.2s; }
+    .close-modal:hover { color: #E53E3E; transform: rotate(90deg); }
     
-    .form-group { margin-bottom: 16px; }
+    /* Toggle Switch */
+    .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: #F8FAFC; justify-content: space-between; }
+    .checkbox-group > label:first-child { margin: 0; font-weight: 500; color: #1A202C; flex: 1; cursor: pointer; }
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex: 0 0 44px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 24px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    input:checked + .toggle-slider { background-color: #4FD1C5; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
     .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted); }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
@@ -197,6 +206,13 @@
           <label>Description</label>
           <textarea id="medDesc" name="description" rows="3" placeholder="Optional details..."></textarea>
         </div>
+        <div class="checkbox-group">
+          <label for="medNhisListed">Covered by NHIS (National Health Insurance Scheme)</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="medNhisListed" value="1">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
         <button type="submit" class="submit-btn" id="submitBtn">Add Product</button>
       </form>
     </div>
@@ -253,8 +269,9 @@
       document.getElementById('medCategory').value = med.category;
       document.getElementById('medPrice').value = med.price;
       document.getElementById('medStock').value = med.stock_qty;
-      document.getElementById('medExpiry').value = med.expiry_date || '';
+      document.getElementById('medExpiry').value = med.expiry_date ? med.expiry_date.split('T')[0] : '';
       document.getElementById('medDesc').value = med.description || '';
+      document.getElementById('medNhisListed').checked = med.nhis_listed == 1;
       
       modal.classList.add('active');
     };
@@ -352,6 +369,7 @@
       formData.append('stock_qty', document.getElementById('medStock').value);
       formData.append('expiry_date', document.getElementById('medExpiry').value);
       formData.append('description', document.getElementById('medDesc').value);
+      formData.append('nhis_listed', document.getElementById('medNhisListed').checked ? 1 : 0);
       
       const fileInput = document.getElementById('medImage');
       if (fileInput.files.length > 0) {
