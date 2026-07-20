@@ -645,7 +645,10 @@ window.openCheckout = async function() {
         if (regionEl && user.region) regionEl.value = user.region;
     }
     // Check for Pay on Delivery restrictions
-    const hasDisabledPOD = cart.some(item => item.medicine.allow_pay_on_delivery == 0 || item.medicine.allow_pay_on_delivery == "0" || item.medicine.allow_pay_on_delivery === false);
+    const hasDisabledPOD = cart.some(item => {
+        const pod = item.medicine.allow_pay_on_delivery;
+        return pod == 0 || pod === "0" || pod === false || pod === null || pod === undefined;
+    });
     const payCashBtn = document.getElementById('pay-cash');
     if (payCashBtn) {
         if (hasDisabledPOD) {
@@ -674,7 +677,10 @@ window.closeCheckout = function() {
 window.selectPayment = function(method) {
   if (method === 'cash') {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const hasDisabledPOD = cart.some(item => item.medicine.allow_pay_on_delivery == 0 || item.medicine.allow_pay_on_delivery == "0" || item.medicine.allow_pay_on_delivery === false);
+    const hasDisabledPOD = cart.some(item => {
+        const pod = item.medicine.allow_pay_on_delivery;
+        return pod == 0 || pod === "0" || pod === false || pod === null || pod === undefined;
+    });
     if (hasDisabledPOD) {
       return; // Do not allow selection if disabled
     }

@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `agents` (
     `pharm_license_url` VARCHAR(255),
     `bio` TEXT,
     `nhis_enabled` BOOLEAN DEFAULT FALSE,
+    `allow_pay_on_delivery` BOOLEAN DEFAULT TRUE,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 );
