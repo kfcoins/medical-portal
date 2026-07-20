@@ -458,10 +458,20 @@
       }
     }
 
-    function closeModal() {
-      document.getElementById('reviewModal').classList.remove('active');
-      activeAgentId = null;
+    function closeModal(modalId = 'reviewModal') {
+      document.getElementById(modalId).classList.remove('active');
+      if (modalId === 'reviewModal') activeAgentId = null;
+      if (modalId === 'nhisModal') activePatientId = null;
     }
+
+    // Close modals on clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal(modal.id);
+        }
+      });
+    });
 
     async function handleAction(action) {
       if (!activeAgentId) return;
