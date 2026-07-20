@@ -213,6 +213,34 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="nhisModal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>Review NHIS Card</h3>
+        <button class="close-modal" onclick="closeNhisModal()">&times;</button>
+      </div>
+      <div id="nhisDetailsContent" class="delivery-content" style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+          <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>NHIS Number:</strong></p>
+          <p id="nhisNumberDisplay" style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-weight: 600;"></p>
+        </div>
+        <div>
+          <p style="font-size: 0.9rem; color: #475569; margin-bottom: 5px;"><strong>NHIS Card:</strong></p>
+          <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; display: flex; justify-content: center;">
+            <a id="nhisCardLink" href="#" target="_blank" style="display: inline-block; max-width: 100%;">
+                <img id="nhisCardImg" src="" alt="NHIS Card" style="max-width: 100%; max-height: 300px; border-radius: 4px; display: none; object-fit: contain;">
+                <span id="nhisCardText" style="display: none; color: #0284c7; text-decoration: underline;"><i class="fas fa-external-link-alt"></i> View Document</span>
+            </a>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button id="nhisAcceptBtn" style="flex: 1; padding: 10px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Accept</button>
+            <button id="nhisDeclineBtn" style="flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Decline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
   <script>
     function viewDeliveryDetails(details) {
@@ -272,6 +300,86 @@
       document.getElementById('deliveryModal').classList.remove('active');
     }
 
+    function closeNhisModal() {
+      document.getElementById('nhisModal').classList.remove('active');
+    }
+
+    function viewNhisDetails(patientId, nhisData) {
+      document.getElementById('nhisNumberDisplay').textContent = nhisData.number || 'N/A';
+      
+      const cardLink = document.getElementById('nhisCardLink');
+      const cardImg = document.getElementById('nhisCardImg');
+      const cardText = document.getElementById('nhisCardText');
+      
+      if (nhisData.url) {
+          const fileUrl = '../backend/' + nhisData.url;
+          cardLink.href = fileUrl;
+          if (fileUrl.match(/\.(jpeg|jpg|gif|png)$/i)) {
+              cardImg.src = fileUrl;
+              cardImg.style.display = 'block';
+              cardText.style.display = 'none';
+          } else {
+              cardImg.style.display = 'none';
+              cardText.style.display = 'inline-block';
+          }
+      } else {
+          cardLink.removeAttribute('href');
+          cardImg.style.display = 'none';
+          cardText.style.display = 'none';
+      }
+
+      document.getElementById('nhisAcceptBtn').onclick = () => updateNhisStatus(patientId, 'approved');
+      document.getElementById('nhisDeclineBtn').onclick = () => updateNhisStatus(patientId, 'declined');
+
+      document.getElementById('nhisModal').classList.add('active');
+    }
+
+    async function updateNhisStatus(patientId, status) {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('../backend/index.php?route=orders/review-nhis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ patient_id: patientId, status: status })
+            });
+            const data = await res.json();
+            if (data.success) {
+                if (window.showToast) window.showToast('NHIS Card ' + status + ' successfully.', 'success');
+                closeNhisModal();
+                fetchOrders(); // Refresh to update status if needed
+            } else {
+                if (window.showToast) window.showToast('Error: ' + data.message, 'error');
+                else alert('Error: ' + data.message);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('An error occurred.');
+        }
+    }
+
+    async function fetchOrders() {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch('../backend/index.php?route=orders/my', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('ordersBody');
+        if (data.success && data.orders.length > 0) {
+          window.allOrders = data.orders;
+          renderOrders(window.allOrders);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="9" class="no-orders">No orders have been placed for your pharmacy yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8" class="no-orders" style="color:red">Failed to load orders.</td></tr>';
+      }
+    }
+
     window.allOrders = [];
     
     document.addEventListener('DOMContentLoaded', async () => {
@@ -287,24 +395,7 @@
       document.getElementById('userName').textContent = name;
       document.getElementById('userInitial').textContent = name.charAt(0);
 
-      try {
-        const res = await fetch('../backend/index.php?route=orders/my', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const data = await res.json();
-        
-        const tbody = document.getElementById('ordersBody');
-        
-        if (data.success && data.orders.length > 0) {
-          window.allOrders = data.orders;
-          renderOrders(window.allOrders);
-        } else {
-          tbody.innerHTML = '<tr><td colspan="9" class="no-orders">No orders have been placed for your pharmacy yet.</td></tr>';
-        }
-      } catch (err) {
-        console.error(err);
-        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="8" class="no-orders" style="color:red">Failed to load orders.</td></tr>';
-      }
+      fetchOrders();
     });
 
     function renderOrders(ordersToRender) {
@@ -351,7 +442,27 @@
               `;
             }
 
-            let actionBtnHtml = `<button onclick='viewDeliveryDetails(${JSON.stringify(order.delivery_address || "No delivery details provided").replace(/'/g, "&#39;")})' style="padding: 6px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px;"><i class="fas fa-truck"></i> View Details</button>`;
+            let actionBtnHtml = `<div style="display: flex; flex-direction: column; gap: 8px;">
+                <button onclick='viewDeliveryDetails(${JSON.stringify(order.delivery_address || "No delivery details provided").replace(/'/g, "&#39;")})' style="padding: 6px 12px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; justify-content: center; gap: 6px;"><i class="fas fa-truck"></i> View Details</button>`;
+            
+            if (order.payment_method === 'nhis' && order.patient_nhis) {
+                let nhisBtnText = "Review NHIS Card";
+                let nhisBtnColor = "#0284c7";
+                let nhisBtnBg = "#e0f2fe";
+                if (order.patient_nhis.status === 'approved') {
+                    nhisBtnText = "NHIS Approved";
+                    nhisBtnColor = "#10b981";
+                    nhisBtnBg = "#d1fae5";
+                } else if (order.patient_nhis.status === 'declined') {
+                    nhisBtnText = "NHIS Declined";
+                    nhisBtnColor = "#ef4444";
+                    nhisBtnBg = "#fee2e2";
+                }
+                
+                actionBtnHtml += `<button onclick='viewNhisDetails(${order.patient_id}, ${JSON.stringify(order.patient_nhis).replace(/'/g, "&#39;")})' style="padding: 6px 12px; background: ${nhisBtnBg}; border: 1px solid ${nhisBtnColor}; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: ${nhisBtnColor}; display: flex; align-items: center; justify-content: center; gap: 6px;"><i class="fas fa-id-card"></i> ${nhisBtnText}</button>`;
+            }
+            actionBtnHtml += `</div>`;
+            
             tr.innerHTML = `
               <td><input type="checkbox" class="order-checkbox" value="${order.id}" onchange="updateBatchUI()"></td>
               <td><strong>${order.order_no}</strong></td>

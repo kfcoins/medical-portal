@@ -138,6 +138,37 @@
         </form>
       </div>
 
+      <!-- NHIS Card Information -->
+      <div class="card">
+        <h3 class="card-title">
+          <i class="fas fa-id-card"></i> NHIS Card Details
+          <span id="nhisStatusBadge" class="badge" style="margin-left: 12px; font-size: 0.75rem;">None</span>
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+          Provide your National Health Insurance Scheme card details to enjoy coverage across pharmacies. Once approved, it can be applied to orders.
+        </p>
+        <form id="nhisForm" onsubmit="updateNhisCard(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">NHIS Number</label>
+              <input type="text" class="form-control" id="nhisNumber" placeholder="e.g. 12345678">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload NHIS Card (Image)</label>
+              <input type="file" class="form-control" id="nhisCardImage" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
+              <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of your card.</small>
+            </div>
+          </div>
+          <div id="nhisCardPreview" style="margin-top: 12px; display: none;">
+            <p style="font-size: 0.85rem; font-weight: 500; margin-bottom: 8px;">Current Card Uploaded:</p>
+            <img id="nhisCardImg" src="" alt="NHIS Card" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border);">
+          </div>
+          <div style="text-align: right; margin-top: 16px;">
+            <button type="submit" class="btn-save" id="saveNhisBtn">Submit Details</button>
+          </div>
+        </form>
+      </div>
+
       <!-- Security Settings -->
       <div class="card">
         <h3 class="card-title"><i class="fas fa-lock"></i> Security Settings</h3>
@@ -183,6 +214,35 @@
       document.getElementById('lastName').value = user.last_name || '';
       document.getElementById('email').value = user.email || '';
       document.getElementById('phone').value = user.phone || '';
+
+      // NHIS Fields
+      if (user.nhis_number) {
+        document.getElementById('nhisNumber').value = user.nhis_number;
+      }
+      
+      const nhisBadge = document.getElementById('nhisStatusBadge');
+      if (user.nhis_status === 'approved') {
+        nhisBadge.textContent = 'APPROVED';
+        nhisBadge.style.backgroundColor = '#C6F6D5';
+        nhisBadge.style.color = '#22543D';
+      } else if (user.nhis_status === 'pending') {
+        nhisBadge.textContent = 'PENDING VERIFICATION';
+        nhisBadge.style.backgroundColor = '#FEEBC8';
+        nhisBadge.style.color = '#7B341E';
+      } else if (user.nhis_status === 'declined') {
+        nhisBadge.textContent = 'DECLINED';
+        nhisBadge.style.backgroundColor = '#FED7D7';
+        nhisBadge.style.color = '#822727';
+      } else {
+        nhisBadge.textContent = 'NOT PROVIDED';
+        nhisBadge.style.backgroundColor = '#E2E8F0';
+        nhisBadge.style.color = '#4A5568';
+      }
+
+      if (user.nhis_card_url) {
+        document.getElementById('nhisCardPreview').style.display = 'block';
+        document.getElementById('nhisCardImg').src = `../backend/${user.nhis_card_url}`;
+      }
     }
 
     function showAlert(message, type = 'success') {
@@ -228,9 +288,61 @@
           showAlert(data.message || 'Failed to update profile.', 'error');
         }
       } catch (err) {
-        showAlert('Network error occurred.', 'error');
+        console.error(err);
+        showAlert('Failed to update profile.', 'error');
       } finally {
         btn.textContent = 'Save Changes';
+        btn.disabled = false;
+      }
+    }
+
+    async function updateNhisCard(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveNhisBtn');
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('nhis_number', document.getElementById('nhisNumber').value);
+      
+      const fileInput = document.getElementById('nhisCardImage');
+      if (fileInput.files.length > 0) {
+        formData.append('nhis_card_image', fileInput.files[0]);
+      }
+
+      try {
+        const response = await fetch('../backend/api.php?action=patient_update_profile', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showAlert('NHIS details submitted successfully. Awaiting verification.');
+          
+          // Refresh user data
+          const userResponse = await fetch('../backend/api.php?action=auth_me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const userData = await userResponse.json();
+          if (userData.success) {
+            localStorage.setItem('user', JSON.stringify(userData.user));
+            user = userData.user;
+            updateUIWithUser();
+          }
+          
+          fileInput.value = ''; // clear file input
+        } else {
+          showAlert(data.message || 'Update failed', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to update NHIS details.', 'error');
+      } finally {
+        btn.textContent = 'Submit Details';
         btn.disabled = false;
       }
     }

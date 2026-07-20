@@ -170,6 +170,10 @@ class PatientController {
 
         $input = json_decode(file_get_contents("php://input"), true);
         if (empty($input)) {
+            $input = $_POST;
+        }
+
+        if (empty($input) && empty($_FILES)) {
             http_response_code(400);
             echo json_encode(["success" => false, "message" => "No data provided."]);
             return;
@@ -178,8 +182,8 @@ class PatientController {
         try {
             $this->conn->beginTransaction();
 
-            // Update basic info if provided
-            if (isset($input['firstName']) || isset($input['lastName']) || isset($input['phone'])) {
+            // Update basic info and NHIS if provided
+            if (isset($input['firstName']) || isset($input['lastName']) || isset($input['phone']) || isset($input['nhis_number']) || isset($_FILES['nhis_card_image'])) {
                 $updates = [];
                 $params = ['id' => $user_id];
                 
@@ -194,6 +198,25 @@ class PatientController {
                 if (isset($input['phone'])) {
                     $updates[] = "phone = :phone";
                     $params['phone'] = $input['phone'];
+                }
+                if (isset($input['nhis_number'])) {
+                    $updates[] = "nhis_number = :nhis_num";
+                    $updates[] = "nhis_status = 'pending'";
+                    $params['nhis_num'] = $input['nhis_number'];
+                }
+                
+                if (isset($_FILES['nhis_card_image']) && $_FILES['nhis_card_image']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = __DIR__ . '/../uploads/nhis/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $fileName = "nhis_" . $user_id . "_" . time() . "_" . basename($_FILES['nhis_card_image']['name']);
+                    $targetPath = $uploadDir . $fileName;
+                    if (move_uploaded_file($_FILES['nhis_card_image']['tmp_name'], $targetPath)) {
+                        $updates[] = "nhis_card_url = :nhis_img";
+                        $updates[] = "nhis_status = 'pending'";
+                        $params['nhis_img'] = 'uploads/nhis/' . $fileName;
+                    }
                 }
 
                 if (count($updates) > 0) {
@@ -221,7 +244,7 @@ class PatientController {
             $this->conn->commit();
 
             // Fetch updated user to return (without password)
-            $stmtGet = $this->conn->prepare("SELECT id, email, first_name, last_name, phone, role FROM users WHERE id = :id");
+            $stmtGet = $this->conn->prepare("SELECT id, email, first_name, last_name, phone, role, nhis_number, nhis_card_url, nhis_status FROM users WHERE id = :id");
             $stmtGet->execute(['id' => $user_id]);
             $updatedUser = $stmtGet->fetch(PDO::FETCH_ASSOC);
 

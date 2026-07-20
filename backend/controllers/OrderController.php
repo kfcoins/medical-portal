@@ -24,6 +24,8 @@ class OrderController {
             $this->checkout();
         } elseif ($method === 'GET' && $action === 'patient-stats') {
             $this->patientStats();
+        } elseif ($method === 'POST' && $action === 'review-nhis') {
+            $this->reviewNhis();
         } elseif ($method === 'PATCH' && $action === 'batch-status') {
             $this->batchUpdateStatus();
         } elseif ($method === 'PATCH' && $id === 'status' && $action !== '') { 
@@ -184,7 +186,7 @@ class OrderController {
             $params['pid'] = $user_id;
         }
 
-        $query = "SELECT o.*, a.pharmacy_name, a.region as agent_region, CONCAT(u.first_name, ' ', u.last_name) as patient_name
+        $query = "SELECT o.*, a.pharmacy_name, a.region as agent_region, CONCAT(u.first_name, ' ', u.last_name) as patient_name, u.nhis_number as patient_nhis_number, u.nhis_card_url as patient_nhis_url, u.nhis_status as patient_nhis_status
                   FROM orders o 
                   LEFT JOIN agents a ON o.agent_id = a.id 
                   LEFT JOIN users u ON o.patient_id = u.id
@@ -220,6 +222,15 @@ class OrderController {
                 'pharmacyName' => $order['pharmacy_name'],
                 'region' => $order['agent_region']
             ];
+            
+            // Send patient NHIS details only if pharmacy role and payment method involves NHIS
+            if ($role === 'pharmacy' && $order['payment_method'] === 'nhis') {
+                $order['patient_nhis'] = [
+                    'number' => $order['patient_nhis_number'],
+                    'url' => $order['patient_nhis_url'],
+                    'status' => $order['patient_nhis_status']
+                ];
+            }
         }
 
         echo json_encode(["success" => true, "orders" => $orders]);
@@ -639,6 +650,37 @@ class OrderController {
             $this->conn->rollBack();
             http_response_code(400);
             echo json_encode(["success" => false, "message" => "Debug Error: " . $e->getMessage() . " on line " . $e->getLine()]);
+        }
+    }
+
+    private function reviewNhis() {
+        $decoded = Jwt::authenticate();
+        if ($decoded['role'] !== 'pharmacy') {
+            http_response_code(403);
+            echo json_encode(["success" => false, "message" => "Only pharmacies can review NHIS details."]);
+            return;
+        }
+
+        $input = json_decode(file_get_contents("php://input"), true);
+        if (!isset($input['patient_id']) || !isset($input['status']) || !in_array($input['status'], ['approved', 'declined'])) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Valid patient_id and status (approved/declined) are required."]);
+            return;
+        }
+
+        try {
+            $stmt = $this->conn->prepare("UPDATE users SET nhis_status = :status WHERE id = :id AND nhis_status = 'pending'");
+            $stmt->execute(['status' => $input['status'], 'id' => $input['patient_id']]);
+            
+            if ($stmt->rowCount() > 0) {
+                echo json_encode(["success" => true, "message" => "NHIS status updated successfully."]);
+            } else {
+                http_response_code(400);
+                echo json_encode(["success" => false, "message" => "Could not update NHIS status (it may already be reviewed or does not exist)."]);
+            }
+        } catch(Exception $e) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
         }
     }
 }
