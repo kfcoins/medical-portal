@@ -45,10 +45,15 @@
     .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
     .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
 
-    .content-area { padding: 32px; max-width: 800px; margin: 0 auto; width: 100%; }
+    .content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-    .card { background: var(--surface); border-radius: 16px; padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border); margin-bottom: 24px; }
-    .card-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    .settings-layout { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start; }
+    @media (min-width: 992px) { .settings-layout { grid-template-columns: 1fr 1fr; } }
+    .settings-column { display: flex; flex-direction: column; gap: 32px; }
+
+    /* Cards */
+    .card { background: var(--surface); border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    .card-title { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; color: #1e293b; }
     
     .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; display: none; }
     .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
@@ -103,46 +108,56 @@
     <div class="content-area">
       <div id="alertBox" class="alert"></div>
 
-      <div class="card">
-        <div class="card-title"><i class="fas fa-user-circle" style="color: var(--primary);"></i> Profile Settings</div>
-        <form id="profileForm">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="firstName" class="form-control" required>
+      <div class="settings-layout">
+        <div class="settings-column">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-user-circle" style="color: var(--primary);"></i> Profile Settings</div>
+            <form id="profileForm">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="firstName" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="lastName" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Phone Number (Optional)</label>
+                <input type="text" id="phone" class="form-control">
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Profile</button>
+              </div>
+            </form>
           </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" id="lastName" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="email" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label>Phone Number (Optional)</label>
-            <input type="text" id="phone" class="form-control">
-          </div>
-          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Profile</button>
-        </form>
-      </div>
+        </div>
 
-      <div class="card">
-        <div class="card-title"><i class="fas fa-lock" style="color: var(--primary);"></i> Security Settings</div>
-        <form id="securityForm">
-          <div class="form-group">
-            <label>Current Password</label>
-            <input type="password" id="currentPassword" class="form-control" required>
+        <div class="settings-column">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-lock" style="color: var(--primary);"></i> Security Settings</div>
+            <form id="securityForm">
+              <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" class="form-control" required>
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Update Password</button>
+              </div>
+            </form>
           </div>
-          <div class="form-group">
-            <label>New Password</label>
-            <input type="password" id="newPassword" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label>Confirm New Password</label>
-            <input type="password" id="confirmPassword" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Update Password</button>
-        </form>
+        </div>
       </div>
     </div>
   </main>
