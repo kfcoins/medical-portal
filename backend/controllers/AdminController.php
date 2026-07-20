@@ -131,8 +131,16 @@ class AdminController {
     }
 
     private function approveNhis($id) {
+        $stmtUser = $this->conn->prepare("SELECT email, first_name FROM users WHERE id = :id");
+        $stmtUser->execute(['id' => $id]);
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $this->conn->prepare("UPDATE users SET nhis_status = 'approved' WHERE id = :id");
         if ($stmt->execute(['id' => $id])) {
+            if ($user) {
+                $mailer = new Mailer();
+                $mailer->sendNhisApproved($user['email'], $user['first_name']);
+            }
             echo json_encode(["success" => true, "message" => "NHIS card approved successfully."]);
         } else {
             http_response_code(500);
@@ -141,8 +149,16 @@ class AdminController {
     }
 
     private function rejectNhis($id) {
+        $stmtUser = $this->conn->prepare("SELECT email, first_name FROM users WHERE id = :id");
+        $stmtUser->execute(['id' => $id]);
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $this->conn->prepare("UPDATE users SET nhis_status = 'declined' WHERE id = :id");
         if ($stmt->execute(['id' => $id])) {
+            if ($user) {
+                $mailer = new Mailer();
+                $mailer->sendNhisDeclined($user['email'], $user['first_name']);
+            }
             echo json_encode(["success" => true, "message" => "NHIS card rejected."]);
         } else {
             http_response_code(500);

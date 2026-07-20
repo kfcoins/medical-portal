@@ -216,6 +216,56 @@ class Mailer {
             return true;
         }
     }
+
+    public function sendNhisApproved($toEmail, $firstName) {
+        try {
+            $this->mail->clearAddresses();
+            $this->mail->addAddress($toEmail);
+            $this->mail->Subject = 'NHIS Card Approved - PharmaTrust Ghana';
+            $this->mail->Body    = "
+                <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                    <h2>Hello $firstName,</h2>
+                    <p>Good news! Your NHIS card has been <strong>approved</strong> by our administration team.</p>
+                    <p>You can now use your NHIS benefits for eligible pharmacy orders.</p>
+                    <br>
+                    <p>Best Regards,</p>
+                    <p><strong>PharmaTrust Ghana Team</strong></p>
+                </div>
+            ";
+            $this->mail->AltBody = "Hello $firstName,\n\nGood news! Your NHIS card has been approved by our administration team.\n\nYou can now use your NHIS benefits for eligible pharmacy orders.\n\nBest Regards,\nPharmaTrust Ghana Team";
+            $this->mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}");
+            return false;
+        }
+    }
+
+    public function sendNhisDeclined($toEmail, $firstName, $reason = "Details were unclear or invalid") {
+        try {
+            $this->mail->clearAddresses();
+            $this->mail->addAddress($toEmail);
+            $this->mail->Subject = 'Action Required: NHIS Card Declined - PharmaTrust Ghana';
+            $this->mail->Body    = "
+                <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                    <h2>Hello $firstName,</h2>
+                    <p>We encountered an issue with your NHIS card submission, and it has been <strong>declined</strong>.</p>
+                    <p><strong>Reason:</strong> $reason</p>
+                    <p>Please log in to your account and submit clear, updated photos of your NHIS card.</p>
+                    <br>
+                    <p>Best Regards,</p>
+                    <p><strong>PharmaTrust Ghana Team</strong></p>
+                </div>
+            ";
+            $this->mail->AltBody = "Hello $firstName,\n\nWe encountered an issue with your NHIS card submission, and it has been declined.\n\nReason: $reason\n\nPlease log in to your account and submit clear, updated photos of your NHIS card.\n\nBest Regards,\nPharmaTrust Ghana Team";
+            $this->mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}");
+            return false;
+        }
+    }
+
     public function sendOrderStatusChanged($toEmail, $patientName, $orderNo, $newStatus) {
         try {
             $this->mail->clearAddresses();
