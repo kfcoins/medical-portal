@@ -485,7 +485,7 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch(`../backend/index.php?route=admin/${action}-pharmacy&id=${activeAgentId}`, {
+        const res = await fetch(`../backend/index.php?route=admin/${action}-pharmacy/${activeAgentId}`, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -541,7 +541,7 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch(`../backend/index.php?route=admin/${action}-nhis&id=${activePatientId}`, {
+        const res = await fetch(`../backend/index.php?route=admin/${action}-nhis/${activePatientId}`, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + token }
         });
