@@ -917,19 +917,22 @@
           const user = JSON.parse(userStr);
           let dashboardLink = 'patient-profile.html';
           let dashboardText = 'Profile';
+          let messagesLink = 'patient-messages.html';
           
           if (user.role === 'admin') {
             dashboardLink = 'admin-dashboard.html';
             dashboardText = 'Dashboard';
+            messagesLink = '#';
           } else if (user.role === 'pharmacy') {
             dashboardLink = 'pharmacy-dashboard.html';
             dashboardText = 'Dashboard';
+            messagesLink = 'pharmacy-messages.html';
           }
           
           const navActions = document.querySelector('.nav-actions');
           if (navActions) {
             navActions.innerHTML = `
-              <a href="${dashboardLink}" class="nav-icon-btn notif-icon" title="Notifications" style="position: relative;">
+              <a href="${messagesLink}" class="nav-icon-btn notif-icon" title="Notifications" style="position: relative;">
                 <i class="fas fa-bell"></i>
                 <span id="notifBadge" class="icon-badge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
               </a>
