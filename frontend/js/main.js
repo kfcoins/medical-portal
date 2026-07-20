@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Update Pharmacy Sidebar Orders Counter globally
-document.addEventListener('DOMContentLoaded', async () => {
+window.updateSidebarOrdersCounter = async function() {
     const userStr = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     
@@ -732,6 +732,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error fetching pharmacy sidebar counter:', e);
         }
     }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.updateSidebarOrdersCounter();
 });
 
 // Services Slider Logic

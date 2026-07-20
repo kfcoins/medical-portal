@@ -423,6 +423,7 @@
         const data = await res.json();
         if(data.success) {
           if (window.showToast) window.showToast('Order status updated to ' + newStatus.toUpperCase(), 'success');
+          if (typeof window.updateSidebarOrdersCounter === 'function') window.updateSidebarOrdersCounter();
         } else {
           if (window.showToast) window.showToast('Failed to update status: ' + data.message, 'error');
           else alert('Failed to update status: ' + data.message);
