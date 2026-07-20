@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <option value="cash">Pay on Delivery (Cash)</option>
                                     <option value="momo">Mobile Money</option>
                                     <option value="card">Card</option>
+                                    <option value="nhis">NHIS (National Health Insurance Scheme)</option>
                                 </select>
                                 <div style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #64748B; pointer-events: none;">
                                     <i class="fas fa-chevron-down"></i>
@@ -156,11 +157,12 @@ function updateCartUI() {
     container.innerHTML = cart.map(item => {
         const itemTotal = parseFloat(item.medicine.price) * item.quantity;
         total += itemTotal;
+        const nhisTag = (item.medicine.nhis_listed && item.medicine.nhis_listed == 1) ? `<span style="display:inline-block; background:#d1fae5; color:#065f46; font-size:0.65rem; padding:2px 6px; border-radius:8px; font-weight:700; margin-left:8px; vertical-align:middle; text-transform:uppercase;"><i class="fas fa-shield-alt"></i> NHIS</span>` : '';
         return `
         <div class="cart-item">
             <img src="${item.medicine.image_url ? item.medicine.image_url : 'https://via.placeholder.com/60?text=M'}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/60'">
             <div class="cart-item-info">
-            <div class="cart-item-name">${item.medicine.name}</div>
+            <div class="cart-item-name">${item.medicine.name}${nhisTag}</div>
             <div class="cart-item-pharmacy">${item.medicine.pharmacy_name || 'System'}</div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="cart-item-price">GHS ${parseFloat(item.medicine.price).toFixed(2)}</div>
