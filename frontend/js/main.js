@@ -604,7 +604,7 @@ window.openCheckout = async function() {
   try {
       document.getElementById('cartWidget').classList.remove('active');
       showToast('Preparing checkout...', 'info');
-      const fetchPromises = cart.map(item => fetch(`../backend/index.php?route=medicines/${item.medicine.id}`).then(res => res.json()));
+      const fetchPromises = cart.map(item => fetch(`../backend/index.php?route=medicines/${item.medicine.id}&_t=${Date.now()}`).then(res => res.json()));
       const results = await Promise.all(fetchPromises);
       let updatedCart = false;
       
@@ -613,6 +613,12 @@ window.openCheckout = async function() {
               // Ensure we have the latest allow_pay_on_delivery status
               if (cart[index].medicine.allow_pay_on_delivery != res.medicine.allow_pay_on_delivery) {
                   cart[index].medicine.allow_pay_on_delivery = res.medicine.allow_pay_on_delivery;
+                  updatedCart = true;
+              }
+          } else {
+              // If API fails or medicine doesn't exist, safely disable POD
+              if (cart[index].medicine.allow_pay_on_delivery !== null) {
+                  cart[index].medicine.allow_pay_on_delivery = null;
                   updatedCart = true;
               }
           }
