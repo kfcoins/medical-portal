@@ -58,7 +58,7 @@
     tbody tr:nth-child(even) { background: #F4F7F9; }
     tbody tr { transition: background 0.2s; }
     tbody tr:hover { background: #E2E8F0; }
-    .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
     .status-badge.in-stock { background: #D1FAE5; color: #059669; }
     .status-badge.out-of-stock { background: #FEE2E2; color: #DC2626; }
     .status-badge.low-stock { background: #FEF3C7; color: #D97706; }
@@ -299,9 +299,11 @@
             
             return `
               <tr>
-                <td style="font-weight: 500;">
-                  ${m.image_url ? `<img src="${m.image_url}" style="width:30px; height:30px; border-radius:4px; object-fit:cover; vertical-align:middle; margin-right:8px;" />` : ''}
-                  ${m.name}
+                <td>
+                  <div style="font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    ${m.image_url ? `<img src="${m.image_url}" style="width:30px; height:30px; border-radius:4px; object-fit:cover; flex-shrink: 0;" />` : ''}
+                    <span>${m.name}</span>
+                  </div>
                 </td>
                 <td style="text-transform: capitalize;">${m.category}</td>
                 <td>GHS ${parseFloat(m.price).toFixed(2)}</td>
@@ -310,8 +312,10 @@
                 <td style="color: #6B7D8C;">${new Date(m.created_at).toLocaleDateString()}</td>
                 <td>${m.expiry_date ? new Date(m.expiry_date).toLocaleDateString() : 'N/A'}</td>
                 <td>
-                  <button onclick="openEditModal('${m.id}')" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;margin-right:4px;"><i class="fas fa-edit"></i> Edit</button>
-                  <button onclick="deleteMedicine('${m.id}')" style="background:#E53E3E;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;"><i class="fas fa-trash"></i> Delete</button>
+                  <div style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;">
+                    <button onclick="openEditModal('${m.id}')" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-edit"></i> Edit</button>
+                    <button onclick="deleteMedicine('${m.id}')" style="background:#E53E3E;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-trash"></i> Delete</button>
+                  </div>
                 </td>
               </tr>
             `;
