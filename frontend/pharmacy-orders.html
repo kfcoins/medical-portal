@@ -315,6 +315,18 @@
       document.getElementById('nhisModal').classList.remove('active');
     }
 
+    // Close modals on clicking outside
+    document.addEventListener('click', (e) => {
+      const deliveryModal = document.getElementById('deliveryModal');
+      const nhisModal = document.getElementById('nhisModal');
+      if (e.target === deliveryModal) {
+        closeDeliveryModal();
+      }
+      if (e.target === nhisModal) {
+        closeNhisModal();
+      }
+    });
+
     function viewNhisDetails(patientId, nhisData) {
       document.getElementById('nhisNumberDisplay').textContent = nhisData.number || 'N/A';
       
