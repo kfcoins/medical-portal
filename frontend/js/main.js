@@ -351,8 +351,68 @@ style.textContent = `
   .toast-message { font-size: 0.85rem; color: #6B7D8C; line-height: 1.4; }
   .toast-close { color: #6B7D8C; font-size: 1.1rem; cursor: pointer; transition: color 0.2s; background: none; border: none; padding: 4px; }
   .toast-close:hover { color: #0F1923; }
+
+  /* Confirm Modal */
+  .confirm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 25, 35, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; backdrop-filter: blur(4px); }
+  .confirm-overlay.active { opacity: 1; visibility: visible; }
+  .confirm-modal { background: #fff; width: 90%; max-width: 400px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(20px); transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+  .confirm-overlay.active .confirm-modal { transform: translateY(0); }
+  .confirm-title { font-family: 'Sora', sans-serif; font-size: 1.2rem; font-weight: 600; color: #0F1923; margin-bottom: 12px; }
+  .confirm-message { font-size: 0.95rem; color: #475569; margin-bottom: 24px; line-height: 1.5; }
+  .confirm-actions { display: flex; justify-content: flex-end; gap: 12px; }
+  .confirm-btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.2s; }
+  .confirm-cancel { background: #F1F5F9; color: #475569; }
+  .confirm-cancel:hover { background: #E2E8F0; color: #0F1923; }
+  .confirm-ok { background: #2D9A6A; color: #fff; }
+  .confirm-ok:hover { background: #25825A; }
+  .confirm-ok.danger { background: #E53E3E; }
+  .confirm-ok.danger:hover { background: #C53030; }
 `;
 document.head.appendChild(style);
+
+// ===== GLOBAL CONFIRM MODAL =====
+window.showConfirm = function(message, title = 'Confirm Action', isDanger = false) {
+  return new Promise((resolve) => {
+    let overlay = document.getElementById('global-confirm-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'global-confirm-overlay';
+      overlay.className = 'confirm-overlay';
+      document.body.appendChild(overlay);
+    }
+
+    overlay.innerHTML = `
+      <div class="confirm-modal">
+        <div class="confirm-title">${title}</div>
+        <div class="confirm-message">${message}</div>
+        <div class="confirm-actions">
+          <button class="confirm-btn confirm-cancel" id="confirm-btn-cancel">Cancel</button>
+          <button class="confirm-btn confirm-ok ${isDanger ? 'danger' : ''}" id="confirm-btn-ok">Confirm</button>
+        </div>
+      </div>
+    `;
+
+    // Force reflow for animation
+    void overlay.offsetWidth;
+    overlay.classList.add('active');
+
+    const btnOk = document.getElementById('confirm-btn-ok');
+    const btnCancel = document.getElementById('confirm-btn-cancel');
+
+    const cleanup = () => {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 300);
+    };
+
+    btnOk.addEventListener('click', () => { cleanup(); resolve(true); });
+    btnCancel.addEventListener('click', () => { cleanup(); resolve(false); });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) { cleanup(); resolve(false); }
+    });
+  });
+};
 
 // ===== GLOBAL TOAST NOTIFICATION =====
 window.showToast = function(message, type = 'success', title = null) {

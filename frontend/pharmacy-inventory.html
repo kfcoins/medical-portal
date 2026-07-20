@@ -328,7 +328,8 @@
 
     // Delete Medicine
     window.deleteMedicine = async function(id) {
-      if (!confirm('Are you sure you want to delete this medicine? This action cannot be undone.')) {
+      const confirmed = await window.showConfirm('Are you sure you want to delete this medicine? This action cannot be undone.', 'Delete Medicine', true);
+      if (!confirmed) {
         return;
       }
       

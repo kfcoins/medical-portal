@@ -475,7 +475,9 @@
 
     async function handleAction(action) {
       if (!activeAgentId) return;
-      if (!confirm(`Are you sure you want to ${action} this pharmacy application?`)) return;
+      const isDanger = action === 'reject';
+      const confirmed = await window.showConfirm(`Are you sure you want to ${action} this pharmacy application?`, 'Confirm Action', isDanger);
+      if (!confirmed) return;
 
       const btn = action === 'approve' ? document.getElementById('btnApprove') : document.getElementById('btnReject');
       const originalText = btn.innerHTML;
@@ -529,7 +531,9 @@
 
     async function handleNhisAction(action) {
       if (!activePatientId) return;
-      if (!confirm(`Are you sure you want to ${action} this NHIS card?`)) return;
+      const isDanger = action === 'reject';
+      const confirmed = await window.showConfirm(`Are you sure you want to ${action} this NHIS card?`, 'Confirm Action', isDanger);
+      if (!confirmed) return;
 
       const btn = action === 'approve' ? document.getElementById('btnApproveNhis') : document.getElementById('btnRejectNhis');
       const originalText = btn.innerHTML;
