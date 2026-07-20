@@ -198,15 +198,24 @@
             <form id="passwordForm">
               <div class="form-group">
                 <label>Current Password</label>
-                <input type="password" id="currentPassword" required>
+                <div style="position: relative;">
+                  <input type="password" id="currentPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
               </div>
               <div class="form-group">
                 <label>New Password</label>
-                <input type="password" id="newPassword" required>
+                <div style="position: relative;">
+                  <input type="password" id="newPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
               </div>
               <div class="form-group">
                 <label>Confirm New Password</label>
-                <input type="password" id="confirmPassword" required>
+                <div style="position: relative;">
+                  <input type="password" id="confirmPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
               </div>
               <div style="text-align: right; margin-top: 16px;">
                 <button type="submit" class="btn btn-primary" id="savePasswordBtn">Update Password</button>

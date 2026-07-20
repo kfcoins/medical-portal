@@ -4,6 +4,24 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ===== GLOBAL PASSWORD TOGGLE =====
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('toggle-password')) {
+      const input = e.target.parentElement.querySelector('input');
+      if (input) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          e.target.classList.remove('fa-eye');
+          e.target.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          e.target.classList.remove('fa-eye-slash');
+          e.target.classList.add('fa-eye');
+        }
+      }
+    }
+  });
+
   // ===== AUTH STATE CHECK =====
   const userStr = localStorage.getItem('user');
   const token = localStorage.getItem('token');
