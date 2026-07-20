@@ -878,3 +878,79 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoScroll();
     }
 });
+
+// ===== GLOBAL BADGES & NOTIFICATIONS =====
+window.updateGlobalBadges = async function() {
+    // 1. Cart Badge (for patient pages)
+    const cartBadge = document.getElementById('cartBadge');
+    if (cartBadge) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartBadge.textContent = totalItems;
+        cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+    
+    // Also update cartCount if it exists (patient-store uses cartCount)
+    const cartCount = document.getElementById('cartCount');
+    if (cartCount) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        cartCount.style.display = totalItems > 0 ? 'inline-block' : 'none';
+    }
+
+    // 2. Notification Badge (unread messages)
+    const notifBadge = document.getElementById('notifBadge');
+    if (notifBadge) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                // Determine base URL dynamically depending on whether we are in root or a subfolder
+                const isRoot = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html');
+                const baseUrl = isRoot ? 'backend/index.php' : '../backend/index.php';
+                const res = await fetch(`${baseUrl}?route=messages/conversations&_t=${Date.now()}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                if (data.success && data.conversations) {
+                    const totalUnread = data.conversations.reduce((sum, c) => sum + parseInt(c.unread_count || 0), 0);
+                    notifBadge.textContent = totalUnread;
+                    notifBadge.style.display = totalUnread > 0 ? 'flex' : 'none';
+                }
+            } catch (err) {
+                console.error('Error fetching unread count:', err);
+            }
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial update
+    if (typeof window.updateGlobalBadges === 'function') {
+        window.updateGlobalBadges();
+    }
+
+    // Global Notification WebSocket
+    const globalToken = localStorage.getItem('token');
+    if (globalToken) {
+        // Prevent setting up if we are on the messages page (which has its own wsConn)
+        if (!window.location.pathname.includes('messages.html')) {
+            const notifWs = new WebSocket('ws://localhost:8081?token=' + globalToken);
+            notifWs.onmessage = function(e) {
+                try {
+                    const payload = JSON.parse(e.data);
+                    if (payload.type === 'message') {
+                        if (typeof window.updateGlobalBadges === 'function') {
+                            window.updateGlobalBadges();
+                        }
+                    }
+                } catch(err) {
+                    console.error('WebSocket payload error:', err);
+                }
+            };
+            notifWs.onerror = function() {
+                // Silently handle errors for background notif socket
+            };
+        }
+    }
+});

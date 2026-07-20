@@ -207,6 +207,13 @@
                 const user = JSON.parse(localStorage.getItem('user'));
                 if (activeContactId === msg.sender_id || activeContactId === msg.receiver_id) {
                     appendMessage(msg, user.id);
+                    if (activeContactId === msg.sender_id) {
+                        const token = localStorage.getItem('token');
+                        fetch(`../backend/index.php?route=messages/read&id=${activeContactId}`, {
+                            method: 'PATCH',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        }).catch(e => console.error(e));
+                    }
                 }
                 loadConversations(false);
             } else if (payload.type === 'typing') {

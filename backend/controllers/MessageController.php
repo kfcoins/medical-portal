@@ -48,8 +48,8 @@ class MessageController {
                 a.pharmacy_name,
                 m.message, 
                 m.created_at, 
-                m.is_read,
-                m.sender_id
+                m.sender_id,
+                COALESCE(unread_data.unread_count, 0) as unread_count
             FROM users u
             LEFT JOIN agents a ON u.id = a.user_id
             JOIN (
@@ -64,8 +64,14 @@ class MessageController {
                 GROUP BY contact_id
             ) latest ON u.id = latest.contact_id
             JOIN messages m ON 
-                (m.sender_id = :uid AND m.receiver_id = u.id AND m.created_at = latest.last_msg_time) OR 
-                (m.receiver_id = :uid AND m.sender_id = u.id AND m.created_at = latest.last_msg_time)
+                ((m.sender_id = :uid AND m.receiver_id = u.id) OR 
+                (m.receiver_id = :uid AND m.sender_id = u.id)) AND m.created_at = latest.last_msg_time
+            LEFT JOIN (
+                SELECT sender_id, COUNT(*) as unread_count 
+                FROM messages 
+                WHERE receiver_id = :uid AND is_read = 0 
+                GROUP BY sender_id
+            ) unread_data ON u.id = unread_data.sender_id
             ORDER BY m.created_at DESC
         ";
 
@@ -92,7 +98,7 @@ class MessageController {
                 'contact_role' => $c['role'],
                 'last_message' => $c['message'],
                 'created_at' => $c['created_at'],
-                'unread_count' => ($c['sender_id'] !== $user_id && !$c['is_read']) ? 1 : 0 // Simplified unread
+                'unread_count' => (int)$c['unread_count']
             ];
         }, $conversations);
 
