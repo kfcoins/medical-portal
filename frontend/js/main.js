@@ -593,11 +593,36 @@ window.renderCart = function() {
   totalEl.textContent = `GHS ${totalAmount.toFixed(2)}`;
 };
 
-window.openCheckout = function() {
+window.openCheckout = async function() {
   let cart = JSON.parse(localStorage.getItem('cart')) || [];
   if (cart.length === 0) {
     showToast('Your cart is empty', 'error');
     return;
+  }
+  
+  // Fetch latest status for all items in the cart to ensure rules (like POD) are up to date
+  try {
+      document.getElementById('cartWidget').classList.remove('active');
+      showToast('Preparing checkout...', 'info');
+      const fetchPromises = cart.map(item => fetch(`../backend/index.php?route=medicines/${item.medicine.id}`).then(res => res.json()));
+      const results = await Promise.all(fetchPromises);
+      let updatedCart = false;
+      
+      results.forEach((res, index) => {
+          if (res.success && res.medicine) {
+              // Ensure we have the latest allow_pay_on_delivery status
+              if (cart[index].medicine.allow_pay_on_delivery != res.medicine.allow_pay_on_delivery) {
+                  cart[index].medicine.allow_pay_on_delivery = res.medicine.allow_pay_on_delivery;
+                  updatedCart = true;
+              }
+          }
+      });
+      
+      if (updatedCart) {
+          localStorage.setItem('cart', JSON.stringify(cart));
+      }
+  } catch (e) {
+      console.error("Error fetching latest medicine status", e);
   }
   
   const token = localStorage.getItem('token');
@@ -638,7 +663,6 @@ window.openCheckout = function() {
     }
 
     checkoutModal.classList.add('active');
-    document.getElementById('cartWidget').classList.remove('active');
   }
 };
 
