@@ -503,17 +503,57 @@
         if(!msg && !hasFile) return;
         if(!activeContactId || !wsConn) return;
 
-        if (wsConn.readyState !== WebSocket.OPEN) {
-            if (window.showToast) window.showToast('You are offline. Please wait for the connection to re-establish before sending messages.', 'error');
-            return;
-        }
+        const isOffline = !wsConn || wsConn.readyState !== WebSocket.OPEN;
 
         // Instantly send text if available
         if (msg) {
-            wsConn.send(JSON.stringify({
-                receiver_id: activeContactId,
-                message: msg
-            }));
+            if (isOffline) {
+                // HTTP Fallback
+                try {
+                    input.disabled = true;
+                    btn.disabled = true;
+                    const token = localStorage.getItem('token');
+                    const res = await fetch('../backend/index.php?route=messages/send', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token 
+                        },
+                        body: JSON.stringify({
+                            receiver_id: activeContactId,
+                            message: msg
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.data) {
+                        appendMessage(data.data);
+                    } else if (data.success) {
+                        const user = JSON.parse(localStorage.getItem('user'));
+                        appendMessage({
+                            sender_id: user.id,
+                            receiver_id: activeContactId,
+                            message: msg,
+                            created_at: new Date().toISOString()
+                        });
+                    } else {
+                        if (window.showToast) window.showToast(data.message || 'Failed to send message', 'error');
+                        return;
+                    }
+                } catch(e) {
+                    console.error("HTTP fallback failed:", e);
+                    if (window.showToast) window.showToast('You are offline and the server is unreachable.', 'error');
+                    return;
+                } finally {
+                    input.disabled = false;
+                    btn.disabled = false;
+                    input.focus();
+                }
+            } else {
+                wsConn.send(JSON.stringify({
+                    receiver_id: activeContactId,
+                    message: msg
+                }));
+            }
             input.value = '';
         }
 
