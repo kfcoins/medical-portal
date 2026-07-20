@@ -211,6 +211,23 @@
       window.location.href = 'login.html';
     } else {
       updateUIWithUser();
+      fetchLatestUserData();
+    }
+
+    async function fetchLatestUserData() {
+      try {
+        const res = await fetch('../backend/index.php?route=auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success) {
+          user = data.user;
+          localStorage.setItem('user', JSON.stringify(user));
+          updateUIWithUser();
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest user data:', err);
+      }
     }
 
     function updateUIWithUser() {
