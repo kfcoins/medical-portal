@@ -42,7 +42,9 @@ h1, h2, h3, h4, h5 { font-family: 'Sora', sans-serif; line-height: 1.15; }
 h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 800; }
 h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; }
 h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); font-weight: 600; }
-p { line-height: 1.7; color: var(--gray-500); }
+h4 { font-size: clamp(1.1rem, 1.5vw, 1.25rem); font-weight: 600; }
+h5 { font-size: clamp(1rem, 1.2vw, 1.1rem); font-weight: 600; }
+p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500); }
 
 /* ===== UTILITIES ===== */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }

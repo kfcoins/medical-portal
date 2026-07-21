@@ -230,3 +230,92 @@ table {
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 16px; padding: 32px; transform: translateY(20px); transition: 0.3s; margin: 16px; }
 .modal-overlay.active .modal { transform: translateY(0); }
+
+/* ==========================================================================
+   Comprehensive Responsiveness
+   ========================================================================== */
+
+/* EXTRA LARGE SCREENS (TVs & Ultra-wide Monitors) */
+@media (min-width: 1920px) {
+  .top-header, .content-area {
+    max-width: 1800px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100%;
+  }
+  
+  html {
+    font-size: 18px; /* Scale up base typography slightly for distant viewing */
+  }
+
+  .sidebar {
+    width: 300px; /* Slightly wider sidebar */
+  }
+  .main-content {
+    margin-left: 300px;
+  }
+  body.sidebar-collapsed .sidebar:hover {
+    width: 300px;
+  }
+}
+
+/* LARGE SCREENS (Standard Desktops) */
+@media (max-width: 1440px) {
+  .content-area {
+    padding: 24px;
+  }
+  .stats-grid, .grid-2-col, .dashboard-grid {
+    gap: 20px;
+  }
+}
+
+/* MEDIUM SCREENS (Small Laptops / Landscape Tablets) */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .grid-2-col, .dashboard-grid, .settings-layout, .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* SMALL SCREENS (Phones / Portrait Tablets) */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .action-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  .modal {
+    padding: 24px;
+    margin: 16px;
+    width: 100%;
+  }
+}
+
+/* EXTRA SMALL SCREENS (Small Phones) */
+@media (max-width: 480px) {
+  .top-header {
+    height: 64px;
+    padding: 0 16px !important;
+  }
+  .header-title {
+    font-size: 1.1rem;
+  }
+  .content-area {
+    padding: 16px !important;
+  }
+  .card {
+    padding: 20px;
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .form-control, .btn {
+    font-size: 1rem; /* Prevent iOS zoom */
+  }
+}
