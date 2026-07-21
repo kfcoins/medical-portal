@@ -167,7 +167,7 @@
           <div class="stat-label">Pending Approvals</div>
           <div class="stat-value-container">
             <div class="stat-value" id="pendingPharmaciesCount">0</div>
-            <div class="stat-trend trend-warning">Requires Action</div>
+            <div class="stat-trend trend-warning" id="pendingActionBadge" style="display: none;">Requires Action</div>
           </div>
         </div>
         
@@ -290,6 +290,12 @@
         const json = await res.json();
         if (json.success) {
           document.getElementById('pendingPharmaciesCount').textContent = json.data.pendingPharmacies || 0;
+          
+          const pendingActionBadge = document.getElementById('pendingActionBadge');
+          if (pendingActionBadge) {
+              pendingActionBadge.style.display = (json.data.pendingPharmacies > 0) ? 'inline-block' : 'none';
+          }
+
           document.getElementById('activePharmaciesCount').textContent = json.data.activePharmacies || 0;
           document.getElementById('totalPatientsCount').textContent = json.data.patients || 0;
           
