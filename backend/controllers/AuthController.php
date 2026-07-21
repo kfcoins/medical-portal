@@ -124,9 +124,8 @@ class AuthController {
             // Create agent profile if role is pharmacy
             if ($role === 'pharmacy' || isset($data['agentType'])) {
                 // Generate agent_id
-                $stmtCount = $this->conn->query("SELECT COUNT(*) FROM agents");
-                $count = $stmtCount->fetchColumn();
-                $agent_id = "PA-GH-" . date('Y') . "-" . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+                $agent_id = "PA-GH-" . date('ymd') . "-" . rand(1000, 9999);
+
 
                 $agent_table_id = Uuid::v4();
                 // Handle File Uploads
