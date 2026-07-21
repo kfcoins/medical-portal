@@ -156,7 +156,13 @@
             <!-- Populated by JS -->
             <tr><td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Loading inventory...</td></tr>
           </tbody>
-        </table>
+          </table>
+        </div>
+        <div class="pagination-container" style="display: flex; justify-content: flex-end; align-items: center; padding: 16px 24px; gap: 12px; border-top: 1px solid var(--border);">
+          <button id="prevPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+          <span id="pageInfo" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Page 1 of 1</span>
+          <button id="nextPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled>Next <i class="fas fa-chevron-right"></i></button>
+        </div>
       </div>
     </div>
   </main>
@@ -256,6 +262,10 @@
     });
 
     let inventoryData = [];
+    
+    let currentPage = 1;
+    const itemsPerPage = 15;
+    let currentFilteredData = [];
 
     window.openEditModal = function(id) {
       const med = inventoryData.find(m => m.id === id);
@@ -289,46 +299,94 @@
         const tbody = document.getElementById('inventoryList');
         if (data.success && data.medicines.length > 0) {
           inventoryData = data.medicines;
-          tbody.innerHTML = data.medicines.map(m => {
-            let stockStatus = `<span class="status-badge out-of-stock">Out of Stock</span>`;
-            if (m.stock_qty > 10) {
-              stockStatus = `<span class="status-badge in-stock">In Stock</span>`;
-            } else if (m.stock_qty > 0 && m.stock_qty <= 10) {
-              stockStatus = `<span class="status-badge low-stock">Low Stock</span>`;
-            }
-            
-            return `
-              <tr>
-                <td>
-                  <div style="font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                    ${m.image_url ? `<img src="${m.image_url}" style="width:30px; height:30px; border-radius:4px; object-fit:cover; flex-shrink: 0;" />` : ''}
-                    <span>${m.name}</span>
-                  </div>
-                </td>
-                <td style="text-transform: capitalize;">${m.category}</td>
-                <td>GHS ${parseFloat(m.price).toFixed(2)}</td>
-                <td>${m.stock_qty}</td>
-                <td>${stockStatus}</td>
-                <td style="color: #6B7D8C;">${new Date(m.created_at).toLocaleDateString()}</td>
-                <td>${m.expiry_date ? new Date(m.expiry_date).toLocaleDateString() : 'N/A'}</td>
-                <td>
-                  <div style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;">
-                    <button onclick="openEditModal('${m.id}')" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-edit"></i> Edit</button>
-                    <button onclick="deleteMedicine('${m.id}')" style="background:#E53E3E;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-trash"></i> Delete</button>
-                  </div>
-                </td>
-              </tr>
-            `;
-          }).join('');
+          renderInventory(inventoryData);
         } else {
           inventoryData = [];
           tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="fas fa-box-open"></i><br>No products found. Add your first medicine.</td></tr>`;
+          updatePaginationControls(1);
         }
       } catch (err) {
         console.error(err);
         document.getElementById('inventoryList').innerHTML = `<tr><td colspan="8" class="empty-state" style="color:red;">Error loading inventory.</td></tr>`;
       }
     }
+
+    function renderInventory(data) {
+      currentFilteredData = data;
+      const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = data.slice(startIndex, endIndex);
+
+      const tbody = document.getElementById('inventoryList');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><i class="fas fa-box-open"></i><br>No products found. Add your first medicine.</td></tr>`;
+        updatePaginationControls(totalPages);
+        return;
+      }
+      
+      tbody.innerHTML = pageData.map(m => {
+        let stockStatus = `<span class="status-badge out-of-stock">Out of Stock</span>`;
+        if (m.stock_qty > 10) {
+          stockStatus = `<span class="status-badge in-stock">In Stock</span>`;
+        } else if (m.stock_qty > 0 && m.stock_qty <= 10) {
+          stockStatus = `<span class="status-badge low-stock">Low Stock</span>`;
+        }
+        
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                ${m.image_url ? `<img src="${m.image_url}" style="width:30px; height:30px; border-radius:4px; object-fit:cover; flex-shrink: 0;" />` : ''}
+                <span>${m.name}</span>
+              </div>
+            </td>
+            <td style="text-transform: capitalize;">${m.category}</td>
+            <td>GHS ${parseFloat(m.price).toFixed(2)}</td>
+            <td>${m.stock_qty}</td>
+            <td>${stockStatus}</td>
+            <td style="color: #6B7D8C;">${new Date(m.created_at).toLocaleDateString()}</td>
+            <td>${m.expiry_date ? new Date(m.expiry_date).toLocaleDateString() : 'N/A'}</td>
+            <td>
+              <div style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;">
+                <button onclick="openEditModal('${m.id}')" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-edit"></i> Edit</button>
+                <button onclick="deleteMedicine('${m.id}')" style="background:#E53E3E;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem;white-space:nowrap;"><i class="fas fa-trash"></i> Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      updatePaginationControls(totalPages);
+    }
+
+    function updatePaginationControls(totalPages) {
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      if (prevBtn) prevBtn.disabled = currentPage === 1;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+      if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderInventory(currentFilteredData);
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderInventory(currentFilteredData);
+      }
+    });
 
     // Delete Medicine
     window.deleteMedicine = async function(id) {

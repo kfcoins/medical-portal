@@ -162,6 +162,11 @@
             </tbody>
           </table>
         </div>
+        <div class="pagination-container" style="display: flex; justify-content: flex-end; align-items: center; padding: 16px 24px; gap: 12px; border-top: 1px solid var(--border);">
+          <button id="prevPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+          <span id="pageInfo" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Page 1 of 1</span>
+          <button id="nextPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled>Next <i class="fas fa-chevron-right"></i></button>
+        </div>
       </div>
     </div>
   </main>
@@ -186,6 +191,10 @@
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
     let allOrders = [];
+    
+    let currentPage = 1;
+    const itemsPerPage = 15;
+    let currentFilteredData = [];
 
     if (!token || !user || user.role !== 'patient') {
       window.location.href = 'login.html';
@@ -207,29 +216,72 @@
         
         if (data.success) {
           allOrders = data.orders;
-          if (allOrders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">No orders found.</td></tr>';
-            return;
-          }
-          
-          tbody.innerHTML = allOrders.map(order => `
-            <tr>
-              <td><strong>${order.order_no}</strong></td>
-              <td>${new Date(order.created_at).toLocaleDateString()}</td>
-              <td>${order.agent?.pharmacyName || 'PharmaTrust'}</td>
-              <td>${order.items.length} item(s)</td>
-              <td>${parseFloat(order.total_amount).toFixed(2)}</td>
-              <td><span class="badge badge-${order.status.toLowerCase()}">${capitalize(order.status)}</span></td>
-              <td><button class="btn-view" onclick="viewOrder('${order.id}')">View Details</button></td>
-            </tr>
-          `).join('');
+          renderOrders(allOrders);
         } else {
           tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Failed to load orders.</td></tr>';
+          updatePaginationControls(1);
         }
       } catch (error) {
         document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Network error occurred.</td></tr>';
       }
     }
+
+    function renderOrders(data) {
+      currentFilteredData = data;
+      const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = data.slice(startIndex, endIndex);
+
+      const tbody = document.getElementById('ordersTableBody');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">No orders found.</td></tr>';
+        updatePaginationControls(totalPages);
+        return;
+      }
+      
+      tbody.innerHTML = pageData.map(order => `
+        <tr>
+          <td><strong>${order.order_no}</strong></td>
+          <td>${new Date(order.created_at).toLocaleDateString()}</td>
+          <td>${order.agent?.pharmacyName || 'PharmaTrust'}</td>
+          <td>${order.items.length} item(s)</td>
+          <td>${parseFloat(order.total_amount).toFixed(2)}</td>
+          <td><span class="badge badge-${order.status.toLowerCase()}">${capitalize(order.status)}</span></td>
+          <td><button class="btn-view" onclick="viewOrder('${order.id}')">View Details</button></td>
+        </tr>
+      `).join('');
+      
+      updatePaginationControls(totalPages);
+    }
+
+    function updatePaginationControls(totalPages) {
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      if (prevBtn) prevBtn.disabled = currentPage === 1;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+      if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderOrders(currentFilteredData);
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderOrders(currentFilteredData);
+      }
+    });
 
     function viewOrder(id) {
       const order = allOrders.find(o => o.id === id);
