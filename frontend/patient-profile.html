@@ -19,7 +19,7 @@
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
     
     /* Sidebar */
     .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
@@ -36,20 +36,25 @@
     .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
 
     /* Main Content */
-    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; position: relative; }
-    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; height: 100vh; position: relative; overflow: hidden; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; flex-shrink: 0; }
     .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
     .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 24px; }
     .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
 
-    .content-area { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .content-area { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; height: calc(100vh - 72px); overflow: hidden; display: flex; flex-direction: column; }
 
-    .settings-layout { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start; }
+    .settings-layout { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start; height: 100%; overflow: hidden; }
     @media (min-width: 992px) { .settings-layout { grid-template-columns: 1fr 1fr; } }
-    .settings-column { display: flex; flex-direction: column; gap: 32px; }
+    .settings-column { display: flex; flex-direction: column; gap: 32px; height: 100%; overflow-y: auto; padding-right: 12px; }
+    
+    .settings-column::-webkit-scrollbar { width: 6px; }
+    .settings-column::-webkit-scrollbar-track { background: transparent; }
+    .settings-column::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .settings-column::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* Cards */
-    .card { background: var(--surface); border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    .card { background: var(--surface); border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); flex-shrink: 0; }
     .card-title { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; color: #1e293b; }
     
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -210,9 +215,9 @@
               </div>
               <div id="nhisCardPreview" style="margin-top: 12px; display: none;">
                 <p style="font-size: 0.85rem; font-weight: 500; margin-bottom: 8px;">Current Card Uploaded:</p>
-                <div style="display: flex; gap: 16px; flex-direction: column;">
-                  <img id="nhisCardFrontImg" src="" alt="NHIS Card Front" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
-                  <img id="nhisCardBackImg" src="" alt="NHIS Card Back" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
+                <div style="display: flex; gap: 16px; flex-direction: row; flex-wrap: wrap;">
+                  <img id="nhisCardFrontImg" src="" alt="NHIS Card Front" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
+                  <img id="nhisCardBackImg" src="" alt="NHIS Card Back" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
                 </div>
               </div>
               <div style="text-align: right; margin-top: 16px;">
@@ -269,6 +274,24 @@
       }
       
       const nhisBadge = document.getElementById('nhisStatusBadge');
+      
+      const nhisSaveBtn = document.getElementById('saveNhisBtn');
+      const nhisNumInput = document.getElementById('nhisNumber');
+      const nhisFrontInput = document.getElementById('nhisCardFront');
+      const nhisBackInput = document.getElementById('nhisCardBack');
+      
+      const disableNhisForm = (user.nhis_status === 'approved');
+      
+      if (nhisSaveBtn) {
+        nhisSaveBtn.disabled = disableNhisForm;
+        nhisSaveBtn.textContent = disableNhisForm ? 'Approved (Locked)' : 'Submit Details';
+        nhisSaveBtn.style.opacity = disableNhisForm ? '0.5' : '1';
+        nhisSaveBtn.style.cursor = disableNhisForm ? 'not-allowed' : 'pointer';
+      }
+      if (nhisNumInput) nhisNumInput.disabled = disableNhisForm;
+      if (nhisFrontInput) nhisFrontInput.disabled = disableNhisForm;
+      if (nhisBackInput) nhisBackInput.disabled = disableNhisForm;
+
       if (user.nhis_status === 'approved') {
         nhisBadge.textContent = 'APPROVED';
         nhisBadge.style.backgroundColor = '#C6F6D5';

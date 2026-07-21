@@ -182,6 +182,12 @@ class PatientController {
         try {
             $this->conn->beginTransaction();
 
+            // Check current NHIS status
+            $stmtUser = $this->conn->prepare("SELECT nhis_number, nhis_status FROM users WHERE id = :id");
+            $stmtUser->execute(['id' => $user_id]);
+            $currentUser = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            $isNhisApproved = $currentUser && $currentUser['nhis_status'] === 'approved';
+
             // Update basic info and NHIS if provided
             if (isset($input['firstName']) || isset($input['lastName']) || isset($input['phone']) || isset($input['nhis_number']) || isset($_FILES['nhis_card_front_image']) || isset($_FILES['nhis_card_back_image'])) {
                 $updates = [];
@@ -199,7 +205,23 @@ class PatientController {
                     $updates[] = "phone = :phone";
                     $params['phone'] = $input['phone'];
                 }
-                if (isset($input['nhis_number'])) {
+                
+                $nhisAttempt = false;
+                if (isset($input['nhis_number']) && $input['nhis_number'] !== $currentUser['nhis_number']) {
+                    $nhisAttempt = true;
+                }
+                if (isset($_FILES['nhis_card_front_image']) && $_FILES['nhis_card_front_image']['error'] === UPLOAD_ERR_OK) {
+                    $nhisAttempt = true;
+                }
+                if (isset($_FILES['nhis_card_back_image']) && $_FILES['nhis_card_back_image']['error'] === UPLOAD_ERR_OK) {
+                    $nhisAttempt = true;
+                }
+
+                if ($nhisAttempt && $isNhisApproved) {
+                    throw new Exception("Your NHIS request has already been approved and cannot be resubmitted.");
+                }
+
+                if (isset($input['nhis_number']) && $input['nhis_number'] !== $currentUser['nhis_number']) {
                     $updates[] = "nhis_number = :nhis_num";
                     $updates[] = "nhis_status = 'pending'";
                     $params['nhis_num'] = $input['nhis_number'];
