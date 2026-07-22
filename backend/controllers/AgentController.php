@@ -158,7 +158,7 @@ class AgentController {
         $delivered = $stmtDel->fetchColumn();
 
         // Revenue
-        $stmtRev = $this->conn->prepare("SELECT SUM(amount_due) FROM orders WHERE agent_id = :aid AND payment_status = 'paid'");
+        $stmtRev = $this->conn->prepare("SELECT SUM(total_amount - admin_commission) FROM orders WHERE agent_id = :aid AND payment_status = 'paid'");
         $stmtRev->execute(['aid' => $agent_id]);
         $revenue = $stmtRev->fetchColumn();
 
@@ -206,7 +206,7 @@ class AgentController {
         // Get revenue by month (last 6 months)
         // Adjust for MySQL vs SQLite date formatting. Assuming MySQL (XAMPP):
         $stmtRev = $this->conn->prepare("
-            SELECT DATE_FORMAT(created_at, '%Y-%m') as month, SUM(amount_due) as total_revenue
+            SELECT DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_amount - admin_commission) as total_revenue
             FROM orders
             WHERE agent_id = :aid AND payment_status = 'paid'
             GROUP BY month
