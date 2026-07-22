@@ -175,7 +175,7 @@
         }
 
         try {
-            const res = await fetch('/backend/index.php?route=invoices/generate', {
+            const res = await fetch('../backend/index.php?route=invoices/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -197,7 +197,7 @@
 
     async function loadInvoices() {
       try {
-        const res = await fetch('/backend/index.php?route=invoices/admin', {
+        const res = await fetch('../backend/index.php?route=invoices/admin', {
           headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         const data = await res.json();
@@ -245,7 +245,7 @@
         if (!confirm("Are you sure you want to mark this invoice as paid?")) return;
 
         try {
-            const res = await fetch(`/backend/index.php?route=invoices/pay/${invoiceId}`, {
+            const res = await fetch(`../backend/index.php?route=invoices/pay/${invoiceId}`, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
