@@ -48,6 +48,12 @@ class AdminController {
             $this->togglePatientStatus($id);
         } elseif ($method === 'GET' && $action === 'stats') {
             $this->getStats();
+        } elseif ($method === 'GET' && $action === 'commissions') {
+            $this->getCommissions();
+        } elseif ($method === 'GET' && $action === 'settings') {
+            $this->getSettings();
+        } elseif ($method === 'POST' && $action === 'settings') {
+            $this->updateSettings();
         } else {
             http_response_code(404);
             echo json_encode(["success" => false, "message" => "Endpoint not found in admin"]);
@@ -351,6 +357,102 @@ class AdminController {
                     "role" => "admin"
                 ]
             ]);
+        } catch(PDOException $e) {
+            $this->conn->rollBack();
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
+        }
+    }
+
+    private function getCommissions() {
+        try {
+            // Get totals
+            $stmt = $this->conn->query("SELECT SUM(admin_commission) as total FROM orders WHERE status = 'paid'");
+            $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+            $stmt = $this->conn->query("SELECT SUM(admin_commission) as month_total FROM orders WHERE status = 'paid' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+            $month = $stmt->fetch(PDO::FETCH_ASSOC)['month_total'] ?? 0;
+
+            // Get trends (last 6 months)
+            $stmt = $this->conn->query("
+                SELECT DATE_FORMAT(created_at, '%b %Y') as month, SUM(admin_commission) as total 
+                FROM orders 
+                WHERE status = 'paid' AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                GROUP BY YEAR(created_at), MONTH(created_at)
+                ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
+            ");
+            $trends = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Get by pharmacy
+            $stmt = $this->conn->query("
+                SELECT p.name, SUM(o.admin_commission) as total 
+                FROM orders o
+                JOIN pharmacies p ON o.pharmacy_id = p.id
+                WHERE o.status = 'paid'
+                GROUP BY p.id
+                ORDER BY total DESC
+                LIMIT 5
+            ");
+            $byPharmacy = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Get recent orders
+            $stmt = $this->conn->query("
+                SELECT o.order_number as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, p.name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.status
+                FROM orders o
+                JOIN pharmacies p ON o.pharmacy_id = p.id
+                ORDER BY o.created_at DESC
+                LIMIT 50
+            ");
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                "success" => true,
+                "data" => [
+                    "total_commission" => (float)$total,
+                    "month_commission" => (float)$month,
+                    "trends" => $trends,
+                    "by_pharmacy" => $byPharmacy,
+                    "orders" => $orders
+                ]
+            ]);
+        } catch(PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
+        }
+    }
+
+    private function getSettings() {
+        try {
+            $stmt = $this->conn->query("SELECT setting_key, setting_value FROM settings");
+            $settings = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+            echo json_encode(["success" => true, "settings" => $settings]);
+        } catch(PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
+        }
+    }
+
+    private function updateSettings() {
+        $input = json_decode(file_get_contents("php://input"), true);
+        if (!isset($input['settings']) || !is_array($input['settings'])) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Invalid settings format"]);
+            return;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+            $stmt = $this->conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+            
+            foreach ($input['settings'] as $key => $value) {
+                $stmt->execute([$key, $value, $value]);
+            }
+            
+            $this->conn->commit();
+            echo json_encode(["success" => true, "message" => "Settings updated successfully"]);
         } catch(PDOException $e) {
             $this->conn->rollBack();
             http_response_code(500);
