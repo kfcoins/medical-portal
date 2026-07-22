@@ -98,6 +98,11 @@ switch ($controller) {
         $patientController = new PatientController();
         $patientController->handleRequest($action, $id);
         break;
+    case 'invoices':
+        require_once 'controllers/InvoiceController.php';
+        $invoiceController = new InvoiceController();
+        $invoiceController->handleRequest($action, $id);
+        break;
     
     default:
         http_response_code(404);
