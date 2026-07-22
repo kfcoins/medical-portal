@@ -325,7 +325,6 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   overflow-x: auto; 
   gap: 16px; 
   padding: 10px 0 24px 0;
-  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -363,7 +362,6 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
 }
 .service-card {
   flex: 0 0 calc(33.333% - 16px);
-  scroll-snap-align: start;
   min-width: 280px;
   background: var(--white); 
   border-radius: 24px;
@@ -485,7 +483,6 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   gap: 16px; 
   margin-bottom: 32px; 
   padding: 10px 0 24px 0;
-  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -495,7 +492,6 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
 }
 .agent-card {
   flex: 0 0 280px;
-  scroll-snap-align: start;
   background: var(--white); border-radius: var(--radius);
   overflow: hidden; transition: var(--transition);
   border: 1px solid var(--gray-200);
