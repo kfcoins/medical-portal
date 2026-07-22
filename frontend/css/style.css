@@ -702,6 +702,19 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   .trust-logos { gap: 16px; }
   .card-1 { left: 0; }
   .card-2 { right: 0; }
+  
+  .agents-grid {
+    margin: 0 -15px 32px -15px;
+    padding: 10px 15px 24px 15px;
+    scroll-padding-left: 15px;
+    gap: 12px;
+  }
+  .agents-cta .btn-lg {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
