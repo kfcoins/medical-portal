@@ -448,9 +448,9 @@
           <td style="padding: 16px 32px;">${o.order_no}</td>
           <td style="padding: 16px;">${o.date}</td>
           <td style="padding: 16px; color: var(--text-muted);">${o.store_name}</td>
-          <td style="padding: 16px;">GH₵ ${o.total_amount.toFixed(2)}</td>
-          <td style="padding: 16px; color: #38A169;">GH₵ ${o.commission.toFixed(2)}</td>
-          <td style="padding: 16px; color: #3182CE;">GH₵ ${o.store_amount.toFixed(2)}</td>
+          <td style="padding: 16px;">GH₵ ${parseFloat(o.total_amount || 0).toFixed(2)}</td>
+          <td style="padding: 16px; color: #38A169;">GH₵ ${parseFloat(o.commission || 0).toFixed(2)}</td>
+          <td style="padding: 16px; color: #3182CE;">GH₵ ${parseFloat(o.store_amount || 0).toFixed(2)}</td>
           <td style="padding: 16px 32px;">
             <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background: ${o.status === 'paid' ? '#C6F6D5' : '#FED7D7'}; color: ${o.status === 'paid' ? '#22543D' : '#822727'}; text-transform: uppercase;">
               ${o.status}
