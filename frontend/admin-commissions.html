@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Commissions &mdash; PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #4A47A3; /* Deep Purple for Admin */
+      --primary-light: #5B58BD;
+      --primary-hover: #F0EDF7;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar matching the design */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.3rem; background: var(--primary); color: white; letter-spacing: 0.5px; height: 80px; }
+    .sidebar-header i { font-size: 1.5rem; color: white; }
+    
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: var(--primary-hover); color: var(--primary); font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 80px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: var(--surface); padding: 28px 32px; border-radius: 20px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.05); }
+    .stat-top-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .stat-top-accent.yellow { background: #D69E2E; }
+    .stat-top-accent.green { background: #38A169; }
+    .stat-top-accent.blue { background: #3182CE; }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .stat-value-container { display: flex; align-items: baseline; gap: 16px; }
+    .stat-value { font-size: 2.8rem; font-weight: 800; font-family: 'Sora', sans-serif; color: var(--text); line-height: 1; letter-spacing: -1px; }
+    .stat-trend { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .trend-up { color: #38A169; }
+    .trend-warning { color: #D69E2E; background: rgba(214, 158, 46, 0.1); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
+
+    /* Quick Links */
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; padding-bottom: 32px; }
+    .action-card { 
+      background: var(--surface); 
+      padding: 32px; 
+      border-radius: 20px; 
+      border: 1px solid var(--border); 
+      display: flex; 
+      align-items: center; 
+      gap: 24px;
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      box-shadow: 0 4px 24px rgba(0,0,0,0.02); 
+      text-decoration: none; 
+      position: relative;
+      overflow: hidden;
+    }
+    .action-card:hover { 
+      border-color: var(--primary); 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 32px rgba(88, 101, 242, 0.08);
+    }
+    .action-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      background: rgba(229, 62, 62, 0.1);
+      color: #E53E3E;
+    }
+    .action-card:nth-child(2) .action-icon-box {
+      background: rgba(49, 130, 206, 0.1);
+      color: #3182CE;
+    }
+    .action-card:hover .action-icon-box {
+      transform: scale(1.08);
+    }
+    .action-content { flex: 1; }
+    .action-card h3 { font-family: 'Sora', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; color: var(--text); transition: color 0.3s; }
+    .action-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+    .action-arrow {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    .action-card:hover .action-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--primary);
+    }
+
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <a href="admin-approvals.html" class="nav-link"><i class="fas fa-file-signature"></i> Approvals <span class="badge" id="sidebarPendingBadge" style="display: none; background: #E53E3E; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: auto; font-weight: bold;">0</span></a>
+      <a href="admin-pharmacies.html" class="nav-link"><i class="fas fa-store"></i> Pharmacies</a>
+      <a href="admin-patients.html" class="nav-link"><i class="fas fa-users"></i> Patients</a>
+      <a href="admin-commissions.html" class="nav-link active"><i class="fas fa-hand-holding-usd"></i> Commissions</a>
+      <a href="admin-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Commissions Dashboard</div>
+      <div class="header-actions" style="display: flex; align-items: center;">
+
+        <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </a>
+      <div class="user-profile">
+        <div class="user-avatar" id="userInitial">A</div>
+        <span id="userName">Admin</span>
+      </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top-accent green"></div>
+          <div class="stat-label">Total Commission</div>
+          <div class="stat-value-container">
+            <div class="stat-value" id="totalCommission">GH₵ 0.00</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-top-accent blue"></div>
+          <div class="stat-label">This Month</div>
+          <div class="stat-value-container">
+            <div class="stat-value" id="monthCommission">GH₵ 0.00</div>
+          </div>
+        </div>
+        
+        <div class="stat-card" style="padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start;">
+          <div class="stat-top-accent yellow"></div>
+          <div class="stat-label" style="margin-bottom: 8px;">Commission Rate</div>
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <input type="number" id="commissionRate" min="0" max="100" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter'; font-size: 1rem; width: 80px;" value="10">
+            <span style="display: flex; align-items: center; font-size: 1.2rem; font-weight: 600;">%</span>
+            <button onclick="updateRate()" style="margin-left: auto; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Inter'; font-weight: 600; transition: background 0.2s;">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+        <!-- Area Chart (Trends) -->
+        <div class="chart-card" style="background: var(--surface); padding: 28px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.02);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+              <h3 style="font-family: 'Sora', sans-serif; font-size: 1.15rem; color: var(--text); font-weight: 700; margin-bottom: 4px;">Commission Revenue</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Earnings over the last 6 months</p>
+            </div>
+          </div>
+          <div style="position: relative; height: 280px; width: 100%;">
+            <canvas id="trendsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Doughnut Chart (Distribution) -->
+        <div class="chart-card" style="background: var(--surface); padding: 28px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.02); display: flex; flex-direction: column;">
+          <h3 style="font-family: 'Sora', sans-serif; font-size: 1.15rem; color: var(--text); font-weight: 700; margin-bottom: 4px;">Top Pharmacies</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px;">Commission generated by store</p>
+          
+          <div style="position: relative; flex: 1; display: flex; justify-content: center; align-items: center; min-height: 200px;">
+            <canvas id="pharmacyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="table-card" style="background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="padding: 24px 32px; border-bottom: 1px solid var(--border);">
+          <h3 style="font-family: 'Sora', sans-serif; font-size: 1.15rem; color: var(--text); font-weight: 700;">Recent Orders</h3>
+        </div>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+            <thead>
+              <tr style="background: #F8FAFC; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="padding: 16px 32px; cursor: pointer;" onclick="sortTable(0)">Order No <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px; cursor: pointer;" onclick="sortTable(1)">Date <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px; cursor: pointer;" onclick="sortTable(2)">Store Name <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px; cursor: pointer;" onclick="sortTable(3, true)">Total Amount <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px; cursor: pointer;" onclick="sortTable(4, true)">Commission <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px; cursor: pointer;" onclick="sortTable(5, true)">Store Amount <i class="fas fa-sort"></i></th>
+                <th style="padding: 16px 32px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="7" style="padding: 32px; text-align: center; color: var(--text-muted);">Loading data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'admin') {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('userName').textContent = user.first_name + ' ' + user.last_name;
+      document.getElementById('userInitial').textContent = user.first_name.charAt(0);
+      loadStats();
+    }
+
+    let trendsChartInstance = null;
+    let pharmacyChartInstance = null;
+    let currentOrders = [];
+
+    async function loadStats() {
+      try {
+        const [commRes, setRes] = await Promise.all([
+          fetch('../backend/index.php?route=admin/commissions', { headers: { 'Authorization': 'Bearer ' + token } }),
+          fetch('../backend/index.php?route=admin/settings', { headers: { 'Authorization': 'Bearer ' + token } })
+        ]);
+        
+        const commData = await commRes.json();
+        const setData = await setRes.json();
+
+        if (setData.success && setData.settings.commission_rate) {
+          document.getElementById('commissionRate').value = setData.settings.commission_rate;
+        }
+
+        if (commData.success) {
+          document.getElementById('totalCommission').textContent = `GH₵ ${commData.data.total_commission.toFixed(2)}`;
+          document.getElementById('monthCommission').textContent = `GH₵ ${commData.data.month_commission.toFixed(2)}`;
+          currentOrders = commData.data.orders;
+          renderCharts(commData.data.trends, commData.data.by_pharmacy);
+          renderTable();
+        }
+      } catch (err) {
+        console.error('Failed to load commissions:', err);
+      }
+    }
+
+    async function updateRate() {
+      const rate = document.getElementById('commissionRate').value;
+      try {
+        const res = await fetch('../backend/index.php?route=admin/settings', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings: { commission_rate: rate } })
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('Commission rate updated successfully.');
+        } else {
+          alert(json.message);
+        }
+      } catch(err) {
+        alert('Failed to update rate');
+      }
+    }
+
+    function renderCharts(trends, byPharmacy) {
+      // Trends Chart
+      const ctxTrends = document.getElementById('trendsChart').getContext('2d');
+      if (trendsChartInstance) trendsChartInstance.destroy();
+      
+      const gradient = ctxTrends.createLinearGradient(0, 0, 0, 280);
+      gradient.addColorStop(0, 'rgba(56, 161, 105, 0.4)');
+      gradient.addColorStop(1, 'rgba(56, 161, 105, 0.0)');
+
+      trendsChartInstance = new Chart(ctxTrends, {
+        type: 'line',
+        data: {
+          labels: trends.map(t => t.month),
+          datasets: [{
+            label: 'Commission (GH₵)',
+            data: trends.map(t => t.total),
+            borderColor: '#38A169',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#F0F4F8' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // Pharmacy Chart
+      const ctxPharm = document.getElementById('pharmacyChart').getContext('2d');
+      if (pharmacyChartInstance) pharmacyChartInstance.destroy();
+
+      pharmacyChartInstance = new Chart(ctxPharm, {
+        type: 'doughnut',
+        data: {
+          labels: byPharmacy.map(p => p.name),
+          datasets: [{
+            data: byPharmacy.map(p => p.total),
+            backgroundColor: ['#38A169', '#3182CE', '#D69E2E', '#E53E3E', '#805AD5'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'Inter', size: 11 } } }
+          }
+        }
+      });
+    }
+
+    let sortCol = 0;
+    let sortAsc = true;
+    function sortTable(colIndex, isNumeric = false) {
+      if (sortCol === colIndex) sortAsc = !sortAsc;
+      else { sortCol = colIndex; sortAsc = true; }
+      
+      const keys = ['order_no', 'date', 'store_name', 'total_amount', 'commission', 'store_amount', 'status'];
+      const key = keys[colIndex];
+
+      currentOrders.sort((a, b) => {
+        let valA = a[key];
+        let valB = b[key];
+        if (!isNumeric) {
+          valA = String(valA).toLowerCase();
+          valB = String(valB).toLowerCase();
+          if (valA < valB) return sortAsc ? -1 : 1;
+          if (valA > valB) return sortAsc ? 1 : -1;
+          return 0;
+        } else {
+          return sortAsc ? valA - valB : valB - valA;
+        }
+      });
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('ordersTableBody');
+      if (currentOrders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="padding: 32px; text-align: center; color: var(--text-muted);">No commissions earned yet.</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = currentOrders.map(o => `
+        <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+          <td style="padding: 16px 32px; font-weight: 500;">${o.order_no}</td>
+          <td style="padding: 16px;">${o.date}</td>
+          <td style="padding: 16px; color: var(--text-muted);">${o.store_name}</td>
+          <td style="padding: 16px; font-weight: 600;">GH₵ ${o.total_amount.toFixed(2)}</td>
+          <td style="padding: 16px; font-weight: 600; color: #38A169;">GH₵ ${o.commission.toFixed(2)}</td>
+          <td style="padding: 16px; font-weight: 500; color: #3182CE;">GH₵ ${o.store_amount.toFixed(2)}</td>
+          <td style="padding: 16px 32px;">
+            <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background: ${o.status === 'paid' ? '#C6F6D5' : '#FED7D7'}; color: ${o.status === 'paid' ? '#22543D' : '#822727'}; text-transform: uppercase;">
+              ${o.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
+
