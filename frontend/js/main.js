@@ -72,11 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
   if (hamburger && navLinks) {
-    hamburger.addEventListener('click', () => {
+    hamburger.addEventListener('click', (e) => {
       navLinks.classList.toggle('open');
+      e.stopPropagation();
     });
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+      const navActions = document.querySelector('.nav-actions');
+      if (navLinks.classList.contains('open') && 
+          !navLinks.contains(e.target) && 
+          !hamburger.contains(e.target) &&
+          (!navActions || !navActions.contains(e.target))) {
+        navLinks.classList.remove('open');
+      }
     });
   }
 
