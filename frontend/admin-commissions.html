@@ -426,12 +426,12 @@
       
       tbody.innerHTML = pageData.map(o => `
         <tr style="border-bottom: 1px solid var(--border); transition: 0.2s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
-          <td style="padding: 16px 32px; font-weight: 500;">${o.order_no}</td>
+          <td style="padding: 16px 32px;">${o.order_no}</td>
           <td style="padding: 16px;">${o.date}</td>
           <td style="padding: 16px; color: var(--text-muted);">${o.store_name}</td>
-          <td style="padding: 16px; font-weight: 600;">GH₵ ${o.total_amount.toFixed(2)}</td>
-          <td style="padding: 16px; font-weight: 600; color: #38A169;">GH₵ ${o.commission.toFixed(2)}</td>
-          <td style="padding: 16px; font-weight: 500; color: #3182CE;">GH₵ ${o.store_amount.toFixed(2)}</td>
+          <td style="padding: 16px;">GH₵ ${o.total_amount.toFixed(2)}</td>
+          <td style="padding: 16px; color: #38A169;">GH₵ ${o.commission.toFixed(2)}</td>
+          <td style="padding: 16px; color: #3182CE;">GH₵ ${o.store_amount.toFixed(2)}</td>
           <td style="padding: 16px 32px;">
             <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background: ${o.status === 'paid' ? '#C6F6D5' : '#FED7D7'}; color: ${o.status === 'paid' ? '#22543D' : '#822727'}; text-transform: uppercase;">
               ${o.status}

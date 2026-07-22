@@ -385,11 +385,11 @@ class AdminController {
 
             // Get by pharmacy
             $stmt = $this->conn->query("
-                SELECT p.name, SUM(o.admin_commission) as total 
+                SELECT a.pharmacy_name as name, SUM(o.admin_commission) as total 
                 FROM orders o
-                JOIN pharmacies p ON o.pharmacy_id = p.id
+                JOIN agents a ON o.agent_id = a.id
                 WHERE o.payment_status = 'paid'
-                GROUP BY p.id
+                GROUP BY a.id
                 ORDER BY total DESC
                 LIMIT 5
             ");
@@ -397,9 +397,9 @@ class AdminController {
 
             // Get recent orders
             $stmt = $this->conn->query("
-                SELECT o.order_no as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, p.name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.payment_status as status
+                SELECT o.order_no as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, a.pharmacy_name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.payment_status as status
                 FROM orders o
-                JOIN pharmacies p ON o.pharmacy_id = p.id
+                JOIN agents a ON o.agent_id = a.id
                 ORDER BY o.created_at DESC
                 LIMIT 50
             ");
