@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy Invoices &mdash; PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #2B6CB0; /* Blue for Pharmacy */
+      --primary-light: #4299E1;
+      --primary-hover: #EBF8FF;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.3rem; background: var(--primary); color: white; letter-spacing: 0.5px; height: 80px; }
+    .sidebar-header i { font-size: 1.5rem; color: white; }
+    
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: var(--primary-hover); color: var(--primary); font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+    .top-header { background: var(--surface); height: 80px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+
+    /* Alert Styles */
+    .alert { padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; display: none; font-size: 0.95rem; }
+    .alert-success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+    .alert-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .badge-unpaid { background: #FEF2F2; color: #991B1B; }
+    .badge-paid { background: #F0FDF4; color: #166534; }
+
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-prescription-bottle-alt"></i> PharmaAgent
+    </div>
+    <div class="nav-links">
+      <a href="pharmacy-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="pharmacy-inventory.html" class="nav-link"><i class="fas fa-box"></i> Inventory</a>
+      <a href="pharmacy-orders.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Orders <span class="sidebarOrdersCounter" style="margin-left: auto; background: #E53E3E; color: white; border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; display: none;">0</span></a>
+      <a href="pharmacy-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="pharmacy-analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="agent-invoices.html" class="nav-link active"><i class="fas fa-file-invoice-dollar"></i> Invoices</a>
+      <a href="pharmacy-settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">My Invoices</div>
+      <div class="user-profile">
+        <div class="user-avatar" id="userInitial">P</div>
+        <span id="userName">Pharmacy</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+
+      <div style="background: var(--surface); padding: 24px 32px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.02); margin-bottom: 24px;">
+        <h3 style="font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 8px;">Cash on Delivery Commissions</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">These are the commissions you owe PharmaTrust for orders where you collected Cash on Delivery. Please pay your invoices promptly to avoid service interruption.</p>
+      </div>
+
+      <div class="table-card" style="background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.02); overflow: hidden;">
+        <div style="padding: 24px 32px; border-bottom: 1px solid var(--border);">
+          <h3 style="font-family: 'Sora', sans-serif; font-size: 1.15rem; color: var(--text); font-weight: 700;">Invoice History</h3>
+        </div>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+            <thead>
+              <tr style="background: #F8FAFC; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="padding: 16px 32px;">Invoice No</th>
+                <th style="padding: 16px;">Month</th>
+                <th style="padding: 16px;">Orders Included</th>
+                <th style="padding: 16px;">Amount Due</th>
+                <th style="padding: 16px;">Status</th>
+                <th style="padding: 16px 32px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesTableBody">
+              <tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted);">Loading invoices...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      document.getElementById('userName').textContent = decoded.name;
+      document.getElementById('userInitial').textContent = decoded.name.charAt(0).toUpperCase();
+
+      loadInvoices();
+    });
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function loadInvoices() {
+      try {
+        const res = await fetch('/backend/index.php?route=invoices/agent', {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('invoicesTableBody');
+        
+        if (data.success) {
+          if (!data.invoices || data.invoices.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding: 24px; text-align: center; color: var(--text-muted);">No invoices found.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = data.invoices.map(inv => {
+            let badgeClass = inv.status === 'paid' ? 'badge-paid' : 'badge-unpaid';
+            let actionText = inv.status === 'unpaid' 
+                ? '<span style="color: var(--text-muted); font-size: 0.85rem;">Pay via Admin</span>' 
+                : '<span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fas fa-check-circle" style="color: #38A169;"></i> Paid</span>';
+
+            return `
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 16px 32px; font-weight: 600;">${inv.invoice_no}</td>
+                <td style="padding: 16px;">${inv.billing_month}</td>
+                <td style="padding: 16px;">${inv.total_orders}</td>
+                <td style="padding: 16px; font-weight: 600; color: #E53E3E;">GH₵ ${parseFloat(inv.amount_due).toFixed(2)}</td>
+                <td style="padding: 16px;">
+                  <span class="badge ${badgeClass}">${inv.status.toUpperCase()}</span>
+                </td>
+                <td style="padding: 16px 32px;">${actionText}</td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="padding: 24px; text-align: center; color: #E53E3E;">Error loading invoices.</td></tr>';
+        }
+      } catch (err) {
+        document.getElementById('invoicesTableBody').innerHTML = '<tr><td colspan="6" style="padding: 24px; text-align: center; color: #E53E3E;">Server error.</td></tr>';
+      }
+    }
+  </script>
+</body>
+</html>
