@@ -481,7 +481,6 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   display: flex; 
   overflow-x: auto; 
   gap: 16px; 
-  margin-bottom: 32px; 
   padding: 10px 0 24px 0;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -700,7 +699,7 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   .card-2 { right: 0; }
   
   .agents-grid {
-    margin: 0 -15px 32px -15px;
+    margin: 0 -15px 0 -15px;
     padding: 10px 15px 24px 15px;
     scroll-padding-left: 15px;
     gap: 12px;
