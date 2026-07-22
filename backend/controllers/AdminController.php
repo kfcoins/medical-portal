@@ -367,17 +367,17 @@ class AdminController {
     private function getCommissions() {
         try {
             // Get totals
-            $stmt = $this->conn->query("SELECT SUM(admin_commission) as total FROM orders WHERE status = 'paid'");
+            $stmt = $this->conn->query("SELECT SUM(admin_commission) as total FROM orders WHERE payment_status = 'paid'");
             $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-            $stmt = $this->conn->query("SELECT SUM(admin_commission) as month_total FROM orders WHERE status = 'paid' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+            $stmt = $this->conn->query("SELECT SUM(admin_commission) as month_total FROM orders WHERE payment_status = 'paid' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
             $month = $stmt->fetch(PDO::FETCH_ASSOC)['month_total'] ?? 0;
 
             // Get trends (last 6 months)
             $stmt = $this->conn->query("
                 SELECT DATE_FORMAT(created_at, '%b %Y') as month, SUM(admin_commission) as total 
                 FROM orders 
-                WHERE status = 'paid' AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                WHERE payment_status = 'paid' AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
                 GROUP BY YEAR(created_at), MONTH(created_at)
                 ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
             ");
@@ -388,7 +388,7 @@ class AdminController {
                 SELECT p.name, SUM(o.admin_commission) as total 
                 FROM orders o
                 JOIN pharmacies p ON o.pharmacy_id = p.id
-                WHERE o.status = 'paid'
+                WHERE o.payment_status = 'paid'
                 GROUP BY p.id
                 ORDER BY total DESC
                 LIMIT 5
@@ -397,7 +397,7 @@ class AdminController {
 
             // Get recent orders
             $stmt = $this->conn->query("
-                SELECT o.order_number as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, p.name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.status
+                SELECT o.order_no as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, p.name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.payment_status as status
                 FROM orders o
                 JOIN pharmacies p ON o.pharmacy_id = p.id
                 ORDER BY o.created_at DESC
