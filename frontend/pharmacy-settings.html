@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy Settings &mdash; PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 20px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #4FD1C5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+
+    .settings-layout { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start; }
+    @media (min-width: 992px) { .settings-layout { grid-template-columns: 1fr 1fr; } }
+    .settings-column { display: flex; flex-direction: column; gap: 32px; }
+
+    /* Cards */
+    .card { background: var(--surface); border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    .card h3 { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; margin-top: 0; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; color: #1e293b; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; color: #475569; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #E2E8F0; background: #F8FAFC; outline: none; font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #4A47A3; }
+    
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-family: inherit; cursor: pointer; transition: 0.2s; border: none; font-size: 0.95rem; }
+    .btn-primary { background: #4A47A3; color: white; }
+    .btn-primary:hover { background: #3B3882; }
+    
+    .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: #F8FAFC; justify-content: space-between; }
+    .checkbox-group > label:first-child { margin: 0; font-weight: 500; color: #1A202C; flex: 1; cursor: pointer; }
+    
+    /* Toggle Switch */
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex: 0 0 44px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 24px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    input:checked + .toggle-slider { background-color: #4FD1C5; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; display: none; }
+    .alert-success { background: #D1FAE5; color: #065F46; }
+    .alert-error { background: #FEE2E2; color: #991B1B; }
+
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 600px) { .two-cols { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-prescription-bottle-alt"></i> PharmaAgent
+    </div>
+    <div class="nav-links">
+      <a href="pharmacy-dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="pharmacy-inventory.html" class="nav-link"><i class="fas fa-box"></i> Inventory</a>
+      <a href="pharmacy-orders.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Orders <span class="sidebarOrdersCounter" style="margin-left: auto; background: #E53E3E; color: white; border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; display: none;">0</span></a>
+
+      <a href="pharmacy-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="pharmacy-analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="pharmacy-settings.html" class="nav-link active"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Settings</div>
+      <div class="header-actions">
+
+        <a href="pharmacy-messages.html" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </a>
+      <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Pharmacy Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+
+      <div class="settings-layout">
+        <div class="settings-column">
+          <!-- Pharmacy Profile Settings -->
+          <div class="card">
+            <h3>Pharmacy Profile</h3>
+            <form id="profileForm">
+              <div class="form-group">
+                <label>Pharmacy Name</label>
+                <input type="text" id="pharmacy_name" required>
+              </div>
+              
+              <div class="two-cols">
+                <div class="form-group">
+                  <label>Pharmacy Council Registration No.</label>
+                  <input type="text" id="council_reg_no" readonly title="Contact support to change this">
+                </div>
+                <div class="form-group">
+                  <label>FDA License No.</label>
+                  <input type="text" id="fda_license_no" readonly title="Contact support to change this">
+                </div>
+              </div>
+
+              <div class="two-cols">
+                <div class="form-group">
+                  <label>Region</label>
+                  <select id="region">
+                    <option value="Greater Accra">Greater Accra</option>
+                    <option value="Ashanti">Ashanti</option>
+                    <option value="Western">Western</option>
+                    <option value="Central">Central</option>
+                    <option value="Eastern">Eastern</option>
+                    <option value="Northern">Northern</option>
+                    <option value="Volta">Volta</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Address</label>
+                  <input type="text" id="address">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Bio / Description</label>
+                <textarea id="bio" rows="3" placeholder="Tell customers about your pharmacy..."></textarea>
+              </div>
+
+              <div class="checkbox-group">
+                <label for="nhis_enabled">Accepts NHIS (National Health Insurance Scheme)</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="nhis_enabled" value="1">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="checkbox-group">
+                <label for="allow_pay_on_delivery">Accepts Pay on Delivery (Cash)</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="allow_pay_on_delivery" value="1">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile Settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="settings-column">
+          <!-- Security Settings -->
+          <div class="card">
+            <h3>Security</h3>
+            <form id="passwordForm">
+              <div class="form-group">
+                <label>Current Password</label>
+                <div style="position: relative;">
+                  <input type="password" id="currentPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <div style="position: relative;">
+                  <input type="password" id="newPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Confirm New Password</label>
+                <div style="position: relative;">
+                  <input type="password" id="confirmPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn btn-primary" id="savePasswordBtn">Update Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      if (!token || !user || user.role !== 'pharmacy') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const name = user.pharmacy_name || (user.first_name + ' ' + user.last_name);
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+
+      loadProfile();
+    });
+
+    function showAlert(msg, isSuccess) {
+        const box = document.getElementById('alertBox');
+        box.textContent = msg;
+        box.style.display = 'block';
+        if(isSuccess) {
+            box.className = 'alert alert-success';
+        } else {
+            box.className = 'alert alert-error';
+        }
+        setTimeout(() => box.style.display = 'none', 4000);
+    }
+
+    async function loadProfile() {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('../backend/index.php?route=auth/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await res.json();
+            if (data.success && data.agentProfile) {
+                const profile = data.agentProfile;
+                document.getElementById('pharmacy_name').value = profile.pharmacy_name || '';
+                document.getElementById('council_reg_no').value = profile.council_reg_no || '';
+                document.getElementById('fda_license_no').value = profile.fda_license_no || '';
+                document.getElementById('region').value = profile.region || 'Greater Accra';
+                document.getElementById('address').value = profile.address || '';
+                document.getElementById('bio').value = profile.bio || '';
+                document.getElementById('nhis_enabled').checked = profile.nhis_enabled == 1;
+                document.getElementById('allow_pay_on_delivery').checked = profile.allow_pay_on_delivery == 1;
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('saveProfileBtn');
+        btn.textContent = 'Saving...';
+        btn.disabled = true;
+
+        const payload = {
+            pharmacy_name: document.getElementById('pharmacy_name').value,
+            council_reg_no: document.getElementById('council_reg_no').value,
+            fda_license_no: document.getElementById('fda_license_no').value,
+            region: document.getElementById('region').value,
+            address: document.getElementById('address').value,
+            bio: document.getElementById('bio').value,
+            nhis_enabled: document.getElementById('nhis_enabled').checked ? 1 : 0,
+            allow_pay_on_delivery: document.getElementById('allow_pay_on_delivery').checked ? 1 : 0
+        };
+
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('../backend/index.php?route=agents/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showAlert('Profile updated successfully!', true);
+                
+                // Update local storage name
+                let user = JSON.parse(localStorage.getItem('user'));
+                user.pharmacy_name = payload.pharmacy_name;
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                document.getElementById('userName').textContent = payload.pharmacy_name;
+                document.getElementById('userInitial').textContent = payload.pharmacy_name.charAt(0);
+            } else {
+                showAlert(data.message || 'Update failed', false);
+            }
+        } catch(err) {
+            showAlert('An error occurred.', false);
+        } finally {
+            btn.textContent = 'Save Profile Settings';
+            btn.disabled = false;
+        }
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if(newPassword !== confirmPassword) {
+            showAlert('New passwords do not match!', false);
+            return;
+        }
+
+        const btn = document.getElementById('savePasswordBtn');
+        btn.textContent = 'Updating...';
+        btn.disabled = true;
+
+        const token = localStorage.getItem('token');
+        try {
+            // Send as URL encoded because backend uses parse_str for PUT logic
+            const formData = new URLSearchParams();
+            formData.append('currentPassword', currentPassword);
+            formData.append('newPassword', newPassword);
+
+            const res = await fetch('../backend/index.php?route=auth/change-password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: formData.toString()
+            });
+            const data = await res.json();
+            if (data.success) {
+                showAlert('Password updated successfully!', true);
+                document.getElementById('passwordForm').reset();
+            } else {
+                showAlert(data.message || 'Failed to update password', false);
+            }
+        } catch(err) {
+            showAlert('An error occurred.', false);
+        } finally {
+            btn.textContent = 'Update Password';
+            btn.disabled = false;
+        }
+    });
+  </script>
+</body>
+</html>
+
+
