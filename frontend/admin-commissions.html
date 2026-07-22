@@ -161,6 +161,8 @@
     </header>
 
     <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+      
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -231,7 +233,7 @@
                 <th style="padding: 16px; cursor: pointer;" onclick="sortTable(3, true)">Total Amount <i class="fas fa-sort"></i></th>
                 <th style="padding: 16px; cursor: pointer;" onclick="sortTable(4, true)">Commission <i class="fas fa-sort"></i></th>
                 <th style="padding: 16px; cursor: pointer;" onclick="sortTable(5, true)">Store Amount <i class="fas fa-sort"></i></th>
-                <th style="padding: 16px 32px;">Status</th>
+                <th style="padding: 16px 32px; cursor: pointer;" onclick="sortTable(6)">Status <i class="fas fa-sort"></i></th>
               </tr>
             </thead>
             <tbody id="ordersTableBody">
@@ -313,12 +315,24 @@
         });
         const json = await res.json();
         if (json.success) {
-          alert('Commission rate updated successfully.');
+          showAlert('Commission rate updated successfully.', 'success');
         } else {
-          alert(json.message);
+          showAlert(json.message, 'error');
         }
       } catch(err) {
-        alert('Failed to update rate');
+        showAlert('Failed to update rate', 'error');
+      }
+    }
+
+    function showAlert(message, type = 'success') {
+      const alertBox = document.getElementById('alertBox');
+      if (alertBox) {
+        alertBox.textContent = message;
+        alertBox.className = `alert alert-${type}`;
+        alertBox.style.display = 'block';
+        setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
+      } else {
+        alert(message);
       }
     }
 
