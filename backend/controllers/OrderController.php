@@ -84,6 +84,10 @@ class OrderController {
 
         $this->conn->beginTransaction();
         try {
+            // Get commission rate
+            $stmtC = $this->conn->query("SELECT setting_value FROM settings WHERE setting_key = 'commission_rate'");
+            $commission_rate = (float)($stmtC->fetchColumn() ?: 10);
+
             $stmtCount = $this->conn->query("SELECT COUNT(*) FROM orders");
             $count = $stmtCount->fetchColumn();
             $orderNo = "ORD-" . time() . "-" . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
@@ -95,8 +99,9 @@ class OrderController {
             $notes = isset($input['notes']) ? $input['notes'] : null;
             $nhisDeduction = isset($input['nhisDeduction']) ? $input['nhisDeduction'] : 0;
             $amountDue = $totalAmount - $nhisDeduction;
+            $admin_commission = ($totalAmount * $commission_rate) / 100;
 
-            $stmt = $this->conn->prepare("INSERT INTO orders (order_no, paystack_reference, patient_id, agent_id, total_amount, nhis_deduction, amount_due, prescription, payment_method, delivery_address, notes) VALUES (:on, :pref, :pid, :aid, :total, :nhis, :due, :presc, :pm, :da, :notes)");
+            $stmt = $this->conn->prepare("INSERT INTO orders (order_no, paystack_reference, patient_id, agent_id, total_amount, nhis_deduction, amount_due, admin_commission, prescription, payment_method, delivery_address, notes) VALUES (:on, :pref, :pid, :aid, :total, :nhis, :due, :comm, :presc, :pm, :da, :notes)");
             $stmt->execute([
                 'on' => $orderNo,
                 'pref' => $paymentReference,
@@ -105,6 +110,7 @@ class OrderController {
                 'total' => $totalAmount,
                 'nhis' => $nhisDeduction,
                 'due' => $amountDue,
+                'comm' => $admin_commission,
                 'presc' => $prescription,
                 'pm' => $paymentMethod,
                 'da' => $deliveryAddress,
@@ -582,6 +588,10 @@ class OrderController {
 
             $emailsToSend = [];
 
+            // Get commission rate
+            $stmtC = $this->conn->query("SELECT setting_value FROM settings WHERE setting_key = 'commission_rate'");
+            $commission_rate = (float)($stmtC->fetchColumn() ?: 10);
+
             // Create order for each agent
             foreach ($ordersByAgent as $agent_id => $orderData) {
                 $stmtCount = $this->conn->query("SELECT COUNT(*) FROM orders");
@@ -591,8 +601,9 @@ class OrderController {
                 $paymentStatus = in_array($paymentMethod, ['card', 'momo']) ? 'paid' : 'unpaid';
 
                 $order_id = "ORD-ID-" . time() . "-" . bin2hex(random_bytes(4));
+                $admin_commission = ($orderData['totalAmount'] * $commission_rate) / 100;
                 
-                $stmt = $this->conn->prepare("INSERT INTO orders (id, order_no, patient_id, agent_id, total_amount, amount_due, payment_method, payment_status, delivery_address) VALUES (:id, :on, :pid, :aid, :total, :due, :pm, :ps, :da)");
+                $stmt = $this->conn->prepare("INSERT INTO orders (id, order_no, patient_id, agent_id, total_amount, amount_due, admin_commission, payment_method, payment_status, delivery_address) VALUES (:id, :on, :pid, :aid, :total, :due, :comm, :pm, :ps, :da)");
                 $stmt->execute([
                     'id' => $order_id,
                     'on' => $orderNo,
@@ -600,6 +611,7 @@ class OrderController {
                     'aid' => $agent_id,
                     'total' => $orderData['totalAmount'],
                     'due' => $orderData['totalAmount'], // No NHIS deduction simple case
+                    'comm' => $admin_commission,
                     'pm' => $paymentMethod,
                     'ps' => $paymentStatus,
                     'da' => $deliveryAddress
