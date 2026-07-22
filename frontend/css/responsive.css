@@ -1,182 +1,181 @@
-/* Mobile Menu Toggle Button */
-.mobile-menu-btn {
-  display: block;
-  background: transparent;
-  border: none;
-  color: var(--text, #4A5568);
-  font-size: 1.5rem;
-  cursor: pointer;
-  margin-right: 16px;
-  padding: 4px;
-}
-
-/* Close Sidebar Button */
-.close-sidebar-btn {
-  display: none;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  margin-left: auto;
-  padding: 4px;
-}
-
-/* Sidebar Overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 95; /* Just below sidebar which is usually 100 */
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-overlay.active {
-  display: block;
-  opacity: 1;
-}
-
-/* Base Responsive Fixes */
-html, body {
-  overflow-x: clip;
-}
-
-.main-content {
-  transition: margin-left 0.3s ease;
-}
-
-.sidebar {
-  transition: transform 0.3s ease;
-}
-
-/* Scrollable Tables on Mobile */
-.table-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-table {
-  min-width: 600px;
-}
-
-@media (max-width: 992px) {
-  .mobile-menu-btn {
-    display: block;
-  }
-  
-  .close-sidebar-btn {
-    display: block;
-  }
-  
-  .sidebar {
-    transform: translateX(-100%);
-    width: 260px; /* Force consistent width */
-  }
-  
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  
-  .main-content {
-    margin-left: 0 !important; /* Override inline or hardcoded margin-left */
-  }
-  
-  .top-header {
-    padding: 0 16px !important;
-  }
-  
-  .content-area {
-    padding: 16px !important;
-  }
-  
-  /* Make grid containers stack on mobile */
-  .stats-grid,
-  .quick-links,
-  .grid-2-col,
-  .dashboard-grid,
-  .order-details-grid {
-    grid-template-columns: 1fr !important;
-  }
-  
-  /* Flex containers that might need wrapping */
-  .header-actions {
-    gap: 8px;
-  }
-  
-  .user-profile span#userName {
-    display: none; /* Hide name on mobile, keep avatar */
-  }
-  
-  /* Chat Layout specific fixes */
-  .chat-container {
-    flex-direction: column !important;
-    height: calc(100vh - 120px) !important;
-  }
-  
-  .chat-sidebar {
-    width: 100% !important;
-    flex: 0 0 100% !important; 
-    min-height: 200px;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border);
-    overflow-y: auto !important;
-    display: flex !important;
-  }
-  
-  .chat-main {
-    width: 100% !important;
-    flex: 1 !important;
-    overflow-y: auto !important;
-    display: none !important;
-  }
-  
-  .chat-container.mobile-chat-active .chat-sidebar {
-    display: none !important;
-  }
-  
-  .chat-container.mobile-chat-active .chat-main {
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
-  .mobile-back-btn {
-    display: block !important;
-  }
-  
-  .chat-messages {
-    padding: 16px !important;
-  }
-  
-  .chat-input-area {
-    padding: 12px !important;
-  }
-  
-  .message-bubble {
-    max-width: 90% !important;
-  }
-}
-
-/* Desktop Collapsible Sidebar */
-@media (min-width: 993px) {
-  body.sidebar-collapsed {
-    --sidebar-width: 84px;
-  }
-  .sidebar {
-    width: var(--sidebar-width);
-    overflow: hidden;
-    white-space: nowrap;
-    transition: width 0.3s ease;
-  }
-  body.sidebar-collapsed .sidebar:hover {
-    width: 260px;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
-  }
+/* Mobile Menu Toggle Button */
+.mobile-menu-btn {
+  display: block;
+  background: transparent;
+  border: none;
+  color: var(--text, #4A5568);
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 16px;
+  padding: 4px;
 }
 
+/* Close Sidebar Button */
+.close-sidebar-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 4px;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 95; /* Just below sidebar which is usually 100 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Base Responsive Fixes */
+html, body {
+  overflow-x: clip;
+}
+
+.main-content {
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar {
+  transition: transform 0.3s ease;
+}
+
+/* Scrollable Tables on Mobile */
+.table-container, .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+table {
+  min-width: 600px;
+}
+
+@media (max-width: 992px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  .close-sidebar-btn {
+    display: block;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px; /* Force consistent width */
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0 !important; /* Override inline or hardcoded margin-left */
+  }
+  
+  .top-header {
+    padding: 0 16px !important;
+  }
+  
+  .content-area {
+    padding: 16px !important;
+  }
+  
+  /* Make grid containers stack on mobile */
+  .stats-grid,
+  .quick-links,
+  .grid-2-col,
+  .dashboard-grid,
+  .order-details-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Flex containers that might need wrapping */
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .user-profile span#userName {
+    display: none; /* Hide name on mobile, keep avatar */
+  }
+  
+  /* Chat Layout specific fixes */
+  .chat-container {
+    flex-direction: column !important;
+    height: calc(100vh - 120px) !important;
+  }
+  
+  .chat-sidebar {
+    width: 100% !important;
+    flex: 0 0 100% !important; 
+    min-height: 200px;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    overflow-y: auto !important;
+    display: flex !important;
+  }
+  
+  .chat-main {
+    width: 100% !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    display: none !important;
+  }
+  
+  .chat-container.mobile-chat-active .chat-sidebar {
+    display: none !important;
+  }
+  
+  .chat-container.mobile-chat-active .chat-main {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .mobile-back-btn {
+    display: block !important;
+  }
+  
+  .chat-messages {
+    padding: 16px !important;
+  }
+  
+  .chat-input-area {
+    padding: 12px !important;
+  }
+  
+  .message-bubble {
+    max-width: 90% !important;
+  }
+}
+
+/* Desktop Collapsible Sidebar */
+@media (min-width: 993px) {
+  body.sidebar-collapsed {
+    --sidebar-width: 84px;
+  }
+  .sidebar {
+    width: var(--sidebar-width);
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width 0.3s ease;
+  }
+  body.sidebar-collapsed .sidebar:hover {
+    width: 260px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+  }
+}
 /* Prevent squishing in header */
 .header-actions {
   display: flex;
@@ -185,20 +184,16 @@ table {
   flex-shrink: 0;
   white-space: nowrap;
 }
-
 .notification-icon {
   flex-shrink: 0;
 }
-
 .user-profile {
   white-space: nowrap;
   flex-shrink: 0;
 }
-
 .user-avatar {
   flex-shrink: 0;
 }
-
 
 /* ==========================================================================
    Global Cart Styles
@@ -230,11 +225,9 @@ table {
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 16px; padding: 32px; transform: translateY(20px); transition: 0.3s; margin: 16px; }
 .modal-overlay.active .modal { transform: translateY(0); }
-
 /* ==========================================================================
    Comprehensive Responsiveness
    ========================================================================== */
-
 /* EXTRA LARGE SCREENS (TVs & Ultra-wide Monitors) */
 @media (min-width: 1920px) {
   .top-header, .content-area {
@@ -247,7 +240,6 @@ table {
   html {
     font-size: 18px; /* Scale up base typography slightly for distant viewing */
   }
-
   .sidebar {
     width: 300px; /* Slightly wider sidebar */
   }
@@ -258,7 +250,6 @@ table {
     width: 300px;
   }
 }
-
 /* LARGE SCREENS (Standard Desktops) */
 @media (max-width: 1440px) {
   .content-area {
@@ -268,7 +259,6 @@ table {
     gap: 20px;
   }
 }
-
 /* MEDIUM SCREENS (Small Laptops / Landscape Tablets) */
 @media (max-width: 1024px) {
   .stats-grid {
@@ -278,7 +268,6 @@ table {
     grid-template-columns: 1fr !important;
   }
 }
-
 /* SMALL SCREENS (Phones / Portrait Tablets) */
 @media (max-width: 768px) {
   .stats-grid {
@@ -295,7 +284,6 @@ table {
     width: 100%;
   }
 }
-
 /* EXTRA SMALL SCREENS (Small Phones) */
 @media (max-width: 480px) {
   .top-header {
@@ -318,4 +306,13 @@ table {
   .form-control, .btn {
     font-size: 1rem; /* Prevent iOS zoom */
   }
+}
+
+/* Fix flexbox horizontal stretch */
+.main-content, .content-area, .card {
+  min-width: 0;
+  max-width: 100vw;
+}
+.table-responsive {
+  width: 100%;
 }
