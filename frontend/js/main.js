@@ -578,7 +578,7 @@ window.renderCart = function() {
   badge.textContent = totalItems;
 
   if (cart.length === 0) {
-    itemsContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted, #6B7D8C); margin-top: 20px;">Your cart is empty</div>`;
+    itemsContainer.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-shopping-basket" style="font-size: 2rem; color: var(--gray-200); margin-bottom: 12px; display: block;"></i>Your cart is empty</div>`;
     totalEl.textContent = 'GHS 0.00';
     return;
   }

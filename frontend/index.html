@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PharmaTrust &mdash; Your Trusted Pharmacy Network</title>
-  <link rel="stylesheet" href="css/style.css?v=2.2"/>
+  <link rel="stylesheet" href="css/style.css?v=2.3"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -302,7 +302,7 @@
         </select>
       </div>
       <div class="medicines-grid" id="medicinesGrid">
-        <!-- Medicines will be dynamically loaded here by main.js -->
+        <!-- Medicines will be dynamically loaded here by main.js?v=1.1 -->
         <p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">Loading medicines...</p>
       </div>
     </div>
@@ -434,7 +434,7 @@
       <div class="agents-slider-container" style="position: relative; width: 100%;">
         <button class="slider-btn prev-btn" id="agentsPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
         <div class="agents-grid" id="agentsGrid">
-          <!-- Agents will be dynamically loaded here by main.js -->
+          <!-- Agents will be dynamically loaded here by main.js?v=1.1 -->
           <p style="grid-column: 1 / -1; text-align: center; color: #6B7D8C; padding: 40px 0;">Loading agents...</p>
         </div>
         <button class="slider-btn next-btn" id="agentsNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
@@ -689,7 +689,10 @@
     </div>
     <div class="cart-items" id="cartItems">
       <!-- Cart items -->
-      <div style="text-align: center; color: var(--text-muted, #6B7D8C); margin-top: 20px;">Your cart is empty</div>
+        <div class="empty-cart-msg">
+          <i class="fas fa-shopping-basket" style="font-size: 2rem; color: var(--gray-200); margin-bottom: 12px; display: block;"></i>
+          Your cart is empty
+        </div>
     </div>
     <div class="cart-footer">
       <div class="cart-total">
@@ -903,7 +906,7 @@
     }
   </style>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v=1.1"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const userStr = localStorage.getItem('user');
