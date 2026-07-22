@@ -690,8 +690,14 @@ p { font-size: clamp(0.9rem, 1vw, 1rem); line-height: 1.7; color: var(--gray-500
   .testimonials-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; gap: 40px; }
   .form-row { grid-template-columns: 1fr; }
-  .process-track { flex-direction: column; align-items: center; }
-  .process-arrow { transform: rotate(90deg); padding: 0; }
+  .process-track { 
+      display: grid !important; 
+      grid-template-columns: repeat(2, 1fr) !important; 
+      gap: 30px 15px; 
+      align-items: start; 
+    }
+    .process-step { padding: 10px 5px; max-width: 100%; }
+    .process-arrow { display: none !important; }
   .footer-grid { grid-template-columns: 1fr; }
   .trust-logos { gap: 16px; }
   .card-1 { left: 0; }
