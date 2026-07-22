@@ -1,6 +1,6 @@
 <?php
 require_once 'config/Database.php';
-require_once 'utils/Jwt.php';
+require_once 'config/Jwt.php';
 
 class InvoiceController {
     private $conn;
@@ -53,12 +53,13 @@ class InvoiceController {
         // Find all cash orders for this month that are marked as paid (i.e. delivered/collected)
         // Group them by agent_id
         $stmt = $this->conn->prepare("
-            SELECT agent_id, COUNT(*) as total_orders, SUM(admin_commission) as total_owed
-            FROM orders
-            WHERE payment_method = 'cash' 
-              AND payment_status = 'paid'
-              AND DATE_FORMAT(created_at, '%Y-%m') = :month
-            GROUP BY agent_id
+            SELECT o.agent_id, COUNT(*) as total_orders, SUM(o.admin_commission) as total_owed
+            FROM orders o
+            JOIN agents a ON o.agent_id = a.id
+            WHERE o.payment_method = 'cash' 
+              AND o.payment_status = 'paid'
+              AND DATE_FORMAT(o.created_at, '%Y-%m') = :month
+            GROUP BY o.agent_id
             HAVING total_owed > 0
         ");
         $stmt->execute(['month' => $month]);
