@@ -366,8 +366,20 @@ class AdminController {
 
     private function getCommissions() {
         try {
+            $filter = $_GET['filter'] ?? 'all';
+            $dateCondition = "";
+            if ($filter === 'daily') {
+                $dateCondition = " AND DATE(created_at) = CURRENT_DATE() ";
+            } elseif ($filter === 'weekly') {
+                $dateCondition = " AND YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE(), 1) ";
+            } elseif ($filter === 'monthly') {
+                $dateCondition = " AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE()) ";
+            } elseif ($filter === 'yearly') {
+                $dateCondition = " AND YEAR(created_at) = YEAR(CURRENT_DATE()) ";
+            }
+
             // Get totals
-            $stmt = $this->conn->query("SELECT SUM(admin_commission) as total FROM orders WHERE payment_status = 'paid'");
+            $stmt = $this->conn->query("SELECT SUM(admin_commission) as total FROM orders WHERE payment_status = 'paid' $dateCondition");
             $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
             $stmt = $this->conn->query("SELECT SUM(admin_commission) as month_total FROM orders WHERE payment_status = 'paid' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
@@ -377,7 +389,7 @@ class AdminController {
             $stmt = $this->conn->query("
                 SELECT DATE_FORMAT(created_at, '%b %Y') as month, SUM(admin_commission) as total 
                 FROM orders 
-                WHERE payment_status = 'paid' AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                WHERE payment_status = 'paid' AND created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH) $dateCondition
                 GROUP BY YEAR(created_at), MONTH(created_at)
                 ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
             ");
@@ -388,7 +400,7 @@ class AdminController {
                 SELECT a.pharmacy_name as name, SUM(o.admin_commission) as total 
                 FROM orders o
                 JOIN agents a ON o.agent_id = a.id
-                WHERE o.payment_status = 'paid'
+                WHERE o.payment_status = 'paid' $dateCondition
                 GROUP BY a.id
                 ORDER BY total DESC
                 LIMIT 5
@@ -400,6 +412,7 @@ class AdminController {
                 SELECT o.order_no as order_no, DATE_FORMAT(o.created_at, '%Y-%m-%d %H:%i') as date, a.pharmacy_name as store_name, o.total_amount, o.admin_commission as commission, (o.total_amount - o.admin_commission) as store_amount, o.payment_status as status
                 FROM orders o
                 JOIN agents a ON o.agent_id = a.id
+                WHERE o.payment_status = 'paid' $dateCondition
                 ORDER BY o.created_at DESC
                 LIMIT 50
             ");

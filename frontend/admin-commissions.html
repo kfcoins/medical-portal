@@ -153,7 +153,13 @@
     <header class="top-header">
       <div class="header-title">Commissions Dashboard</div>
       <div class="header-actions" style="display: flex; align-items: center;">
-
+        <select id="timeFilter" onchange="updateFilterLabel(); loadStats()" style="margin-right: 16px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--text); outline: none; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+          <option value="all">All Time</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
         <a href="#" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
           <i class="fas fa-bell"></i>
           <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
@@ -172,7 +178,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-top-accent green"></div>
-          <div class="stat-label">Total Commission</div>
+          <div class="stat-label" id="totalCommissionLabel">Total Commission</div>
           <div class="stat-value-container">
             <div class="stat-value" id="totalCommission">GH₵ 0.00</div>
           </div>
@@ -277,10 +283,17 @@
     let pharmacyChartInstance = null;
     let currentOrders = [];
 
+    function updateFilterLabel() {
+      const filter = document.getElementById('timeFilter').value;
+      const labelMap = { 'all': 'Total Commission', 'daily': 'Daily Commission', 'weekly': 'Weekly Commission', 'monthly': 'Monthly Commission', 'yearly': 'Yearly Commission' };
+      document.getElementById('totalCommissionLabel').textContent = labelMap[filter] || 'Total Commission';
+    }
+
     async function loadStats() {
       try {
+        const filter = document.getElementById('timeFilter') ? document.getElementById('timeFilter').value : 'all';
         const [commRes, setRes] = await Promise.all([
-          fetch('../backend/index.php?route=admin/commissions', { headers: { 'Authorization': 'Bearer ' + token } }),
+          fetch('../backend/index.php?route=admin/commissions&filter=' + filter, { headers: { 'Authorization': 'Bearer ' + token } }),
           fetch('../backend/index.php?route=admin/settings', { headers: { 'Authorization': 'Bearer ' + token } })
         ]);
         
