@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order History &mdash; PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; position: relative; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 24px; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 24px; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+
+    /* Orders Card */
+    .card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border); margin-bottom: 24px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-title { font-family: 'Sora', sans-serif; font-size: 1.15rem; font-weight: 600; }
+    
+    /* Table */
+    .table-responsive { overflow-x: auto; }
+    .table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    .table th, .table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .table th { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .table td { font-size: 0.95rem; vertical-align: middle; }
+    .table tr:last-child td { border-bottom: none; }
+    .table tbody tr { transition: 0.2s; }
+    .table tbody tr:hover { background: #f8fafc; }
+
+    /* Badges */
+    .badge { padding: 6px 12px; border-radius: 24px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+    .badge-pending { background: #FEF3C7; color: #D97706; }
+    .badge-confirmed { background: #E0E7FF; color: #4F46E5; }
+    .badge-dispensed { background: #DBEAFE; color: #2563EB; }
+    .badge-delivered { background: #D1FAE5; color: #059669; }
+    .badge-cancelled { background: #FEE2E2; color: #DC2626; }
+    
+    .btn-view { padding: 6px 12px; background: #F0F4F8; color: var(--text); border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-view:hover { background: #E2E8F0; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: 0.2s; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal { background: var(--surface); width: 100%; max-width: 600px; border-radius: 16px; padding: 32px; transform: translateY(20px); transition: 0.3s; max-height: 90vh; overflow-y: auto; }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
+    
+    .order-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .detail-item { font-size: 0.95rem; }
+    .detail-label { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 4px; font-weight: 500; }
+    .detail-value { color: var(--text); font-weight: 400; line-height: 1.5; }
+    
+    .items-list { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+    .items-list table { width: 100%; border-collapse: collapse; }
+    .items-list th, .items-list td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .items-list th { background: #F8FAFC; font-size: 0.85rem; color: var(--text-muted); }
+    .items-list tr:last-child td { border-bottom: none; }
+    
+    .modal-footer { display: flex; justify-content: flex-end; }
+    .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="index.html#medicines" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
+      <a href="patient-orders.html" class="nav-link active"><i class="fas fa-history"></i> Order History</a>
+      <a href="patient-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="patient-profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">Order History</div>
+      <div class="header-actions">
+
+        <button class="notification-icon cart-btn-global" onclick="toggleCart()" title="Cart" style="border:none; cursor:pointer; position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 8px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="cartBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #10B981; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </button>
+
+        <a href="patient-messages.html" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </a>
+      <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Patient Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">My Orders</div>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Pharmacy</th>
+                <th>Items</th>
+                <th>Total (GHS)</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">Loading orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-container" style="display: flex; justify-content: flex-end; align-items: center; padding: 16px 24px; gap: 12px; border-top: 1px solid var(--border);">
+          <button id="prevPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+          <span id="pageInfo" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Page 1 of 1</span>
+          <button id="nextPageBtn" class="btn btn-outline" style="padding: 6px 12px; border-radius: 6px;" disabled>Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Order Details</div>
+        <button class="btn-close" onclick="closeOrderModal()">&times;</button>
+      </div>
+      <div id="modalContent">
+        Loading...
+      </div>
+      <div class="modal-footer" style="margin-top: 24px;">
+        <button class="btn-primary" onclick="closeOrderModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    let allOrders = [];
+    
+    let currentPage = 1;
+    const itemsPerPage = 15;
+    let currentFilteredData = [];
+
+    if (!token || !user || user.role !== 'patient') {
+      window.location.href = 'login.html';
+    } else {
+      const name = user.first_name + ' ' + user.last_name;
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+      
+      fetchOrders();
+    }
+
+    async function fetchOrders() {
+      try {
+        const response = await fetch('../backend/index.php?route=orders/my', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await response.json();
+        const tbody = document.getElementById('ordersTableBody');
+        
+        if (data.success) {
+          allOrders = data.orders;
+          renderOrders(allOrders);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Failed to load orders.</td></tr>';
+          updatePaginationControls(1);
+        }
+      } catch (error) {
+        document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Network error occurred.</td></tr>';
+      }
+    }
+
+    function renderOrders(data) {
+      currentFilteredData = data;
+      const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = data.slice(startIndex, endIndex);
+
+      const tbody = document.getElementById('ordersTableBody');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">No orders found.</td></tr>';
+        updatePaginationControls(totalPages);
+        return;
+      }
+      
+      tbody.innerHTML = pageData.map(order => `
+        <tr>
+          <td><strong>${order.order_no}</strong></td>
+          <td>${new Date(order.created_at).toLocaleDateString()}</td>
+          <td>${order.agent?.pharmacyName || 'PharmaTrust'}</td>
+          <td>${order.items.length} item(s)</td>
+          <td>${parseFloat(order.total_amount).toFixed(2)}</td>
+          <td><span class="badge badge-${order.status.toLowerCase()}">${capitalize(order.status)}</span></td>
+          <td><button class="btn-view" onclick="viewOrder('${order.id}')">View Details</button></td>
+        </tr>
+      `).join('');
+      
+      updatePaginationControls(totalPages);
+    }
+
+    function updatePaginationControls(totalPages) {
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      if (prevBtn) prevBtn.disabled = currentPage === 1;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+      if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderOrders(currentFilteredData);
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderOrders(currentFilteredData);
+      }
+    });
+
+    function viewOrder(id) {
+      const order = allOrders.find(o => o.id === id);
+      if (!order) return;
+      
+      const content = document.getElementById('modalContent');
+      content.innerHTML = `
+        <div class="order-details-grid">
+          <div class="detail-item">
+            <div class="detail-label">Order Number</div>
+            <div class="detail-value">${order.order_no}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Date</div>
+            <div class="detail-value">${new Date(order.created_at).toLocaleString()}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Status</div>
+            <div class="detail-value"><span class="badge badge-${order.status.toLowerCase()}">${capitalize(order.status)}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Payment Method</div>
+            <div class="detail-value">${capitalize(order.payment_method)} (${capitalize(order.payment_status)})</div>
+          </div>
+          <div class="detail-item" style="grid-column: 1 / -1; background: #F8FAFC; padding: 16px; border-radius: 8px;">
+            <div class="detail-label">Delivery Details</div>
+            <div class="detail-value">
+              ${(order.delivery_address || 'Not specified')
+                .replace(/📞 Phone:/g, 'Phone:')
+                .replace(/📧 Email:/g, 'Email:')
+                .replace(/📍 Delivery Location:/g, 'Location:')
+                .replace(/\n/g, '<br>')}
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-label" style="margin-bottom: 12px; font-size: 1rem; font-weight: 600; color: var(--text);">Items</div>
+        <div class="items-list">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items.map(i => `
+                <tr>
+                  <td>${i.medicine.name}</td>
+                  <td>${i.quantity}</td>
+                  <td>GHS ${parseFloat(i.unitPrice).toFixed(2)}</td>
+                  <td>GHS ${(parseFloat(i.unitPrice) * parseInt(i.quantity)).toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; padding: 16px 12px; background: #F8FAFC; border-radius: 8px;">
+          <span>Total Amount</span>
+          <span style="color: var(--primary);">GHS ${parseFloat(order.total_amount).toFixed(2)}</span>
+        </div>
+      `;
+      
+      document.getElementById('orderModal').classList.add('active');
+    }
+
+    function closeOrderModal() {
+      document.getElementById('orderModal').classList.remove('active');
+    }
+
+    function capitalize(str) {
+      if(!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
+  <script src="js/cart.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile &mdash; PharmaTrust Ghana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1A6349;
+      --primary-light: #2D9A6A;
+      --bg: #F4F7FA;
+      --surface: #FFFFFF;
+      --text: #0F1923;
+      --text-muted: #6B7D8C;
+      --border: #E8EDF2;
+      --sidebar-width: 260px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: #FFFFFF; color: #4A5568; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s; border-right: 1px solid var(--border); }
+    .sidebar-header { padding: 32px 24px; display: flex; align-items: center; gap: 12px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.4rem; background: #4A47A3; color: white; letter-spacing: 1px; }
+    .sidebar-header i { font-size: 1.6rem; color: white; }
+    .nav-links { padding: 24px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+    .nav-link { display: flex; align-items: center; gap: 16px; padding: 14px 20px; color: #4A5568; text-decoration: none; border-radius: 24px; font-weight: 500; font-size: 0.95rem; transition: 0.2s; position: relative; }
+    .nav-link:hover { background: #F7FAFC; color: #1A202C; }
+    .nav-link.active { background: #F0EDF7; color: #4A47A3; font-weight: 600; }
+    .nav-link i { width: 24px; text-align: center; font-size: 1.15rem; }
+    .sidebar-footer { padding: 24px 16px; border-top: 1px solid var(--border); background: white; }
+    .logout-btn { display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding: 14px 20px; color: #4A5568; background: transparent; text-decoration: none; border-radius: 24px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; border: none; width: 100%; text-align: left; font-size: 0.95rem; font-family: inherit; box-shadow: none; position: relative; }
+    .logout-btn:hover { background: #FFF5F5; color: #E53E3E; }
+    .logout-btn i { width: 24px; text-align: center; font-size: 1.15rem; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; height: 100vh; position: relative; overflow: hidden; }
+    .top-header { background: var(--surface); height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; flex-shrink: 0; }
+    .header-title { font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 600; }
+    .user-profile { display: flex; align-items: center; gap: 12px; font-weight: 500; padding-left: 24px; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Sora', sans-serif; }
+
+    .content-area { padding: 40px; max-width: 100%; margin: 0 auto; width: 100%; height: calc(100vh - 72px); overflow: hidden; display: flex; flex-direction: column; }
+
+    .settings-layout { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: start; height: 100%; overflow: hidden; }
+    @media (min-width: 992px) { .settings-layout { grid-template-columns: 1fr 1fr; } }
+    .settings-column { display: flex; flex-direction: column; gap: 32px; height: 100%; overflow-y: auto; padding-right: 12px; }
+    
+    .settings-column::-webkit-scrollbar { width: 6px; }
+    .settings-column::-webkit-scrollbar-track { background: transparent; }
+    .settings-column::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .settings-column::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Cards */
+    .card { background: var(--surface); border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); flex-shrink: 0; }
+    .card-title { font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px; color: #1e293b; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .form-group { margin-bottom: 24px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; color: #475569; }
+    .form-control { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.95rem; background: #fff; transition: 0.2s; outline: none; }
+    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 99, 73, 0.1); }
+    .form-control:disabled { background: #f8fafc; cursor: not-allowed; color: #64748b; }
+
+    .btn-save { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+    .btn-save:hover { background: var(--primary-light); }
+    .btn-save:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; display: none; }
+    .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/responsive.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-shield-virus"></i> PharmaTrust
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="index.html#medicines" class="nav-link"><i class="fas fa-store-alt"></i> Pharmacy Store</a>
+      <a href="patient-orders.html" class="nav-link"><i class="fas fa-history"></i> Order History</a>
+      <a href="patient-messages.html" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
+      <a href="patient-profile.html" class="nav-link active"><i class="fas fa-user-circle"></i> Profile</a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="header-title">My Profile</div>
+      <div class="header-actions">
+
+        <button class="notification-icon cart-btn-global" onclick="toggleCart()" title="Cart" style="border:none; cursor:pointer; position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 8px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="cartBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #10B981; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </button>
+
+        <a href="patient-messages.html" class="notification-icon" title="Notifications" style="position: relative; color: #6B7D8C; font-size: 1.25rem; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #F4F7FA; transition: 0.2s; margin-right: 16px;" onmouseover="this.style.background='#E8EDF2'; this.style.color='var(--primary)';" onmouseout="this.style.background='#F4F7FA'; this.style.color='#6B7D8C';">
+          <i class="fas fa-bell"></i>
+          <span id="notifBadge" style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 4px; background-color: #E53E3E; color: white; border-radius: 10px; font-size: 0.65rem; font-weight: bold; display: none; align-items: center; justify-content: center; border: 2px solid #FFFFFF;">0</span>
+        </a>
+      <div class="user-profile">
+          <div class="user-avatar" id="userInitial">P</div>
+          <span id="userName">Patient Name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div id="alertBox" class="alert"></div>
+
+      <div class="settings-layout">
+        
+        <!-- Left Column -->
+        <div class="settings-column">
+          <!-- Personal Information -->
+          <div class="card">
+            <h3 class="card-title">Personal Information</h3>
+            <form id="profileForm" onsubmit="updateProfile(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="firstName" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="lastName" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" class="form-control" id="email" disabled>
+                  <small style="color: var(--text-muted); margin-top: 4px; display: block;">Email cannot be changed.</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" id="phone" required>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn-save" id="saveProfileBtn">Save Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Security Settings -->
+          <div class="card">
+            <h3 class="card-title">Security Settings</h3>
+            <form id="passwordForm" onsubmit="changePassword(event)">
+              <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <div style="position: relative;">
+                  <input type="password" class="form-control" id="currentPassword" style="padding-right: 40px;" required>
+                  <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <div style="position: relative;">
+                    <input type="password" class="form-control" id="newPassword" style="padding-right: 40px;" required minlength="6">
+                    <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Confirm New Password</label>
+                  <div style="position: relative;">
+                    <input type="password" class="form-control" id="confirmPassword" style="padding-right: 40px;" required minlength="6">
+                    <i class="fas fa-eye toggle-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;"></i>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn-save" id="savePasswordBtn">Change Password</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="settings-column">
+          <!-- NHIS Card Information -->
+          <div class="card">
+            <h3 class="card-title">
+              NHIS Card Details
+              <span id="nhisStatusBadge" class="badge" style="margin-left: 12px; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;">None</span>
+            </h3>
+            <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 24px;">
+              Provide your National Health Insurance Scheme card details to enjoy coverage across pharmacies. Once approved, it can be applied to orders.
+            </p>
+            <form id="nhisForm" onsubmit="updateNhisCard(event)">
+              <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-group">
+                  <label class="form-label">NHIS Number</label>
+                  <input type="text" class="form-control" id="nhisNumber" placeholder="e.g. 12345678">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Upload NHIS Card (Front)</label>
+                  <input type="file" class="form-control" id="nhisCardFront" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
+                  <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of the front of your card.</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Upload NHIS Card (Back)</label>
+                  <input type="file" class="form-control" id="nhisCardBack" accept="image/jpeg, image/png, image/jpg" style="padding: 9px 16px;">
+                  <small style="color: var(--text-muted); margin-top: 4px; display: block;">Upload a clear picture of the back of your card.</small>
+                </div>
+              </div>
+              <div id="nhisCardPreview" style="margin-top: 12px; display: none;">
+                <p style="font-size: 0.85rem; font-weight: 500; margin-bottom: 8px;">Current Card Uploaded:</p>
+                <div style="display: flex; gap: 16px; flex-direction: row; flex-wrap: wrap;">
+                  <img id="nhisCardFrontImg" src="" alt="NHIS Card Front" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
+                  <img id="nhisCardBackImg" src="" alt="NHIS Card Back" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border); display: none; width: fit-content;">
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn-save" id="saveNhisBtn">Submit Details</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    let user = JSON.parse(localStorage.getItem('user'));
+
+    if (!token || !user || user.role !== 'patient') {
+      window.location.href = 'login.html';
+    } else {
+      updateUIWithUser();
+      fetchLatestUserData();
+    }
+
+    async function fetchLatestUserData() {
+      try {
+        const res = await fetch('../backend/index.php?route=auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const data = await res.json();
+        if (data.success) {
+          user = data.user;
+          localStorage.setItem('user', JSON.stringify(user));
+          updateUIWithUser();
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest user data:', err);
+      }
+    }
+
+    function updateUIWithUser() {
+      const name = user.first_name + ' ' + user.last_name;
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userInitial').textContent = name.charAt(0);
+
+      document.getElementById('firstName').value = user.first_name || '';
+      document.getElementById('lastName').value = user.last_name || '';
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('phone').value = user.phone || '';
+
+      // NHIS Fields
+      if (user.nhis_number) {
+        document.getElementById('nhisNumber').value = user.nhis_number;
+      }
+      
+      const nhisBadge = document.getElementById('nhisStatusBadge');
+      
+      const nhisSaveBtn = document.getElementById('saveNhisBtn');
+      const nhisNumInput = document.getElementById('nhisNumber');
+      const nhisFrontInput = document.getElementById('nhisCardFront');
+      const nhisBackInput = document.getElementById('nhisCardBack');
+      
+      const disableNhisForm = (user.nhis_status === 'approved');
+      
+      if (nhisSaveBtn) {
+        nhisSaveBtn.disabled = disableNhisForm;
+        nhisSaveBtn.textContent = disableNhisForm ? 'Approved (Locked)' : 'Submit Details';
+        nhisSaveBtn.style.opacity = disableNhisForm ? '0.5' : '1';
+        nhisSaveBtn.style.cursor = disableNhisForm ? 'not-allowed' : 'pointer';
+      }
+      if (nhisNumInput) nhisNumInput.disabled = disableNhisForm;
+      if (nhisFrontInput) nhisFrontInput.disabled = disableNhisForm;
+      if (nhisBackInput) nhisBackInput.disabled = disableNhisForm;
+
+      if (user.nhis_status === 'approved') {
+        nhisBadge.textContent = 'APPROVED';
+        nhisBadge.style.backgroundColor = '#C6F6D5';
+        nhisBadge.style.color = '#22543D';
+      } else if (user.nhis_status === 'pending') {
+        nhisBadge.textContent = 'PENDING VERIFICATION';
+        nhisBadge.style.backgroundColor = '#FEEBC8';
+        nhisBadge.style.color = '#7B341E';
+      } else if (user.nhis_status === 'declined') {
+        nhisBadge.textContent = 'DECLINED';
+        nhisBadge.style.backgroundColor = '#FED7D7';
+        nhisBadge.style.color = '#822727';
+      } else {
+        nhisBadge.textContent = 'NOT PROVIDED';
+        nhisBadge.style.backgroundColor = '#E2E8F0';
+        nhisBadge.style.color = '#4A5568';
+      }
+
+      if (user.nhis_card_front_url || user.nhis_card_back_url) {
+        document.getElementById('nhisCardPreview').style.display = 'block';
+        if (user.nhis_card_front_url) {
+          document.getElementById('nhisCardFrontImg').src = user.nhis_card_front_url.startsWith('/') ? user.nhis_card_front_url : `../${user.nhis_card_front_url}`;
+          document.getElementById('nhisCardFrontImg').style.display = 'block';
+        }
+        if (user.nhis_card_back_url) {
+          document.getElementById('nhisCardBackImg').src = user.nhis_card_back_url.startsWith('/') ? user.nhis_card_back_url : `../${user.nhis_card_back_url}`;
+          document.getElementById('nhisCardBackImg').style.display = 'block';
+        }
+      }
+    }
+
+    function showAlert(message, type = 'success') {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.textContent = message;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.style.display = 'block';
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 5000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function updateProfile(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveProfileBtn');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      const payload = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        phone: document.getElementById('phone').value
+      };
+
+      try {
+        const res = await fetch('../backend/index.php?route=patient/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          user = data.user;
+          localStorage.setItem('user', JSON.stringify(user));
+          updateUIWithUser();
+          showAlert('Profile information updated successfully!', 'success');
+        } else {
+          showAlert(data.message || 'Failed to update profile.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to update profile.', 'error');
+      } finally {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+      }
+    }
+
+    async function updateNhisCard(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveNhisBtn');
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('nhis_number', document.getElementById('nhisNumber').value);
+      
+      const frontFile = document.getElementById('nhisCardFront');
+      if (frontFile.files.length > 0) {
+        formData.append('nhis_card_front_image', frontFile.files[0]);
+      }
+      
+      const backFile = document.getElementById('nhisCardBack');
+      if (backFile.files.length > 0) {
+        formData.append('nhis_card_back_image', backFile.files[0]);
+      }
+
+      try {
+        const response = await fetch('../backend/index.php?route=patient/profile', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showAlert('NHIS details submitted successfully. Awaiting verification.');
+          
+          // Refresh user data
+          const userResponse = await fetch('../backend/index.php?route=auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const userData = await userResponse.json();
+          if (userData.success) {
+            localStorage.setItem('user', JSON.stringify(userData.user));
+            user = userData.user;
+            updateUIWithUser();
+          }
+          
+          document.getElementById('nhisCardFront').value = ''; 
+          document.getElementById('nhisCardBack').value = ''; 
+        } else {
+          showAlert(data.message || 'Update failed', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to update NHIS details.', 'error');
+      } finally {
+        btn.textContent = 'Submit Details';
+        btn.disabled = false;
+      }
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('savePasswordBtn');
+      btn.textContent = 'Changing...';
+      btn.disabled = true;
+
+      const payload = {
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      };
+
+      try {
+        const res = await fetch('../backend/index.php?route=patient/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('Password changed successfully!', 'success');
+          document.getElementById('passwordForm').reset();
+        } else {
+          showAlert(data.message || 'Failed to change password.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred.', 'error');
+      } finally {
+        btn.textContent = 'Change Password';
+        btn.disabled = false;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+
+    // Password Toggle Logic
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('toggle-password')) {
+        const input = e.target.parentElement.querySelector('input');
+        if (input) {
+          if (input.type === 'password') {
+            input.type = 'text';
+            e.target.classList.remove('fa-eye');
+            e.target.classList.add('fa-eye-slash');
+          } else {
+            input.type = 'password';
+            e.target.classList.remove('fa-eye-slash');
+            e.target.classList.add('fa-eye');
+          }
+        }
+      }
+    });
+  </script>
+  <script src="js/cart.js"></script>
+</body>
+</html>
+
+
